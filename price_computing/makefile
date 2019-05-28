@@ -1,6 +1,6 @@
 LIBS=
 FLAGS=-std=c++11 -Wno-deprecated-gpu-targets
-TARGS=../unit_test_2019_05_28/InputGPUData/Input_gpu_data.o ../unit_test_2019_05_28/InputMarketData/Input_market_data.o ../unit_test_2019_05_28/InputMCData/Input_MC_data.o ../unit_test_2019_05_28/InputOptionData/Input_option_data.o ../unit_test_2019_05_28/OutputMCData/Output_MC_data.o ../unit_test_2019_05_28/Path/Path.o ../unit_test_2019_05_28/PathPerThread/Path_per_thread.o ../RNG/rng.o main.o
+TARGS=../libraries/InputGPUData/Input_gpu_data.o ../libraries/InputMarketData/Input_market_data.o ../libraries/InputMCData/Input_MC_data.o ../libraries/InputOptionData/Input_option_data.o ../libraries/OutputMCData/Output_MC_data.o ../libraries/Path/Path.o ../libraries/PathPerThread/Path_per_thread.o ../random_generator/rng.o main.o
 NVCC=nvcc
 
 ECHO=/bin/echo
@@ -14,14 +14,14 @@ obj: %.o
 	$(NVCC) $(FLAGS) $(LIBS) -dc $< -o $@
 
 clean:
-	cd ../unit_test_2019_05_28/InputGPUData && rm -f *.x *.o
-	cd ../unit_test_2019_05_28/InputMarketData && rm -f *.x *.o
-	cd ../unit_test_2019_05_28/InputMCData && rm -f *.x *.o
-	cd ../unit_test_2019_05_28/InputOptionData && rm -f *.x *.o
-	cd ../unit_test_2019_05_28/OutputMCData && rm -f *.x *.o
-	cd ../unit_test_2019_05_28/Path && rm -f *.x *.o
-	cd ../unit_test_2019_05_28/PathPerThread && rm -f *.x *.o
-	cd ../RNG && rm -f *.x *.o
+	cd ../libraries/InputGPUData && rm -f *.x *.o
+	cd ../libraries/InputMarketData && rm -f *.x *.o
+	cd ../libraries/InputMCData && rm -f *.x *.o
+	cd ../libraries/InputOptionData && rm -f *.x *.o
+	cd ../libraries/OutputMCData && rm -f *.x *.o
+	cd ../libraries/Path && rm -f *.x *.o
+	cd ../libraries/PathPerThread && rm -f *.x *.o
+	cd ../random_generator && rm -f *.x *.o
 	rm -f *.x *.o
 	echo "Done cleaning."
 #esegui:
