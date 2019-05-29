@@ -71,13 +71,13 @@ int main(){
 	//Methods testing
 	cout << "Methods testing" << endl;
 	Input_market_data other_market(200., 3., 0.6);
-	Input_option_data other_option(190., 100, 300., 'p');	// DeltaTime = 3.	
-	
+	Input_option_data other_option(190., 100, 300., 'p');	// DeltaTime = 3.
+
 	path1.SetGaussianRandomVariable(0.3);
 	path1.SetSpotPrice(240.2);
 	path1.SetInputMarketData(other_market);
 	path1.SetInputOptionData(other_option);
-	
+
 	cout << (bool)(path1.GetGaussianRandomVariable()==static_cast<float>(0.3))
 	<< "\t" << (bool)(path1.GetSpotPrice()==static_cast<float>(240.2))
 	<< "\t" << (bool)(path1.GetInputMarketData().GetZeroPrice()==static_cast<float>(200.))
@@ -88,7 +88,25 @@ int main(){
 	<< "\t" << (bool)(path1.GetInputOptionData().GetTimeToMaturity()==static_cast<float>(300.))
 	<< "\t" << (bool)(path1.GetInputOptionData().GetDeltaTime()==static_cast<float>(3.))
 	<< "\t" << (bool)(path1.GetInputOptionData().GetOptionType()==static_cast<char>('p')) << endl;
-	
+
+	cout << "Eulero Testing" << endl;
+	//Variables for testing Eulero formulae
+	//Option
+	float SpotPriceEulero = 1.;
+	float StrikePriceEulero = 100.;
+	unsigned int NumberOfIntervalsEulero = 1;
+	float TimeToMaturityEulero = 1.;
+	//Market
+	float ZeroPriceEulero = 100.;
+	float VolatilityEulero = 0.25;
+	float RiskFreeRateEulero = 0.1;
+	Input_market_data marketEulero(ZeroPriceEulero, VolatilityEulero, RiskFreeRateEulero);
+	Input_option_data optionEulero(StrikePriceEulero, NumberOfIntervalsEulero, TimeToMaturityEulero, 'p');
+
+	Path pathEulero(marketEulero, optionEulero, SpotPriceEulero);
+	pathEulero.EuleroStep();
+	cout << (bool)(pathEulero.GetSpotPrice()==static_cast<float>(1.1)) << endl;
+
 	return 0;
 
 }
