@@ -5,8 +5,8 @@ using namespace std;
 //Default Constructor
 __device__ __host__ Input_option_data::Input_option_data(){
 	this->SetStrikePrice(110.);
-	this->SetNumberOfIntervals(365);
 	this->SetTimeToMaturity(365.);
+	this->SetNumberOfIntervals(365);
 	this->SetDeltaTime();
 	this->SetOptionType('c');
 }
