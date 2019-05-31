@@ -35,3 +35,4 @@ esegui:
 	cd libraries/PathPerThread && make obj
 	cd random_generator && make obj
 	make
+	./main.x
