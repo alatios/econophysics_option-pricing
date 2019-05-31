@@ -9,14 +9,14 @@
 #include <cstdio>
 #include <vector>
 
-#include "../unit_test_2019_05_28/InputGPUData/Input_gpu_data.cuh"
-#include "../unit_test_2019_05_28/InputMarketData/Input_market_data.cuh"
-#include "../unit_test_2019_05_28/InputMCData/Input_MC_data.cuh"
-#include "../unit_test_2019_05_28/InputOptionData/Input_option_data.cuh"
-#include "../unit_test_2019_05_28/OutputMCData/Output_MC_data.cuh"
-#include "../unit_test_2019_05_28/Path/Path.cuh"
-#include "../unit_test_2019_05_28/PathPerThread/Path_per_thread.cuh"
-#include "../RNG/rng.cuh"
+#include "../libraries/InputGPUData/Input_gpu_data.cuh"
+#include "../libraries/InputMarketData/Input_market_data.cuh"
+#include "../libraries/InputMCData/Input_MC_data.cuh"
+#include "../libraries/InputOptionData/Input_option_data.cuh"
+#include "../libraries/OutputMCData/Output_MC_data.cuh"
+#include "../libraries/Path/Path.cuh"
+#include "../libraries/PathPerThread/Path_per_thread.cuh"
+#include "../random_generator/rng.cuh"
 
 using namespace std;
 
