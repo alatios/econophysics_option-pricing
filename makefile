@@ -14,16 +14,16 @@ obj: %.o
 	$(NVCC) $(FLAGS) $(LIBS) -dc $< -o $@
 
 clean:
-	@cd libraries/InputGPUData && (rm -f *.x *.o || echo "Failed to clean libraries/InputGPUData.")
-	@cd libraries/InputMarketData && rm -f *.x *.o
-	@cd libraries/InputMCData && rm -f *.x *.o
-	@cd libraries/InputOptionData && rm -f *.x *.o
-	@cd libraries/OutputMCData && rm -f *.x *.o
-	@cd libraries/Path && rm -f *.x *.o
-	@cd libraries/PathPerThread && rm -f *.x *.o
-	@cd random_generator && rm -f *.x *.o
-	@rm -f *.x *.o
-	@echo "Done cleaning."
+	@cd libraries/InputGPUData && (rm -f *.x *.o || $(ECHO) "Failed to clean libraries/InputGPUData.")
+	@cd libraries/InputMarketData && (rm -f *.x *.o || $(ECHO) "Failed to clean libraries/InputMarketData.")
+	@cd libraries/InputMCData && (rm -f *.x *.o || $(ECHO) "Failed to clean libraries/InputMCData.")
+	@cd libraries/InputOptionData && (rm -f *.x *.o || $(ECHO) "Failed to clean libraries/InputOptionData.")
+	@cd libraries/OutputMCData && (rm -f *.x *.o || $(ECHO) "Failed to clean libraries/OutputMCData.")
+	@cd libraries/Path && (rm -f *.x *.o || $(ECHO) "Failed to clean libraries/Path.")
+	@cd libraries/PathPerThread && (rm -f *.x *.o || $(ECHO) "Failed to clean libraries/PathPerThread.")
+	@cd random_generator && (rm -f *.x *.o || $(ECHO) "Failed to clean random_generator.")
+	@rm -f *.x *.o || $(ECHO) "Failed to clean root directory."
+	@$(ECHO) "Done cleaning."
 
 run:
 	make
