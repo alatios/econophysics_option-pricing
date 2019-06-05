@@ -23,8 +23,9 @@ using namespace std;
 int main(){
 	
 	// Input GPU data
-	unsigned int numberOfBlocks = 14;
-	unsigned int numberOfThreadsPerBlock = 1024;
+	unsigned int numberOfBlocks = 20;
+	unsigned int numberOfThreadsPerBlock = 512;
+	unsigned int numberOfSimulationsPerThread = 50;
 	unsigned int totalNumberOfThreads = numberOfBlocks * numberOfThreadsPerBlock;
 	
 	Input_gpu_data inputGPU(numberOfBlocks, numberOfThreadsPerBlock);
@@ -43,22 +44,20 @@ int main(){
 	Input_option_data inputOption(strikePrice, numberOfIntervals, timeToMaturity);
 	
 	// Input Monte Carlo data
-	unsigned int numberOfSimulationsPerThread = 5;
 	Input_MC_data inputMC(numberOfSimulationsPerThread, inputGPU);
 	
 	// Output Monte Carlo data (default, will be set in global function)
 	Output_MC_data outputMC;
 	
 	// Path per thread
-	Path_per_thread *pathsPerThread = new Path_per_thread[totalNumberOfThreads];
+	Path_per_thread **pathsPerThread = new Path_per_thread*[totalNumberOfThreads];
 	for(unsigned int i=0; i<totalNumberOfThreads; ++i){
-//		pathsPerThread[i].SetNumberOfPathsPerThread(numberOfSimulationsPerThread);
-
+		pathsPerThread[i] = new Path_per_thread(numberOfSimulationsPerThread);
 		
 
-		pathsPerThread[i].SetInputMarketData(inputMarket);
-		pathsPerThread[i].SetInputOptionData(inputOption);
-		pathsPerThread[i].SetSpotSprice(zeroPrice);
+//		pathsPerThread[i].SetInputMarketData(inputMarket);
+//		pathsPerThread[i].SetInputOptionData(inputOption);
+//		pathsPerThread[i].SetSpotSprice(zeroPrice);
 	}
 	
 	// Mersenne random generator of unsigned ints, courtesy of C++11
@@ -75,6 +74,11 @@ int main(){
 	}
 	
 	
+	for(unsigned int=0; i<totalNumberOfThreads; ++i)
+		delete pathsPerThread[i];
+	
+	delete[] pathsPerThread;
+	delete[] randomGenerators;
 	
 	return 0;
 }
