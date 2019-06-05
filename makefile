@@ -14,25 +14,17 @@ obj: %.o
 	$(NVCC) $(FLAGS) $(LIBS) -dc $< -o $@
 
 clean:
-	cd libraries/InputGPUData && rm -f *.x *.o
-	cd libraries/InputMarketData && rm -f *.x *.o
-	cd libraries/InputMCData && rm -f *.x *.o
-	cd libraries/InputOptionData && rm -f *.x *.o
-	cd libraries/OutputMCData && rm -f *.x *.o
-	cd libraries/Path && rm -f *.x *.o
-	cd libraries/PathPerThread && rm -f *.x *.o
-	cd random_generator && rm -f *.x *.o
-	rm -f *.x *.o
-	echo "Done cleaning."
+	@cd libraries/InputGPUData && (rm -f *.x *.o || echo "Failed to clean libraries/InputGPUData.")
+	@cd libraries/InputMarketData && rm -f *.x *.o
+	@cd libraries/InputMCData && rm -f *.x *.o
+	@cd libraries/InputOptionData && rm -f *.x *.o
+	@cd libraries/OutputMCData && rm -f *.x *.o
+	@cd libraries/Path && rm -f *.x *.o
+	@cd libraries/PathPerThread && rm -f *.x *.o
+	@cd random_generator && rm -f *.x *.o
+	@rm -f *.x *.o
+	@echo "Done cleaning."
 
-esegui:
-	cd libraries/InputGPUData && make obj
-	cd libraries/InputMarketData && make obj
-	cd libraries/InputMCData && make obj
-	cd libraries/InputOptionData && make obj
-	cd libraries/OutputMCData && make obj
-	cd libraries/Path && make obj
-	cd libraries/PathPerThread && make obj
-	cd random_generator && make obj
+run:
 	make
 	./main.x

@@ -38,10 +38,10 @@ int main(){
 	
 	// Input option data
 	float strikePrice = 110.;				// $
-	float timeToMaturity = 365.				// days
+	float timeToMaturity = 365.;				// days
 	unsigned int numberOfIntervals = 365;	// No unit of measure
 	char optionType = 'c';					// Call option
-	Input_option_data inputOption(strikePrice, numberOfIntervals, timeToMaturity);
+	Input_option_data inputOption(strikePrice, numberOfIntervals, timeToMaturity, optionType);
 	
 	// Input Monte Carlo data
 	Input_MC_data inputMC(numberOfSimulationsPerThread, inputGPU);
@@ -74,7 +74,7 @@ int main(){
 	}
 	
 	
-	for(unsigned int=0; i<totalNumberOfThreads; ++i)
+	for(unsigned int i=0; i<totalNumberOfThreads; ++i)
 		delete pathsPerThread[i];
 	
 	delete[] pathsPerThread;
