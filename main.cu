@@ -20,6 +20,12 @@
 
 using namespace std;
 
+// ARGS: thread no., PPT and RNG arrays (one element per thread)
+__host__ __device__ void OptionPricingEvaluator_HostDev(unsigned int, Path_per_thread**, RNGCombinedGenerator*);
+
+// ARGS: number of blocks, number of threads per block, PPT and RNG arrays (one element per thread)
+__host__ __device__ void OptionPricingEvaluator_Host(unsigned int, unsigned int, Path_per_thread**, RNGCombinedGenerator*);
+
 int main(){
 	
 	// Input GPU data
@@ -51,13 +57,14 @@ int main(){
 	
 	// Path per thread
 	Path_per_thread **pathsPerThread = new Path_per_thread*[totalNumberOfThreads];
-	for(unsigned int i=0; i<totalNumberOfThreads; ++i){
-		pathsPerThread[i] = new Path_per_thread(numberOfSimulationsPerThread);
+	for(unsigned int threadNumber=0; threadNumber<totalNumberOfThreads; ++threadNumber){
+		pathsPerThread[threadNumber] = new Path_per_thread(numberOfSimulationsPerThread);
 		
-
-//		pathsPerThread[i].SetInputMarketData(inputMarket);
-//		pathsPerThread[i].SetInputOptionData(inputOption);
-//		pathsPerThread[i].SetSpotSprice(zeroPrice);
+		for(unsigned int simulationNumber=0; simulationNumber<numberOfSimulationsPerThread; ++simulationNumber){
+			pathsPerThread[threadNumber][simulationNumber].SetInputMarketData(inputMarket);
+			pathsPerThread[threadNumber][simulationNumber].SetInputOptionData(inputOption);
+			pathsPerThread[threadNumber][simulationNumber].SetSpotPrice(zeroPrice);
+		}
 	}
 	
 	// Mersenne random generator of unsigned ints, courtesy of C++11
@@ -73,12 +80,31 @@ int main(){
 		randomGenerators[i].SetSeedTaus3(mersenneDistribution(mersenneCoreGenerator));
 	}
 	
+	// Simulating device function
+	OptionPricingEvaluator_Host(numberOfBlocks, numberOfThreadsPerBlock, pathsPerThread, randomGenerators);
 	
-	for(unsigned int i=0; i<totalNumberOfThreads; ++i)
-		delete pathsPerThread[i];
+	
+	// Trash bin section, where segfaults come to die
+	for(unsigned int threadNumber=0; threadNumber<totalNumberOfThreads; ++threadNumber)
+		delete pathsPerThread[threadNumber];
 	
 	delete[] pathsPerThread;
 	delete[] randomGenerators;
 	
 	return 0;
+}
+
+/////////////////////
+//////FUNCTIONS//////
+/////////////////////
+
+__host__ __device__ void OptionPricingEvaluator_HostDev(unsigned int threadNumber, Path_per_thread** pathsPerThread, RNGCombinedGenerator* randomGenerators){
+	
+}
+
+__host__ __device__ void OptionPricingEvaluator_Host(unsigned int numberOfBlocks, unsigned int numberOfThreadsPerBlock, Path_per_thread** pathsPerThread, RNGCombinedGenerator* randomGenerators){
+	unsigned int totalNumberOfThreads = numberOfBlocks * numberOfThreadsPerBlock;
+	
+	for(unsigned int threadNumber=0; threadNumber<totalNumberOfThreads; ++threadNumber)
+		OptionPricingEvaluator_HostDev(threadNumber, pathsPerThread, randomGenerators);
 }
