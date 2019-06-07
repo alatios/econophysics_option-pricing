@@ -7,7 +7,6 @@
 #include <algorithm>	// min
 #include <fstream>
 #include <cstdio>
-#include <vector>
 
 #include "libraries/InputGPUData/Input_gpu_data.cuh"
 #include "libraries/InputMarketData/Input_market_data.cuh"
@@ -20,12 +19,12 @@
 
 using namespace std;
 
-// ARGS: thread no., PPT and RNG arrays (one element per thread)
-//__host__ __device__ void OptionPricingEvaluator_HostDev(unsigned int, Path_per_thread**, RNGCombinedGenerator*);
-__host__ void OptionPricingEvaluator_HostDev(unsigned int, Path_per_thread**, RNGCombinedGenerator*);
+// ARGS: thread no., InputMC object, Path and RNG arrays (one element per thread)
+//__host__ __device__ void OptionPricingEvaluator_HostDev(unsigned int, Input_MC_data, Path**, RNGCombinedGenerator*);
+__host__ void OptionPricingEvaluator_HostDev(unsigned int, Input_MC_data, Path**, RNGCombinedGenerator*);
 
-// ARGS: number of blocks, number of threads per block, PPT and RNG arrays (one element per thread)
-__host__ void OptionPricingEvaluator_Host(unsigned int, unsigned int, Path_per_thread**, RNGCombinedGenerator*);
+// ARGS: number of blocks, number of threads per block, InputMC object, Path and RNG arrays (one element per thread)
+__host__ void OptionPricingEvaluator_Host(unsigned int, unsigned int, Input_MC_data, Path**, RNGCombinedGenerator*);
 
 
 int main(){
@@ -39,14 +38,14 @@ int main(){
 	Input_gpu_data inputGPU(numberOfBlocks, numberOfThreadsPerBlock);
 	
 	// Input market data
-	float zeroPrice = 100.;		// $
-	float volatility = 0.25;	// No unit of measure
-	float riskFreeRate = 0.1;	// 10%
+	float zeroPrice = 100.;				// USD
+	float volatility = 0.25;			// Percentage
+	float riskFreeRate = 0.5;			// 50% per year (percentage per unit of time)
 	Input_market_data inputMarket(zeroPrice, volatility, riskFreeRate);
 	
 	// Input option data
 	float strikePrice = 110.;				// $
-	float timeToMaturity = 365.;			// days
+	float timeToMaturity = 1.;				// years
 	unsigned int numberOfIntervals = 365;	// No unit of measure
 	char optionType = 'c';					// Call option
 	Input_option_data inputOption(strikePrice, numberOfIntervals, timeToMaturity, optionType);
@@ -59,7 +58,8 @@ int main(){
 	
 	// Path per thread
 	Path pathTemplate(inputMarket, inputOption, zeroPrice);
-	
+
+/*	
 	Path_per_thread **pathsPerThread = new Path_per_thread*[totalNumberOfThreads];
 	for(unsigned int threadNumber=0; threadNumber<totalNumberOfThreads; ++threadNumber){
 		pathsPerThread[threadNumber] = new Path_per_thread(numberOfSimulationsPerThread);
@@ -67,6 +67,12 @@ int main(){
 		for(unsigned int simulationNumber=0; simulationNumber<numberOfSimulationsPerThread; ++simulationNumber)
 			pathsPerThread[threadNumber]->SetPathComponent(simulationNumber, pathTemplate);
 	}
+*/
+
+	Path **paths = new Path*[totalNumberOfThreads];
+	for(unsigned int threadNumber=0; threadNumber<totalNumberOfThreads; ++threadNumber)
+		paths[threadNumber] = new Path(inputMarket, inputOption, zeroPrice);
+
 	
 	// Mersenne random generator of unsigned ints, courtesy of C++11
 	// For reproducibility, replace time(NULL) with a fixed seed
@@ -82,15 +88,15 @@ int main(){
 	}
 	
 	// Simulating device function
-	cout << "thread\t path\t interval" << endl;
-	OptionPricingEvaluator_Host(numberOfBlocks, numberOfThreadsPerBlock, pathsPerThread, randomGenerators);
+	cout << "thread\t path\t interval\t spotprice" << endl;
+	OptionPricingEvaluator_Host(numberOfBlocks, numberOfThreadsPerBlock, inputMC, paths, randomGenerators);
 	
 	
 	// Trash bin section, where segfaults come to die
 	for(unsigned int threadNumber=0; threadNumber<totalNumberOfThreads; ++threadNumber)
-		delete pathsPerThread[threadNumber];
+		delete paths[threadNumber];
 	
-	delete[] pathsPerThread;
+	delete[] paths;
 	delete[] randomGenerators;
 	
 	return 0;
@@ -103,20 +109,34 @@ int main(){
 ///////////////////////////
 
 //__host__ __device__ void OptionPricingEvaluator_HostDev(unsigned int threadNumber, Path_per_thread** pathsPerThread, RNGCombinedGenerator* randomGenerators){
-__host__ void OptionPricingEvaluator_HostDev(unsigned int threadNumber, Path_per_thread** pathsPerThread, RNGCombinedGenerator* randomGenerators){
-	unsigned int numberOfPathsPerThread = pathsPerThread[threadNumber]->GetNumberOfPathsPerThread();
-	unsigned int numberOfIntervalsPerPath = 365;
+__host__ void OptionPricingEvaluator_HostDev(unsigned int threadNumber, Input_MC_data inputMC, Path** paths, RNGCombinedGenerator* randomGenerators){
+	unsigned int numberOfPathsPerThread = inputMC.GetNumberOfMCSimulationsPerThread();
+	unsigned int numberOfIntervalsPerPath = (paths[threadNumber]->GetInputOptionData()).GetNumberOfIntervals();
 	
-	for(unsigned int pathNumber=0; pathNumber<numberOfPathsPerThread; ++pathNumber){
+	// Dummy variable to reduce memory access
+	Path currentPath;
+	
+	// Cycling on paths
+	for(unsigned int pathNumber=0; pathNumber<3; ++pathNumber){
+//	for(unsigned int pathNumber=0; pathNumber<numberOfPathsPerThread; ++pathNumber){
+		currentPath.SetInputMarketData(paths[threadNumber]->GetInputMarketData());
+		currentPath.SetInputOptionData(paths[threadNumber]->GetInputOptionData());
+		currentPath.SetSpotPrice(paths[threadNumber]->GetSpotPrice());
+		
+		cout << threadNumber << "\t" << pathNumber << "\t" << 0 << "\t" << currentPath.GetSpotPrice() << endl;
+	
+		// Cycling on steps in each path
 		for(unsigned int stepNumber=0; stepNumber<numberOfIntervalsPerPath; ++stepNumber){
-			cout << threadNumber << "\t" << pathNumber << "\t" << stepNumber << endl;
+			currentPath.SetGaussianRandomVariable(randomGenerators[threadNumber].GetGauss());
+			currentPath.EuleroStep();
+			cout << threadNumber << "\t" << pathNumber << "\t" << stepNumber+1 << "\t" << currentPath.GetSpotPrice() << endl;
 		}
 	}
 }
 
-__host__ void OptionPricingEvaluator_Host(unsigned int numberOfBlocks, unsigned int numberOfThreadsPerBlock, Path_per_thread** pathsPerThread, RNGCombinedGenerator* randomGenerators){
+__host__ void OptionPricingEvaluator_Host(unsigned int numberOfBlocks, unsigned int numberOfThreadsPerBlock, Input_MC_data inputMC, Path** paths, RNGCombinedGenerator* randomGenerators){
 	unsigned int totalNumberOfThreads = numberOfBlocks * numberOfThreadsPerBlock;
 	
 	for(unsigned int threadNumber=0; threadNumber<totalNumberOfThreads; ++threadNumber)
-		OptionPricingEvaluator_HostDev(threadNumber, pathsPerThread, randomGenerators);
+		OptionPricingEvaluator_HostDev(threadNumber, inputMC, paths, randomGenerators);
 }
