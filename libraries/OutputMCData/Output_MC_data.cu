@@ -44,8 +44,7 @@ __device__ __host__ float Output_MC_data::GetErrorMC() const{
 }
 
 __device__ __host__ void Output_MC_data::SetErrorBlackScholes(){
-	_ErrorBlackScholes = fabsf(this->GetEstimatedPriceMC() - this->GetBlackScholesPrice())
-		/ this->GetErrorMC();
+	_ErrorBlackScholes = fabsf(this->GetEstimatedPriceMC() - this->GetBlackScholesPrice()) / this->GetErrorMC();
 }
 
 __device__ __host__ float Output_MC_data::GetErrorBlackScholes(){

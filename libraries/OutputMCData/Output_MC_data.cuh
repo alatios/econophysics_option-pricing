@@ -17,9 +17,9 @@ private:
 
 	float _EstimatedPriceMC;
 	float _ErrorMC;
+	float _BlackScholesPrice;
 	float _ErrorBlackScholes;				//error with respect to the exact result
 	float _Tick;							//calculation time [ms]
-	float _BlackScholesPrice;
 	
 	__device__ __host__ void BlackScholesCallOption();
 	__device__ __host__ void BlackScholesPutOption();
