@@ -21,11 +21,14 @@
 using namespace std;
 
 // ARGS: thread no., InputMC object, Path and RNG arrays (one element per thread)
-//__host__ __device__ void OptionPricingEvaluator_HostDev(unsigned int, Input_MC_data, Path**, RNGCombinedGenerator*);
-__host__ void OptionPricingEvaluator_HostDev(unsigned int, Input_MC_data, Path**, RNGCombinedGenerator*, Output_MC_per_thread*);
+__host__ __device__ void OptionPricingEvaluator_HostDev(unsigned int, Input_MC_data, Path**, RNGCombinedGenerator*, Output_MC_per_thread*);
+//__host__ void OptionPricingEvaluator_HostDev(unsigned int, Input_MC_data, Path**, RNGCombinedGenerator*, Output_MC_per_thread*);
 
 // ARGS: number of blocks, number of threads per block, InputMC object, Path and RNG arrays (one element per thread)
 __host__ void OptionPricingEvaluator_Host(unsigned int, unsigned int, Input_MC_data, Path**, RNGCombinedGenerator*, Output_MC_per_thread*);
+
+// ARGS: final underlying spot price, option strike price, option type ('c' for call or 'p' for put, as of now)
+__host__ __device__ float EvaluatePayoff(float spotPrice, float strikePrice, char optionType);
 
 
 int main(){
@@ -45,7 +48,7 @@ int main(){
 	Input_market_data inputMarket(zeroPrice, volatility, riskFreeRate);
 	
 	// Input option data
-	float strikePrice = 110.;				// $
+	float strikePrice = 140.;				// $
 	float timeToMaturity = 1.;				// years
 	unsigned int numberOfIntervals = 365;	// No unit of measure
 	char optionType = 'c';					// Call option
@@ -89,7 +92,7 @@ int main(){
 	Output_MC_per_thread *threadOutputs = new Output_MC_per_thread[totalNumberOfThreads];
 	
 	// Simulating device function
-//	cout << "thread\t path\t spotprice" << endl;
+//	cout << "thread\t path\t payoff" << endl;
 	OptionPricingEvaluator_Host(numberOfBlocks, numberOfThreadsPerBlock, inputMC, paths, randomGenerators, threadOutputs);
 	
 	// Sum all payoffs from threads, then average them
@@ -106,7 +109,7 @@ int main(){
 	cout << "MC estimated price [USD] = " << monteCarloEstimatedPrice << endl;
 	cout << "MC error [USD] = " << monteCarloError << endl;
 	cout << "Elapsed time [ms] = " << elapsedTime << endl;
-	cout << "Black-Scholes estimated price = " << outputMC.GetBlackScholesPrice() << endl;	// Indagare sul perché sia 0
+	cout << "Black-Scholes estimated price = " << outputMC.GetBlackScholesPrice() << endl;	// Questo non funziona al momento
 	cout << "Black-Scholes discrepancy [MCSigmas] = " << outputMC.GetErrorBlackScholes() << endl;
 	
 	
@@ -121,19 +124,29 @@ int main(){
 	return 0;
 }
 
-///////////////////////////
-///////////////////////////
-//////   FUNCTIONS   //////
-///////////////////////////
-///////////////////////////
+//////////////////////////////////////////
+//////////////////////////////////////////
+//////   FUNCTIONS IMPLEMENTATION   //////
+//////////////////////////////////////////
+//////////////////////////////////////////
 
-//__host__ __device__ void OptionPricingEvaluator_HostDev(unsigned int threadNumber, Path_per_thread** pathsPerThread, RNGCombinedGenerator* randomGenerators, Output_MC_per_thread* threadOutputs){
-__host__ void OptionPricingEvaluator_HostDev(unsigned int threadNumber, Input_MC_data inputMC, Path** paths, RNGCombinedGenerator* randomGenerators, Output_MC_per_thread* threadOutputs){
+__host__ __device__ float EvaluatePayoff(float spotPrice, float strikePrice, char optionType){
+	if(optionType == 'c')
+		return fmaxf(spotPrice - strikePrice, 0.);
+	else if(optionType == 'p')
+		return fmaxf(strikePrice - spotPrice, 0.);
+	else
+		return -10000.;
+}
+
+__host__ __device__ void OptionPricingEvaluator_HostDev(unsigned int threadNumber, Input_MC_data inputMC, Path** paths, RNGCombinedGenerator* randomGenerators, Output_MC_per_thread* threadOutputs){
+//__host__ void OptionPricingEvaluator_HostDev(unsigned int threadNumber, Input_MC_data inputMC, Path** paths, RNGCombinedGenerator* randomGenerators, Output_MC_per_thread* threadOutputs){
 	unsigned int numberOfPathsPerThread = inputMC.GetNumberOfMCSimulationsPerThread();
 	unsigned int numberOfIntervalsPerPath = (paths[threadNumber]->GetInputOptionData()).GetNumberOfIntervals();
 	
-	// Dummy variable to reduce memory access
+	// Dummy variables to reduce memory accesses
 	Path currentPath;
+	float payoff;
 	
 	// Cycling on paths
 //	for(unsigned int pathNumber=0; pathNumber<3; ++pathNumber){
@@ -148,8 +161,9 @@ __host__ void OptionPricingEvaluator_HostDev(unsigned int threadNumber, Input_MC
 			currentPath.EuleroStep();
 		}
 		
-//		cout << threadNumber << "\t" << pathNumber << "\t" << currentPath.GetSpotPrice() << endl;
-		threadOutputs[threadNumber].AddToAll(currentPath.GetSpotPrice());
+		payoff = EvaluatePayoff(currentPath.GetSpotPrice(), currentPath.GetInputOptionData().GetStrikePrice(), currentPath.GetInputOptionData().GetOptionType());
+//		cout << threadNumber << "\t" << pathNumber << "\t" << payoff << endl;
+		threadOutputs[threadNumber].AddToAll(payoff);
 	}
 }
 
