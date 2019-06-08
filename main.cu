@@ -15,6 +15,7 @@
 #include "libraries/OutputMCData/Output_MC_data.cuh"
 #include "libraries/Path/Path.cuh"
 #include "libraries/PathPerThread/Path_per_thread.cuh"
+#include "libraries/OutputMCPerThread/Output_MC_per_thread.cuh"
 #include "random_generator/rng.cuh"
 
 using namespace std;
