@@ -34,21 +34,22 @@ __host__ __device__ float EvaluatePayoff(float spotPrice, float strikePrice, cha
 int main(){
 	
 	// Input GPU data
-	unsigned int numberOfBlocks = 2;
+	unsigned int numberOfBlocks = 10;
 	unsigned int numberOfThreadsPerBlock = 512;
 	unsigned int numberOfSimulationsPerThread = 50;
 	unsigned int totalNumberOfThreads = numberOfBlocks * numberOfThreadsPerBlock;
+	unsigned int totalNumberOfSimulations = totalNumberOfThreads * numberOfSimulationsPerThread;
 	
 	Input_gpu_data inputGPU(numberOfBlocks, numberOfThreadsPerBlock);
 	
 	// Input market data
 	float zeroPrice = 100.;				// USD
 	float volatility = 0.25;			// Percentage
-	float riskFreeRate = 0.5;			// 50% per year (percentage per unit of time)
+	float riskFreeRate = 0.01;			// 50% per year (percentage per unit of time)
 	Input_market_data inputMarket(zeroPrice, volatility, riskFreeRate);
 	
 	// Input option data
-	float strikePrice = 140.;				// $
+	float strikePrice = 100.;				// $
 	float timeToMaturity = 1.;				// years
 	unsigned int numberOfIntervals = 365;	// No unit of measure
 	char optionType = 'c';					// Call option
@@ -97,12 +98,16 @@ int main(){
 	
 	// Sum all payoffs from threads, then average them
 	float totalSumOfPayoffs = 0;
-	for(unsigned int threadNumber=0; threadNumber<totalNumberOfThreads; ++threadNumber)
+	float totalSumOfSquaredPayoffs = 0;
+	for(unsigned int threadNumber=0; threadNumber<totalNumberOfThreads; ++threadNumber){
 		totalSumOfPayoffs += threadOutputs[threadNumber].GetPayoffSum();
+		totalSumOfSquaredPayoffs += threadOutputs[threadNumber].GetSquaredPayoffSum();
+	}
 		
-	float monteCarloEstimatedPrice = totalSumOfPayoffs / (totalNumberOfThreads * numberOfSimulationsPerThread);
-	float monteCarloError = sqrt(monteCarloEstimatedPrice);
-	float elapsedTime = 10000.;
+	float monteCarloEstimatedPrice = totalSumOfPayoffs / (totalNumberOfSimulations);
+	float monteCarloError = sqrt(((totalSumOfSquaredPayoffs/totalNumberOfSimulations) - pow(monteCarloEstimatedPrice,2))/totalNumberOfSimulations);
+	// Elapsed time is temporary, will be implemented later
+	float elapsedTime = 0.;
 	
 	// Global output MC
 	Output_MC_data outputMC(inputMarket, inputOption, monteCarloEstimatedPrice, monteCarloError, elapsedTime);
@@ -146,7 +151,7 @@ __host__ __device__ void OptionPricingEvaluator_HostDev(unsigned int threadNumbe
 	
 	// Dummy variables to reduce memory accesses
 	Path currentPath;
-	float payoff;
+	float payoff, actualizedPayoff;
 	
 	// Cycling on paths
 //	for(unsigned int pathNumber=0; pathNumber<3; ++pathNumber){
@@ -163,7 +168,11 @@ __host__ __device__ void OptionPricingEvaluator_HostDev(unsigned int threadNumbe
 		
 		payoff = EvaluatePayoff(currentPath.GetSpotPrice(), currentPath.GetInputOptionData().GetStrikePrice(), currentPath.GetInputOptionData().GetOptionType());
 //		cout << threadNumber << "\t" << pathNumber << "\t" << payoff << endl;
-		threadOutputs[threadNumber].AddToAll(payoff);
+
+		// Actualization of payoff
+		actualizedPayoff = payoff * expf(- currentPath.GetInputMarketData().GetRiskFreeRate() * currentPath.GetInputOptionData().GetTimeToMaturity());
+
+		threadOutputs[threadNumber].AddToAll(actualizedPayoff);
 	}
 }
 

@@ -69,6 +69,18 @@ __device__ __host__ void Path::EuleroStep(){			//It takes a step according to th
 	Input_market_data market = this->GetInputMarketData();
 	Input_option_data option = this->GetInputOptionData();
 	float SpotPrice_i;		//The price at the next step
-	SpotPrice_i = (this->GetSpotPrice()) * (1 + market.GetRiskFreeRate() * (option.GetDeltaTime()) + market.GetVolatility() * sqrt(option.GetDeltaTime()) * (this->GetGaussianRandomVariable()));
+	SpotPrice_i = (this->GetSpotPrice()) *
+	(1
+	+ market.GetRiskFreeRate() * (option.GetDeltaTime())
+	+ market.GetVolatility() * sqrt(option.GetDeltaTime()) * (this->GetGaussianRandomVariable()));
+
+// Geometric brownian motion, only for test purposes
+/*
+	SpotPrice_i = (this->GetSpotPrice()) * expf((market.GetRiskFreeRate() - 0.5 * pow(market.GetVolatility(),2)) * option.GetDeltaTime()
+	+ market.GetVolatility() * this->GetGaussianRandomVariable() * sqrt(option.GetDeltaTime()));
+*/
+
+
+
 	this->SetSpotPrice(SpotPrice_i);
 }

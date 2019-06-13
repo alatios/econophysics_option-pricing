@@ -40,5 +40,5 @@ clean:
 	@$(ECHO) "Done cleaning."
 
 run:
-	make
+	make --no-print-directory
 	./main.x

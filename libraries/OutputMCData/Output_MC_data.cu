@@ -78,8 +78,8 @@ __device__ __host__ void Output_MC_data::BlackScholesCallOption(){
 	Input_market_data market = GetInputMarketData();
 	Input_option_data option = GetInputOptionData();
 
-	float tmp1 = (1./ (market.GetVolatility() * sqrtf(option.GetDeltaTime()))) * logf(market.GetZeroPrice()/option.GetStrikePrice())
-	+ (market.GetRiskFreeRate()
+	float tmp1 = (1./ (market.GetVolatility() * sqrtf(option.GetTimeToMaturity()))) * (logf(market.GetZeroPrice()/option.GetStrikePrice())
+	+ market.GetRiskFreeRate()
 	+ (powf(market.GetVolatility(),2)/2.) * option.GetTimeToMaturity());
 	
 	float tmp2 = tmp1 - market.GetVolatility() * sqrtf(option.GetTimeToMaturity());
@@ -97,8 +97,8 @@ __device__ __host__ void Output_MC_data::BlackScholesPutOption(){
 	Input_market_data market = GetInputMarketData();
 	Input_option_data option = GetInputOptionData();
 
-	float tmp1 = (1./ (market.GetVolatility() * sqrtf(option.GetDeltaTime()))) * logf(market.GetZeroPrice()/option.GetStrikePrice())
-	+ (market.GetRiskFreeRate()
+	float tmp1 = (1./ (market.GetVolatility() * sqrtf(option.GetTimeToMaturity()))) * (logf(market.GetZeroPrice()/option.GetStrikePrice())
+	+ market.GetRiskFreeRate()
 	+ (powf(market.GetVolatility(),2)/2.) * option.GetTimeToMaturity());
 	
 	float tmp2 = tmp1 - market.GetVolatility() * sqrtf(option.GetTimeToMaturity());
