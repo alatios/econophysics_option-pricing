@@ -15,7 +15,7 @@ int main(){
 
 	bool test;
 
-	cout << endl << "-------------Input_MC_data_test-------------" << endl;
+	cout << endl << "-------------Output_MC_per_thread_test-------------" << endl;
 	cout << "Constructors testing" << endl;
 
 	Output_MC_per_thread out_per_thread;
