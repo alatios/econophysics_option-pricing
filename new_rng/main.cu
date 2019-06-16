@@ -12,8 +12,8 @@
 
 using namespace std;
 
-__host__ __device__ void GenerateRandomNumbers_HostDev(RandomNumberGenerator **generators, unsigned int *unsignedNumbers, double *uniformNumbers, double *gaussianNumbers, unsigned int totalNumbersToGenerate, int unsigned int numbersToGeneratePerThread, unsigned int threadNumber);
-__host__ void GenerateRandomNumbers_Host(RandomNumberGenerator **generators, unsigned int *unsignedNumbers, double *uniformNumbers, double *gaussianNumbers, unsigned int totalNumbersToGenerate, int unsigned int numbersToGeneratePerThread, unsigned int numberOfBlocks, unsigned int numberOfThreadsPerBlock);
+__host__ __device__ void GenerateRandomNumbers_HostDev(RandomNumberGenerator **generators, unsigned int *unsignedNumbers, double *uniformNumbers, double *gaussianNumbers, unsigned int totalNumbersToGenerate, unsigned int numbersToGeneratePerThread, unsigned int threadNumber);
+__host__ void GenerateRandomNumbers_Host(RandomNumberGenerator **generators, unsigned int *unsignedNumbers, double *uniformNumbers, double *gaussianNumbers, unsigned int totalNumbersToGenerate, unsigned int numbersToGeneratePerThread, unsigned int numberOfBlocks, unsigned int numberOfThreadsPerBlock);
 
 
 int main(){
@@ -73,7 +73,7 @@ int main(){
 	return 0;
 }
 
-__host__ __device__ void GenerateRandomNumbers_HostDev(RandomNumberGenerator **generators, unsigned int *unsignedNumbers, double *uniformNumbers, double *gaussianNumbers, unsigned int totalNumbersToGenerate, int unsigned int numbersToGeneratePerThread, unsigned int threadNumber){
+__host__ __device__ void GenerateRandomNumbers_HostDev(RandomNumberGenerator **generators, unsigned int *unsignedNumbers, double *uniformNumbers, double *gaussianNumbers, unsigned int totalNumbersToGenerate, unsigned int numbersToGeneratePerThread, unsigned int threadNumber){
 	
 	unsigned int temp_unsigned;
 	double temp_gaussian, temp_uniform;
@@ -91,7 +91,7 @@ __host__ __device__ void GenerateRandomNumbers_HostDev(RandomNumberGenerator **g
 	}
 }
 
-__host__ void GenerateRandomNumbers_Host(RandomNumberGenerator **generators, unsigned int *unsignedNumbers, double *uniformNumbers, double *gaussianNumbers, unsigned int totalNumbersToGenerate, int unsigned int numbersToGeneratePerThread, unsigned int numberOfBlocks, unsigned int numberOfThreadsPerBlock){
+__host__ void GenerateRandomNumbers_Host(RandomNumberGenerator **generators, unsigned int *unsignedNumbers, double *uniformNumbers, double *gaussianNumbers, unsigned int totalNumbersToGenerate, unsigned int numbersToGeneratePerThread, unsigned int numberOfBlocks, unsigned int numberOfThreadsPerBlock){
 	
 	for(unsigned int threadNumber=0; threadNumber<numberOfBlocks*numberOfThreadsPerBlock; ++threadNumber){
 		GenerateRandomNumbers_HostDev(generators, numbersToGeneratePerThread, uniformNumbers, gaussianNumbers, threadNumber, numberOfBlocks, numberOfThreadsPerBlock, totalNumbersToGenerate);
