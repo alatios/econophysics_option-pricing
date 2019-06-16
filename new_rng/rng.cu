@@ -111,7 +111,7 @@ __device__ __host__ double RandomNumberGenerator_Hybrid::GetGauss(){
 
 // Public seed manipulation methods
 __device__ __host__ void RandomNumberGenerator_Hybrid::ResetSeed(){
-	this->SetSeedLCGS(static_cast<unsigned int>(0)));
+	this->SetSeedLCGS(static_cast<unsigned int>(0));
 	this->SetSeedTaus1(static_cast<unsigned int>(129));
 	this->SetSeedTaus2(static_cast<unsigned int>(130));
 	this->SetSeedTaus3(static_cast<unsigned int>(131));
