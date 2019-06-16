@@ -17,5 +17,5 @@ obj: %.o
 clean:
 	rm -f *.x *.o
 
-esegui:
+run:
 	./clean.sh && make && ./UnitTest.x

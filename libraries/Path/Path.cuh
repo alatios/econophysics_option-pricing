@@ -14,28 +14,21 @@ class Path{
 
 private:
 
-	Input_market_data _MarketData;
-	Input_option_data _OptionData;
-	float _GaussianRandomVariable;					//Mean = 0; Variance = 1
-	float _SpotPrice;								//The step (spotprice) required to generate the next one
+	double _GaussianRandomVariable;					//Mean = 0; Variance = 1
+	double _SpotPrice;								//The step (spotprice) required to generate the next one
 
 public:
 
 	__device__ __host__ Path();
-	__device__ __host__ Path(const Input_market_data&, const Input_option_data&, float SpotPrice);
+	__device__ __host__ Path(double SpotPrice);
 	__device__ __host__ Path(const Path&);
 	__device__ __host__ ~Path() = default;
 
-	__device__ __host__ float GetGaussianRandomVariable() const;
-	__device__ __host__ void SetGaussianRandomVariable(float);
-	__device__ __host__ float GetSpotPrice() const;
-	__device__ __host__ void SetSpotPrice(float);
-	
-	__device__ __host__ void SetInputMarketData(const Input_market_data&);
-	__device__ __host__ Input_market_data GetInputMarketData() const;
-	__device__ __host__ void SetInputOptionData(const Input_option_data&);
-	__device__ __host__ Input_option_data GetInputOptionData() const;
+	__device__ __host__ double GetGaussianRandomVariable() const;
+	__device__ __host__ void SetGaussianRandomVariable(double);
+	__device__ __host__ double GetSpotPrice() const;
+	__device__ __host__ void SetSpotPrice(double);
 
-	__device__ __host__ void EuleroStep();
+	__device__ __host__ void EuleroStep(const Input_market_data& market, const Input_option_data& option);
 };
 #endif

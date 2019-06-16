@@ -1,16 +1,16 @@
 #!/bin/bash
 cd InputMarketData/ &&
-make esegui &&
+make run &&
 cd ../InputOptionData/ &&
-make esegui &&
+make run &&
 cd  ../InputMCData/ &&
-make esegui &&
+make run &&
 cd  ../InputGPUData/ &&
-make esegui &&
+make run &&
 cd  ../OutputMCData/ &&
-make esegui &&
+make run &&
 cd ../Path &&
-make esegui &&
-cd ../PathPerThread &&
-make esegui &&
+make run &&
+cd ../OutputMCPerThread &&
+make run &&
 cd ../..

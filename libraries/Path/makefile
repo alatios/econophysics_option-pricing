@@ -17,5 +17,5 @@ obj: %.o
 clean:
 	rm -f *.x *.o
 
-esegui:
+run:
 	cd ../InputMarketData  make obj && cd ../InputOptionData  make obj && cd ../Path && ./clean.sh && make && ./UnitTest.x

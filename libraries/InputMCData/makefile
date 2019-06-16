@@ -1,7 +1,7 @@
 LIBS=
 #-lcuda -lm -L/usr/local/cuda/lib/ -lcudart
 FLAGS=-std=c++11 -Wno-deprecated-gpu-targets
-TARGS=../InputGPUData/Input_gpu_data.o Input_MC_data.o UnitTest.o
+TARGS=Input_MC_data.o UnitTest.o
 NVCC=nvcc
 
 ECHO=/bin/echo
@@ -17,5 +17,5 @@ obj: %.o
 clean:
 	rm -f *.x *.o
 
-esegui:
+run:
 	./clean.sh && make && ./UnitTest.x
