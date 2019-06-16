@@ -40,13 +40,13 @@ class RandomNumberGenerator_Hybrid: public RandomNumberGenerator{
 		unsigned int m_seedTaus3;
 		
 		__device__ __host__ unsigned int GetSeedLCGS();
-		__device__ __host__ SetSeedLCGS(unsigned int seed);
+		__device__ __host__ void SetSeedLCGS(unsigned int seed);
 		__device__ __host__ unsigned int GetSeedTaus1();
-		__device__ __host__ SetSeedTaus1(unsigned int seed);
+		__device__ __host__ void SetSeedTaus1(unsigned int seed);
 		__device__ __host__ unsigned int GetSeedTaus2();
-		__device__ __host__ SetSeedTaus2(unsigned int seed);
+		__device__ __host__ void SetSeedTaus2(unsigned int seed);
 		__device__ __host__ unsigned int GetSeedTaus3();
-		__device__ __host__ SetSeedTaus3(unsigned int seed);
+		__device__ __host__ void SetSeedTaus3(unsigned int seed);
 		
 		__device__ __host__ unsigned int LCGStep();
 		__device__ __host__ unsigned int TausStep1();
