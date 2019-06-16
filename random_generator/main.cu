@@ -12,72 +12,142 @@
 
 using namespace std;
 
-#define NTOGEN 200000	// How many pseudorandom numbers do you need?
-
-__global__ void RNGen_Global(RNGCombinedGenerator *rng_array, unsigned int N_rng, double *res_array, double *gauss_array);
-__host__ __device__ void RNGen_HostDev(RNGCombinedGenerator *rng_array, unsigned int N_rng, double *res_array, double *gauss_array, unsigned int tid);
-__host__ void RNGen_Host(RNGCombinedGenerator *rng_array, unsigned int N_rng, double *res_array, double *gauss_array);
+__global__ void RNGen_Global(RNGCombinedGenerator *generators, unsigned int *unsignedNumbers, double *uniformNumbers, double *gaussianNumbers, unsigned int totalNumbersToGenerate, unsigned int numbersToGeneratePerThread);
+__host__ __device__ void RNGen_HostDev(RNGCombinedGenerator *generators, unsigned int *unsignedNumbers, double *uniformNumbers, double *gaussianNumbers, unsigned int totalNumbersToGenerate, unsigned int numbersToGeneratePerThread, unsigned int threadNumber);
+__host__ void RNGen_Host(unsigned int numberOfBlocks, unsigned int numberOfThreadsPerBlock, RNGCombinedGenerator *generators, unsigned int numbersToGeneratePerThread, double *uniformNumbers, double *gaussianNumbers, unsigned int totalNumbersToGenerate);
 
 int main(){
-
-/********************************************************* 	
-	How many numbers will each thread generate?
-	 static_cast because I never trust int division
-	unsigned int rng_num = ceil(static_cast<double>(NTOGEN) / NTHREADMAX);
-**********************************************************/
-
-	// Mersenne random generator of unsigned ints, courtesy of C++11
-	mt19937 mersennegen(time(NULL));
-	uniform_int_distribution<unsigned int> dis(0, UINT_MAX - 128);
-
-	RNGCombinedGenerator *gens = new RNGCombinedGenerator[NTOGEN];
 	
-	RNG_Generator *generic_rng_pointer = &mersennegen;
-	for(unsigned int i=0; i<NTHREADMAX; ++i)
-		gens[i].Set_internal_state(generic_rng_pointer);
+	unsigned int numberOfBlocks = 10;
+	unsigned int numberOfThreadsPerBlock = 512;
+	unsigned int totalNumberOfThreads = numberOfBlocks * numberOfThreadsPerBlock;	// Exp 6
+//	unsigned int numbersToGeneratePerThread = 100;
+//	unsigned int totalNumbersToGenerate = totalNumberOfThreads * numbersToGeneratePerThread;	// Exp. 24
 
-	double *results = new double[NTOGEN];
-	double *gauss_results = new double[NTOGEN];
+	unsigned int totalNumbersToGenerate = 20;
+	unsigned int numbersToGeneratePerThread = ceil(static_cast<double>(totalNumbersToGenerate) / totalNumberOfThreads);
+	cout << "Total numbers to generate: " << totalNumbersToGenerate << endl;
+	cout << "Total number of threads: " << totalNumberOfThreads << endl;
+	cout << "Total numbers to generate per thread (exp. 2): " << numbersToGeneratePerThread << endl;
+/*
+	cout << "###############################################" << endl;
+	cout << "###############################################" << endl;
+	cout << "################ RNG DEBUGGING ################" << endl;
+	cout << "###############################################" << endl;
+	cout << "###############################################" << endl << endl;
+	
+	cout << "################## HOST SIDE ##################" << endl << endl << endl;
+	
+	cout << "################# BASIC DATA ##################" << endl << endl;
+	
+	cout << "Number of blocks (exp. 2): " << numberOfBlocks << endl;
+	cout << "Number of threads per blocks (exp. 3): " << numberOfThreadsPerBlock << endl;
+	cout << "Total number of threads (exp. 6): " << totalNumberOfThreads << endl;
+
+	cout << "How many numbers each thread generates (exp. 4): " << numbersToGeneratePerThread << endl;
+	cout << "How many numbers are generated in total (exp. 24): " << totalNumbersToGenerate << endl;
+*/
+	// Mersenne random generator of unsigned ints, courtesy of C++11
+	mt19937 mersenneCoreGenerator(time(NULL));
+	uniform_int_distribution<unsigned int> mersenneDistribution(129, UINT_MAX);
+	
+	cout << "Maximum unsigned int, aka endpoint of uniform seed distribution: " << UINT_MAX << endl << endl;
+
+//	cout << "################# SEED GENERATION ##################" << endl << endl;
+	// Genero i seed in versione struct
+	// Non sprecate tempo con i cout: ho verificato, i seed generati sono casuali e giusti
+	RNGCombinedGenerator *generators = new RNGCombinedGenerator[totalNumberOfThreads];
+//	cout << "Seeds during for cycle (exp. between 0 and " << UINT_MAX << ", from 0 to " << totalNumberOfThreads-1 << "): " << endl;
+//	cout << "thread number\t seedLCGS\t seedTaus1\t seedTaus2\t seedTaus3" << endl;
+	for(unsigned int threadNumber=0; threadNumber<totalNumberOfThreads; ++threadNumber){
+		generators[threadNumber].SetSeedLCGS(mersenneDistribution(mersenneCoreGenerator));
+		generators[threadNumber].SetSeedTaus1(mersenneDistribution(mersenneCoreGenerator));
+		generators[threadNumber].SetSeedTaus2(mersenneDistribution(mersenneCoreGenerator));
+		generators[threadNumber].SetSeedTaus3(mersenneDistribution(mersenneCoreGenerator));
+		
+//		cout << threadNumber
+//		<< "\t" << generators[threadNumber].GetSeedLCGS()
+//		<< "\t" << generators[threadNumber].GetSeedTaus1()
+//		<< "\t" << generators[threadNumber].GetSeedTaus2()
+//		<< "\t" << generators[threadNumber].GetSeedTaus3() << endl;
+	}
+//	cout << "Seeds after for cycle (exp. between 0 and " << UINT_MAX << ", from 0 to " << totalNumberOfThreads-1 << "): " << endl;
+//	cout << "thread number\t seedLCGS\t seedTaus1\t seedTaus2\t seedTaus3" << endl;
+//	for(unsigned int threadNumber=0; threadNumber<totalNumberOfThreads; ++threadNumber){
+//		cout << threadNumber
+//		<< "\t" << generators[threadNumber].GetSeedLCGS()
+//		<< "\t" << generators[threadNumber].GetSeedTaus1()
+//		<< "\t" << generators[threadNumber].GetSeedTaus2()
+//		<< "\t" << generators[threadNumber].GetSeedTaus3() << endl;
+//	}
+	cout << endl;
+
+//	cout << "Generating " << totalNumbersToGenerate << "-sized arrays for RNGs (exp. 24)" << endl;
+	unsigned int *unsignedNumbers = new unsigned int[totalNumbersToGenerate];
+	double *uniformNumbers = new double[totalNumbersToGenerate];
+	double *gaussianNumbers = new double[totalNumbersToGenerate];
+
+//	cout << "################# DFVICE SIDE #################" << endl << endl << endl;
 
 /*
 	////////////// HOST-SIDE GENERATOR //////////////
-	RNGen_Host(gens, rng_num, results, gauss_results);
+	RNGen_Host(numberOfBlocks, numberOfThreadsPerBlock, generators, numbersToGeneratePerThread, uniformNumbers, gaussianNumbers);
 	/////////////////////////////////////////////////
 */
 
-
 ///*
 	////////////// DEVICE-SIDE GENERATOR //////////////
-	RNGCombinedGenerator *dev_gens;
-	double *dev_results, *dev_gauss_results;
+	RNGCombinedGenerator *device_generators;
+	unsigned int *device_unsignedNumbers;
+	double *device_uniformNumbers, *device_gaussianNumbers;
 	
-	cudaMalloc( (void **)&dev_gens, NTHREADMAX*sizeof(RNGCombinedGenerator) );
-	cudaMalloc( (void **)&dev_results, NTOGEN*sizeof(double) );
-	cudaMalloc( (void **)&dev_gauss_results, NTOGEN*sizeof(double) );
+	cudaMalloc( (void **)&device_generators, totalNumberOfThreads*sizeof(RNGCombinedGenerator) );
+	cudaMalloc( (void **)&device_unsignedNumbers, totalNumbersToGenerate*sizeof(unsigned int) );
+	cudaMalloc( (void **)&device_uniformNumbers, totalNumbersToGenerate*sizeof(double) );
+	cudaMalloc( (void **)&device_gaussianNumbers, totalNumbersToGenerate*sizeof(double) );
 	
-	cudaMemcpy(dev_gens, gens, NTHREADMAX*sizeof(RNGCombinedGenerator), cudaMemcpyHostToDevice);
+	cudaMemcpy(device_generators, generators, totalNumberOfThreads*sizeof(RNGCombinedGenerator), cudaMemcpyHostToDevice);
 	
-	RNGen_Global<<<14,1024>>>(dev_gens, rng_num, dev_results, dev_gauss_results);
-	
-	cudaMemcpy(results, dev_results, NTOGEN*sizeof(double), cudaMemcpyDeviceToHost);
-	cudaMemcpy(gauss_results, dev_gauss_results, NTOGEN*sizeof(double), cudaMemcpyDeviceToHost);
+	RNGen_Global<<<numberOfBlocks,numberOfThreadsPerBlock>>>(device_generators, device_unsignedNumbers, device_uniformNumbers, device_gaussianNumbers, totalNumbersToGenerate, numbersToGeneratePerThread);
 
-	cudaFree(dev_gens);
-	cudaFree(dev_results);
-	cudaFree(dev_gauss_results);
+	cudaMemcpy(unsignedNumbers, device_unsignedNumbers, totalNumbersToGenerate*sizeof(unsigned int), cudaMemcpyDeviceToHost);
+	cudaMemcpy(uniformNumbers, device_uniformNumbers, totalNumbersToGenerate*sizeof(double), cudaMemcpyDeviceToHost);
+	cudaMemcpy(gaussianNumbers, device_gaussianNumbers, totalNumbersToGenerate*sizeof(double), cudaMemcpyDeviceToHost);
+
+	cudaFree(device_generators);
+	cudaFree(device_unsignedNumbers);
+	cudaFree(device_uniformNumbers);
+	cudaFree(device_gaussianNumbers);
 	///////////////////////////////////////////////////
 //*/
 
+/*	cout << "################## HOST SIDE ##################" << endl << endl << endl;
+	cout << "################# SEED CHECK ##################" << endl << endl;
+	cout << "Seeds after run (exp. between 0 and " << UINT_MAX << ", from 0 to 5), should be equal to last check: " << endl;
+	cout << "thread number\t seedLCGS\t seedTaus1\t seedTaus2\t seedTaus3" << endl;*/
+//	for(unsigned int threadNumber=0; threadNumber<totalNumberOfThreads; ++threadNumber){
+//		cout << threadNumber
+//		<< "\t" << generators[threadNumber].GetSeedLCGS()
+//		<< "\t" << generators[threadNumber].GetSeedTaus1()
+//		<< "\t" << generators[threadNumber].GetSeedTaus2()
+//		<< "\t" << generators[threadNumber].GetSeedTaus3() << endl;
+//	}
+	cout << endl;
+	
+	cout << "############### OUTPUT NUMBERS ################" << endl << endl;
+	cout << "RNG (exp. uniform [0,1] and gaussian (0,1), from 0 to 23): " << endl;
+	cout << "thread number\t uniform\t gauss3" << endl;
 
-	cout << "i uniform gauss" << endl;	// For astropy.ascii compatibility
-//	for(int i=0; i<NTOGEN; ++i){
-	for(unsigned int i=0; i<10; ++i){
-		cout << i << " " << results[i] << " " << gauss_results[i] << endl;
+	cout << "Numbers to generate: " << totalNumbersToGenerate << endl;
+
+	for(int randomNumber=0; randomNumber<totalNumbersToGenerate; ++randomNumber){
+		cout << randomNumber << "\t" << unsignedNumbers[randomNumber] << "\t" << uniformNumbers[randomNumber] << "\t" << gaussianNumbers[randomNumber] << endl;
 	}
 
-	delete[] gens;
-	delete[] results;
-	delete[] gauss_results;
+	delete[] generators;
+	delete[] unsignedNumbers;
+	delete[] uniformNumbers;
+	delete[] gaussianNumbers;
 
 	return 0;
 
@@ -87,28 +157,65 @@ int main(){
 ///////////////// FUNCTIONS /////////////////
 /////////////////////////////////////////////
 
-__global__ void RNGen_Global(RNGCombinedGenerator *rng_array, unsigned int N_rng, double *res_array, double *gauss_array){
-	unsigned int tid = threadIdx.x + blockDim.x * blockIdx.x;
-	RNGen_HostDev(rng_array, N_rng, res_array, gauss_array, tid);
+__global__ void RNGen_Global(RNGCombinedGenerator *generators, unsigned int *unsignedNumbers, double *uniformNumbers, double *gaussianNumbers, unsigned int totalNumbersToGenerate, unsigned int numbersToGeneratePerThread){
+	unsigned int threadNumber = threadIdx.x + blockDim.x * blockIdx.x;
+	RNGen_HostDev(generators, unsignedNumbers, uniformNumbers, gaussianNumbers, totalNumbersToGenerate, numbersToGeneratePerThread, threadNumber);
 }
 
-__host__ __device__ void RNGen_HostDev(RNGCombinedGenerator *rng_array, unsigned int N_rng, double *res_array, double *gauss_array, unsigned int tid){
-//	double rand_uni, rand_gauss;
+__host__ __device__ void RNGen_HostDev(RNGCombinedGenerator *generators, unsigned int *unsignedNumbers, double *uniformNumbers, double *gaussianNumbers, unsigned int totalNumbersToGenerate, unsigned int numbersToGeneratePerThread, unsigned int threadNumber){
+	
+	unsigned int unsignedNumber;
+	double gaussian, uniform;
 
-	for(unsigned int threadRNG=0; threadRNG<N_rng; ++threadRNG){
-		if(N_rng*tid+threadRNG < NTOGEN){
+//	cout << "Inside thread no. (exp. equal to precedent): " << threadNumber << endl;
+
+	for(unsigned int RNGNumber=0; RNGNumber<numbersToGeneratePerThread; ++RNGNumber){
+//		cout << endl << endl << "RNGNumber (exp. between 0 and 3): " << RNGNumber << endl;
+//		cout << "numbersToGeneratePerThread*threadNumber+RNGNumber (exp. between 0 and 23): " << numbersToGeneratePerThread*threadNumber+RNGNumber << endl;
+//		cout << "numbersToGeneratePerThread * numberOfBlocks*numberOfThreadsPerBlock (exp. 24): " << numbersToGeneratePerThread * numberOfBlocks*numberOfThreadsPerBlock << endl;
+		
+		
+		if(numbersToGeneratePerThread*threadNumber+RNGNumber < totalNumbersToGenerate){
+//			cout << "Condizione di if soddisfatta." << endl;
+			
+//			cout << "*** SEED CHECK ***" << endl;
+//			cout << "LCGS: " << generators[threadNumber].GetSeedLCGS() << endl;
+//			cout << "Taus1: " << generators[threadNumber].GetSeedTaus1() << endl;
+//			cout << "Taus2: " << generators[threadNumber].GetSeedTaus2() << endl;
+//			cout << "Taus3: " << generators[threadNumber].GetSeedTaus3() << endl << endl;
+
+			unsignedNumber = generators[threadNumber].GetUnsignedInt();
+			unsignedNumbers[numbersToGeneratePerThread*threadNumber+RNGNumber] = unsignedNumber;
+			
 			// Ho verificato che il problema sta nell'implementazione di HybridTaus o dei suoi sottoposti
-			res_array[N_rng*tid+threadRNG] = rng_array[tid].GetUniform();
-			gauss_array[N_rng*tid+threadRNG] = rng_array[tid].GetGauss();
-
-	// DEBUGGING OUTPUT; REMOVE __device__ AND C0OMMENT __global__ FUNCTION TO USE IT (ONLY WORKS ON CPU)
-//			if(N_rng*tid+threadRNG < 10)
-//				cout << N_rng*tid+threadRNG << " " << res_array[N_rng*tid+threadRNG] << " " << gauss_array[N_rng*tid+threadRNG] << endl;
+			uniform = generators[threadNumber].GetUniform();
+//			cout << "Uniform: " << uniform << endl;
+			uniformNumbers[numbersToGeneratePerThread*threadNumber+RNGNumber] = uniform;
+			
+//			cout << "*** SEED CHECK ***" << endl;
+//			cout << "LCGS: " << generators[threadNumber].GetSeedLCGS() << endl;
+//			cout << "Taus1: " << generators[threadNumber].GetSeedTaus1() << endl;
+//			cout << "Taus2: " << generators[threadNumber].GetSeedTaus2() << endl;
+//			cout << "Taus3: " << generators[threadNumber].GetSeedTaus3() << endl << endl;
+			
+			gaussian = generators[threadNumber].GetGauss();
+//			cout << "Gaussian: " << gaussian << endl;
+			gaussianNumbers[numbersToGeneratePerThread*threadNumber+RNGNumber] = gaussian;
+			
+//			cout << "*** SEED CHECK ***" << endl;
+//			cout << "LCGS: " << generators[threadNumber].GetSeedLCGS() << endl;
+//			cout << "Taus1: " << generators[threadNumber].GetSeedTaus1() << endl;
+//			cout << "Taus2: " << generators[threadNumber].GetSeedTaus2() << endl;
+//			cout << "Taus3: " << generators[threadNumber].GetSeedTaus3() << endl << endl;
 		}
 	}
 }
 
-__host__ void RNGen_Host(RNGCombinedGenerator *rng_array, unsigned int N_rng, double *res_array, double *gauss_array){
-	for(unsigned int tid=0; tid<NTHREADMAX; ++tid)
-		RNGen_HostDev(rng_array, N_rng, res_array, gauss_array, tid);
+__host__ void RNGen_Host(unsigned int numberOfBlocks, unsigned int numberOfThreadsPerBlock, RNGCombinedGenerator *generators, unsigned int *unsignedNumbers, double *uniformNumbers, double *gaussianNumbers, unsigned int totalNumbersToGenerate, unsigned int numbersToGeneratePerThread){
+	
+	for(unsigned int threadNumber=0; threadNumber<numberOfBlocks*numberOfThreadsPerBlock; ++threadNumber){
+		cout << "Thread no. (exp. between 0 and 5): " << threadNumber << endl;
+			RNGen_HostDev(generators, unsignedNumbers, uniformNumbers, gaussianNumbers, totalNumbersToGenerate, numbersToGeneratePerThread, threadNumber);
+	}
 }
+
