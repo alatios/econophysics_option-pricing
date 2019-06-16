@@ -22,7 +22,7 @@ int main(){
 	unsigned int numberOfThreadsPerBlock = 512;
 	unsigned int totalNumberOfThreads = numberOfBlocks * numberOfThreadsPerBlock;
 	
-	unsigned int totalNumbersToGenerate = 10;
+	unsigned int totalNumbersToGenerate = 20;
 	unsigned int numbersToGeneratePerThread = ceil(static_cast<double>(totalNumbersToGenerate) / totalNumberOfThreads);
 	
 	mt19937 mersenneCoreGenerator(time(NULL));
@@ -58,7 +58,7 @@ int main(){
 
 
 	for(int randomNumber=0; randomNumber<totalNumbersToGenerate; ++randomNumber){
-		cout << randomNumber << "\t" << unsignedNumbers << "\t" << uniformNumbers[randomNumber] << "\t" << gaussianNumbers[randomNumber] << endl;
+		cout << randomNumber << "\t" << unsignedNumbers[randomNumber] << "\t" << uniformNumbers[randomNumber] << "\t" << gaussianNumbers[randomNumber] << endl;
 	}
 
 	
