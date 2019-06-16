@@ -12,6 +12,10 @@
 
 using namespace std;
 
+__host__ __device__ void GenerateRandomNumbers_HostDev(RandomNumberGenerator **generators, unsigned int *unsignedNumbers, double *uniformNumbers, double *gaussianNumbers, unsigned int totalNumbersToGenerate, int unsigned int numbersToGeneratePerThread, unsigned int threadNumber);
+__host__ void GenerateRandomNumbers_Host(RandomNumberGenerator **generators, unsigned int *unsignedNumbers, double *uniformNumbers, double *gaussianNumbers, unsigned int totalNumbersToGenerate, int unsigned int numbersToGeneratePerThread, unsigned int numberOfBlocks, unsigned int numberOfThreadsPerBlock);
+
+
 int main(){
 	
 	unsigned int numberOfBlocks = 2;
@@ -30,7 +34,7 @@ int main(){
 	
 	RandomNumberGenerator** generators = new RandomNumberGenerator*[totalNumberOfThreads];
 	
-	for(threadNumber=0; threadNumber<totalNumberOfThreads; ++threadNumber){
+	for(unsigned int threadNumber=0; threadNumber<totalNumberOfThreads; ++threadNumber){
 		generators[threadNumber] = new RandomNumberGenerator_Hybrid(
 												mersenneDistribution(mersenneCoreGenerator),
 												mersenneDistribution(mersenneCoreGenerator),
