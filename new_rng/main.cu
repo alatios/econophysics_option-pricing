@@ -28,8 +28,7 @@ int main(){
 	cout << "Total number of threads: " << totalNumberOfThreads << endl;
 	cout << "Numbers each thread generates (round up): " << numbersToGeneratePerThread << endl;
 	
-	RandomNumberGenerator* generator = new RandomNumberGenerator_Hybrid;
-	generator->SetInternalState(mersenneDistribution(mersenneCoreGenerator), mersenneDistribution(mersenneCoreGenerator), mersenneDistribution(mersenneCoreGenerator), mersenneDistribution(mersenneCoreGenerator));
+	RandomNumberGenerator* generator = new RandomNumberGenerator_Hybrid(mersenneDistribution(mersenneCoreGenerator), mersenneDistribution(mersenneCoreGenerator), mersenneDistribution(mersenneCoreGenerator), mersenneDistribution(mersenneCoreGenerator));
 
 	for(int i=0; i<totalNumbersToGenerate; ++i)
 		cout << generator->GetUniform() << " " << generator->GetGauss() << endl;
