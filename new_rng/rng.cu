@@ -97,7 +97,7 @@ __device__ __host__ unsigned int RandomNumberGenerator_Hybrid::HybridStep(){
 }
 
 // Public methods to generate random numbers
-__device__ __host__ unsigned int GetUnsignedInt(){
+__device__ __host__ unsigned int RandomNumberGenerator_Hybrid::GetUnsignedInt(){
 	return this->HybridStep();
 }	
 
