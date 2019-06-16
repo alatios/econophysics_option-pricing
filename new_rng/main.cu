@@ -52,7 +52,7 @@ int main(){
 
 ///*
 	////////////// HOST-SIDE GENERATOR //////////////
-	GenerateRandomNumbers_Host(generators, unsignedNumbers, uniformNumbers, totalNumbersToGenerate, numbersToGeneratePerThread, numberOfBlocks, numberOfThreadsPerBlock);
+	GenerateRandomNumbers_Host(generators, unsignedNumbers, uniformNumbers, gaussianNumbers, totalNumbersToGenerate, numbersToGeneratePerThread, numberOfBlocks, numberOfThreadsPerBlock);
 	/////////////////////////////////////////////////
 //*/
 
@@ -62,7 +62,7 @@ int main(){
 	}
 
 	
-	for(threadNumber=0; threadNumber<totalNumberOfThreads; ++threadNumber)
+	for(unsigned int threadNumber=0; threadNumber<totalNumberOfThreads; ++threadNumber)
 		delete generators[threadNumber];
 		
 	delete[] generators;
@@ -94,6 +94,6 @@ __host__ __device__ void GenerateRandomNumbers_HostDev(RandomNumberGenerator **g
 __host__ void GenerateRandomNumbers_Host(RandomNumberGenerator **generators, unsigned int *unsignedNumbers, double *uniformNumbers, double *gaussianNumbers, unsigned int totalNumbersToGenerate, unsigned int numbersToGeneratePerThread, unsigned int numberOfBlocks, unsigned int numberOfThreadsPerBlock){
 	
 	for(unsigned int threadNumber=0; threadNumber<numberOfBlocks*numberOfThreadsPerBlock; ++threadNumber){
-		GenerateRandomNumbers_HostDev(generators, numbersToGeneratePerThread, uniformNumbers, gaussianNumbers, threadNumber, numberOfBlocks, numberOfThreadsPerBlock, totalNumbersToGenerate);
+		GenerateRandomNumbers_HostDev(generators, unsignedNumbers, uniformNumbers, gaussianNumbers, totalNumbersToGenerate, numbersToGeneratePerThread, numberOfBlocks, numberOfThreadsPerBlock, threadNumber);
 	}
 }
