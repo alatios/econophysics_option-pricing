@@ -88,24 +88,27 @@ __device__ __host__ unsigned int RandomNumberGenerator_Hybrid::TausStep3(){
 	return this->GetSeedTaus3();
 }
 
-__device__ __host__ double RandomNumberGenerator_Hybrid::HybridGenerator(){
-	return 2.3283064365387e-10 * (
-		this->TausStep1() ^
-		this->TausStep2() ^
-		this->TausStep3() ^
-		this->LCGStep()
+__device__ __host__ unsigned int RandomNumberGenerator_Hybrid::HybridStep(){
+	return (this->TausStep1()
+		^ this->TausStep2()
+		^ this->TausStep3()
+		^ this->LCGStep()
 	);
 }
 
 // Public methods to generate random numbers
+__device__ __host__ unsigned int GetUnsignedInt(){
+	return this->HybridStep();
+}	
+
 __device__ __host__ double RandomNumberGenerator_Hybrid::GetUniform(){
-	double r = this->HybridGenerator();
-	return r;
+	unsigned int r = this->GetUnsignedInt();
+	return 2.3283064365387e-10 * r;
 }
 
 __device__ __host__ double RandomNumberGenerator_Hybrid::GetGauss(){
-	double u = this->HybridGenerator();
-	double v = this->HybridGenerator();
+	double u = this->GetUniform();
+	double v = this->GetUniform();
 	return sqrt(-2.*log(u)) * cos(2.*M_PI*v);
 }
 
@@ -117,9 +120,9 @@ __device__ __host__ void RandomNumberGenerator_Hybrid::ResetSeed(){
 	this->SetSeedTaus3(static_cast<unsigned int>(131));
 }
 
-__device__ __host__ void RandomNumberGenerator_Hybrid::SetInternalState(unsigned int seedLGCS, unsigned int seedTaus1, unsigned int seedTaus2, unsigned int seedTaus3){
-	this->SetSeedLCGS(seedLGCS);
-	this->SetSeedTaus1(seedTaus1);
-	this->SetSeedTaus2(seedTaus2);
-	this->SetSeedTaus3(seedTaus3);	
+__device__ __host__ void RandomNumberGenerator_Hybrid::SetInternalState(RandomNumberGenerator* supportGenerator){
+	this->SetSeedLCGS(supportGenerator->GetUnsignedInt());
+	this->SetSeedTaus1(supportGenerator->GetUnsignedInt());
+	this->SetSeedTaus2(supportGenerator->GetUnsignedInt());
+	this->SetSeedTaus3(supportGenerator->GetUnsignedInt());
 }

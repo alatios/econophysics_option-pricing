@@ -12,9 +12,11 @@ class RandomNumberGenerator{
 	
 	public:
 		
+		__device__ __host__ virtual unsigned int GetUnsignedInt() = 0;
 		__device__ __host__ virtual double GetUniform() = 0;
 		__device__ __host__ virtual double GetGauss() = 0;
 		__device__ __host__ virtual void ResetSeed() = 0;
+		__device__ __host__ virtual void SetInternalState(RandomNumberGenerator* supportGenerator) = 0;
 	
 };
 
@@ -25,12 +27,12 @@ class RandomNumberGenerator_Hybrid: public RandomNumberGenerator{
 		__device__ __host__ RandomNumberGenerator_Hybrid();
 		__device__ __host__ RandomNumberGenerator_Hybrid(unsigned int seedLGCS, unsigned int seedTaus1, unsigned int seedTaus2, unsigned int seedTaus3);
 		__device__ __host__ ~RandomNumberGenerator_Hybrid() = default;
-		
+
+		__device__ __host__ unsigned int GetUnsignedInt();		
 		__device__ __host__ double GetUniform();
 		__device__ __host__ double GetGauss();
 		__device__ __host__ void ResetSeed();
-		
-		__device__ __host__ void SetInternalState(unsigned int seedLGCS, unsigned int seedTaus1, unsigned int seedTaus2, unsigned int seedTaus3);
+		__device__ __host__ void SetInternalState(RandomNumberGenerator* supportGenerator);
 		
 	private:
 	
@@ -52,7 +54,7 @@ class RandomNumberGenerator_Hybrid: public RandomNumberGenerator{
 		__device__ __host__ unsigned int TausStep1();
 		__device__ __host__ unsigned int TausStep2();
 		__device__ __host__ unsigned int TausStep3();
-		__device__ __host__ double HybridGenerator();
+		__device__ __host__ unsigned int HybridStep();
 	
 };
 
