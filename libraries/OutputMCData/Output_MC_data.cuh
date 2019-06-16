@@ -12,38 +12,32 @@ class Output_MC_data{
 
 private:
 
-	Input_market_data _MarketData;
-	Input_option_data _OptionData;
-
-	float _EstimatedPriceMC;
-	float _ErrorMC;
-	float _BlackScholesPrice;
-	float _ErrorBlackScholes;				//error with respect to the exact result
-	float _Tick;							//calculation time [ms]
+	double _EstimatedPriceMC;
+	double _ErrorMC;
+	double _BlackScholesPrice;
+	double _ErrorBlackScholes;				//error with respect to the exact result
+	double _Tick;							//calculation time [ms]
 	
-	__device__ __host__ void BlackScholesCallOption();
-	__device__ __host__ void BlackScholesPutOption();
+	__device__ __host__ void BlackScholesCallOption(const Input_option_data&, const Input_market_data&);
+	__device__ __host__ void BlackScholesPutOption(const Input_option_data&, const Input_market_data&);
+
+	__device__ __host__ void SetErrorBlackScholes(const Input_option_data&, const Input_market_data&);
 
 public:
 
 	__device__ __host__ Output_MC_data();
-	__device__ __host__ Output_MC_data(const Input_market_data&, const Input_option_data&, float, float, float);
+	__device__ __host__ Output_MC_data(const Input_option_data&, const Input_market_data&, double, double, double);
 	__device__ __host__ ~Output_MC_data() = default;
 
-	__device__ __host__ void SetEstimatedPriceMC(float);
-	__device__ __host__ float GetEstimatedPriceMC() const;
-	__device__ __host__ void SetErrorMC(float);
-	__device__ __host__ float GetErrorMC() const;
-	__device__ __host__ void SetErrorBlackScholes();
-	__device__ __host__ float GetErrorBlackScholes();
-	__device__ __host__ void SetTick(float);
-	__device__ __host__ float GetTick() const;
-	__device__ __host__ void SetBlackScholesPrice();
-	__device__ __host__ float GetBlackScholesPrice();
-	
-	__device__ __host__ Input_market_data GetInputMarketData() const;
-	__device__ __host__ void SetInputMarketData(const Input_market_data&);
-	__device__ __host__ Input_option_data GetInputOptionData() const;
-	__device__ __host__ void SetInputOptionData(const Input_option_data&);
+	__device__ __host__ void SetEstimatedPriceMC(double);
+	__device__ __host__ double GetEstimatedPriceMC() const;
+	__device__ __host__ void SetErrorMC(double);
+	__device__ __host__ double GetErrorMC() const;
+	__device__ __host__ void EvaluateErrorBlackScholes(const Input_option_data&, const Input_market_data&);
+	__device__ __host__ double GetErrorBlackScholes();
+	__device__ __host__ void SetTick(double);
+	__device__ __host__ double GetTick() const;
+	__device__ __host__ void SetBlackScholesPrice(const Input_option_data&, const Input_market_data&);
+	__device__ __host__ double GetBlackScholesPrice(const Input_option_data&, const Input_market_data&);
 };
 #endif
