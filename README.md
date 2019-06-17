@@ -1,7 +1,7 @@
-# econophysics_option-pricing
-Econophysics CUDA project simulating a gaussian option pricing model with a Monte Carlo approach. Computes European style put/call options with fixed time to maturity, comparing the output to the theoretical result from the Black-Scholes formula.
+# Econophysics option pricing project "Orbison"
+Econophysics option pricing CUDA project simulating evolutions of the underlying asset through a gaussian Monte Carlo approach. Computes European-style plain vanilla put/call options with fixed time to maturity and strike price, comparing the estimated payoff to the theoretical result obtained from the Black-Scholes formula.
 
-## Tree
+## Tree structure
 ```
 econophysics_option-pricing/
 ├── [2.5K]  README.md
