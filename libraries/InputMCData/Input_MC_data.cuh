@@ -22,7 +22,7 @@ class Input_MC_data{
 		__device__ __host__ void SetNumberOfMCSimulations(unsigned int);
 		__device__ __host__ unsigned int GetNumberOfMCSimulations() const;
 		
-		__device__ __host__ unsigned int GetNumberOfSimulationsPerThread(const Input_gpu_data& inputGPU);
+		__device__ __host__ unsigned int GetNumberOfSimulationsPerThread(const Input_gpu_data&);
 };
 
 #endif

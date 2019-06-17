@@ -46,4 +46,5 @@ class Output_MC_data{
 		__device__ __host__ double GetErrorBlackScholes();
 
 };
+
 #endif
