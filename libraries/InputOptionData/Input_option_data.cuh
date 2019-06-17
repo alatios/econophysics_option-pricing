@@ -28,6 +28,7 @@ public:
 	__device__ __host__ unsigned int GetNumberOfIntervals() const;
 	__device__ __host__ void SetTimeToMaturity(double);
 	__device__ __host__ double GetTimeToMaturity() const;
+	__device__ __host__ double GetDeltaTime() const;	
 	__device__ __host__ void SetOptionType(const char);
 	__device__ __host__ char GetOptionType() const;
 

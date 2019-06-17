@@ -12,23 +12,30 @@ using namespace std;
 
 class Path{
 
-private:
+	private:
 
-	double _GaussianRandomVariable;					//Mean = 0; Variance = 1
-	double _SpotPrice;								//The step (spotprice) required to generate the next one
+		double _SpotPrice;		// The step (spotprice) required to generate the next one
+		double _RiskFreeRate;
+		double _Volatility;
+		double _DeltaTime;
+		
+		__device__ __host__ void SetSpotPrice(double);
+		__device__ __host__ void SetRiskFreeRate(double);
+		__device__ __host__ void SetVolatility(double);
+		__device__ __host__ void SetDeltaTime(double);
 
-public:
+	public:
 
-	__device__ __host__ Path();
-	__device__ __host__ Path(double SpotPrice);
-	__device__ __host__ Path(const Path&);
-	__device__ __host__ ~Path() = default;
+		__device__ __host__ Path();
+		__device__ __host__ Path(const Input_market_data& market, const Input_option_data& option, double SpotPrice);
+		__device__ __host__ ~Path() = default;
 
-	__device__ __host__ double GetGaussianRandomVariable() const;
-	__device__ __host__ void SetGaussianRandomVariable(double);
-	__device__ __host__ double GetSpotPrice() const;
-	__device__ __host__ void SetSpotPrice(double);
+		__device__ __host__ double GetSpotPrice() const;
+		__device__ __host__ double GetVolatility() const;
+		__device__ __host__ double GetRiskFreeRate() const;
+		__device__ __host__ double GetDeltaTime() const;
 
-	__device__ __host__ void EuleroStep(const Input_market_data& market, const Input_option_data& option);
+
+		__device__ __host__ void EuleroStep(double gaussianRandomVariable);
 };
 #endif

@@ -1,5 +1,3 @@
-LIBS=
-#-lcuda -lm -L/usr/local/cuda/lib/ -lcudart
 FLAGS=-std=c++11 -Wno-deprecated-gpu-targets
 TARGS=UnitTest.o ../InputOptionData/Input_option_data.o ../InputMarketData/Input_market_data.o Path.o
 NVCC=nvcc
@@ -7,15 +5,15 @@ NVCC=nvcc
 ECHO=/bin/echo
 
 all: $(TARGS)
-	$(NVCC) $(FLAGS) $(LIBS) $(TARGS) -o UnitTest.x
-
-obj: %.o
+	$(NVCC) $(FLAGS) $(TARGS) -o UnitTest.x
 
 %.o: %.cu
-	$(NVCC) $(FLAGS) $(LIBS) -dc $< -o $@
+	$(NVCC) $(FLAGS) -dc $< -o $@
 
 clean:
-	rm -f *.x *.o
+	@rm -f *.x *.o && echo "Done cleaning."
 
-run:
-	cd ../InputMarketData  make obj && cd ../InputOptionData  make obj && cd ../Path && ./clean.sh && make && ./UnitTest.x
+run: clean
+	@make --no-print-directory
+	@$(ECHO) "Running Path unit test..."
+	@./UnitTest.x

@@ -35,41 +35,33 @@ int main(){
 	
 	// Input GPU data
 	unsigned int numberOfBlocks = 10;
-	unsigned int numberOfThreadsPerBlock = 512;
-	unsigned int numberOfSimulationsPerThread = 50;
-	unsigned int totalNumberOfThreads = numberOfBlocks * numberOfThreadsPerBlock;
-	unsigned int totalNumberOfSimulations = totalNumberOfThreads * numberOfSimulationsPerThread;
-	
-	Input_gpu_data inputGPU(numberOfBlocks, numberOfThreadsPerBlock);
+	Input_gpu_data inputGPU(numberOfBlocks);
+	unsigned int numberOfThreadsPerBlock = inputGPU.GetNumberOfThreadsPerBlock();
+	unsigned int totalNumberOfThreads = inputGPU.GetTotalNumberOfThreads();
 	
 	// Input market data
-	float zeroPrice = 100.;				// USD
-	float volatility = 0.25;			// Percentage
-	float riskFreeRate = 0.01;			// 50% per year (percentage per unit of time)
-	Input_market_data inputMarket(zeroPrice, volatility, riskFreeRate);
-	
+	double initialPrice = 100.;			// USD
+	double volatility = 0.25;			// Percentage
+	double riskFreeRate = 0.01;			// 50% per year (percentage per unit of time)
+	Input_market_data inputMarket(initialPrice, volatility, riskFreeRate);
+
 	// Input option data
-	float strikePrice = 100.;				// $
-	float timeToMaturity = 1.;				// years
+	double strikePrice = 100.;				// $
+	double timeToMaturity = 1.;				// years
 	unsigned int numberOfIntervals = 365;	// No unit of measure
 	char optionType = 'c';					// Call option
 	Input_option_data inputOption(strikePrice, numberOfIntervals, timeToMaturity, optionType);
-	
+
+
 	// Input Monte Carlo data
-	Input_MC_data inputMC(numberOfSimulationsPerThread, inputGPU);
-	
+	unsigned int totalNumberOfSimulations = 10000;
+	Input_MC_data inputMC(totalNumberOfSimulations);
+	unsigned int numberOfSimulationsPerThread = inputMC.GetNumberOfSimulationsPerThread(inputGPU);
+
+//	
 	// Path per thread
 	Path pathTemplate(inputMarket, inputOption, zeroPrice);
-
-/*	
-	Path_per_thread **pathsPerThread = new Path_per_thread*[totalNumberOfThreads];
-	for(unsigned int threadNumber=0; threadNumber<totalNumberOfThreads; ++threadNumber){
-		pathsPerThread[threadNumber] = new Path_per_thread(numberOfSimulationsPerThread);
-		
-		for(unsigned int simulationNumber=0; simulationNumber<numberOfSimulationsPerThread; ++simulationNumber)
-			pathsPerThread[threadNumber]->SetPathComponent(simulationNumber, pathTemplate);
-	}
-*/
+//
 
 	Path **paths = new Path*[totalNumberOfThreads];
 	for(unsigned int threadNumber=0; threadNumber<totalNumberOfThreads; ++threadNumber)
@@ -79,7 +71,7 @@ int main(){
 	// Mersenne random generator of unsigned ints, courtesy of C++11
 	// For reproducibility, replace time(NULL) with a fixed seed
 	mt19937 mersenneCoreGenerator(time(NULL));
-	uniform_int_distribution<unsigned int> mersenneDistribution(0, UINT_MAX);
+	uniform_int_distribution<unsigned int> mersenneDistribution(129, UINT_MAX);
 
 	RNGCombinedGenerator *randomGenerators = new RNGCombinedGenerator[totalNumberOfThreads];
 	for(unsigned int threadNumber=0; threadNumber<totalNumberOfThreads; ++threadNumber){
@@ -88,6 +80,8 @@ int main(){
 		randomGenerators[threadNumber].SetSeedTaus2(mersenneDistribution(mersenneCoreGenerator));
 		randomGenerators[threadNumber].SetSeedTaus3(mersenneDistribution(mersenneCoreGenerator));
 	}
+	
+	//// Sono qui
 	
 	// Output MC per thread
 	Output_MC_per_thread *threadOutputs = new Output_MC_per_thread[totalNumberOfThreads];

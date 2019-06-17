@@ -2,45 +2,60 @@
 
 using namespace std;
 
+// Constructors
 __device__ __host__ Path::Path(){
 	this->SetSpotPrice(0.);
-	this->SetGaussianRandomVariable(0.);
+	this->SetRiskFreeRate(0.1);
+	this->SetVolatility(0.25);
+	this->SetDeltaTime(1./365);
 }
 
-//Constructor
-__device__ __host__ Path::Path(double SpotPrice){
+__device__ __host__ Path::Path(const Input_market_data& market, const Input_option_data& option, double SpotPrice){
 	this->SetSpotPrice(SpotPrice);
-	this->SetGaussianRandomVariable(0.);
-}
-//Copy Constructor
-__device__ __host__ Path::Path(const Path& p){
-	this->SetGaussianRandomVariable(p.GetGaussianRandomVariable());
-	this->SetSpotPrice(p.GetSpotPrice());
+	this->SetRiskFreeRate(market.GetRiskFreeRate());
+	this->SetVolatility(market.GetVolatility());
+	this->SetDeltaTime(option.GetDeltaTime());
 }
 
-//Methods
+// Private set methods
+__device__ __host__ void Path::SetSpotPrice(double spotPrice){
+	_SpotPrice = spotPrice;
+}
+
+__device__ __host__ void Path::SetRiskFreeRate(double riskFreeRate){
+	_RiskFreeRate = riskFreeRate;
+}
+
+__device__ __host__ void Path::SetVolatility(double volatility){
+	_Volatility = volatility;
+}
+
+__device__ __host__ void Path::SetDeltaTime(double deltaTime){
+	_DeltaTime = deltaTime;
+}
+
+// Public get methods
 __device__ __host__ double Path::GetSpotPrice() const{
 	return _SpotPrice;
 }
 
-__device__ __host__ void Path::SetSpotPrice(double SpotPrice){
-	_SpotPrice = SpotPrice;
+__device__ __host__ double Path::GetVolatility() const{
+	return _Volatility;
+}
+__device__ __host__ double Path::GetRiskFreeRate() const{
+	return _RiskFreeRate;
+}
+__device__ __host__ double Path::GetDeltaTime() const{
+	return _DeltaTime;
 }
 
-__device__ __host__ double Path::GetGaussianRandomVariable() const{
-	return _GaussianRandomVariable;
-}
 
-__device__ __host__ void Path::SetGaussianRandomVariable(double GaussianRandomVariable){
-	_GaussianRandomVariable = GaussianRandomVariable;
-}
-
-__device__ __host__ void Path::EuleroStep(const Input_market_data& market, const Input_option_data& option){			//It takes a step according to the euler formula
+// Euler step implementation
+__device__ __host__ void Path::EuleroStep(double gaussianRandomVariable){
 	double SpotPrice_i;		//The price at the next step
 	SpotPrice_i = (this->GetSpotPrice()) *
-	(1
-	+ market.GetRiskFreeRate() * (option.GetTimeToMaturity() / option.GetNumberOfIntervals())
-	+ market.GetVolatility() * sqrt(option.GetTimeToMaturity() / option.GetNumberOfIntervals()) * (this->GetGaussianRandomVariable()));
+	(1 + this->GetRiskFreeRate() * this->GetDeltaTime()
+	+ this->GetVolatility() * sqrt(this->GetDeltaTime()) * gaussianRandomVariable);
 
 // Geometric brownian motion, only for test purposes
 /*

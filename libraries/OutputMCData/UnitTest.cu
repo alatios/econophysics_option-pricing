@@ -15,7 +15,7 @@ OUTPUT:
 */
 
 int main(){
-	bool test;
+/*	bool test;
 	Output_MC_data MCData_1;
 	
 	Input_market_data MarketData(0.1,0.2,0.3);

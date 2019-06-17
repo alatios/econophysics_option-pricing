@@ -2,26 +2,20 @@
 
 using namespace std;
 
-//Constructor
+//Constructors
 __device__ __host__ Output_MC_data::Output_MC_data(){
 	this->SetEstimatedPriceMC(1.);
 	this->SetErrorMC(1.);
 	this->SetTick(1.);
-	Input_option_data option;
-	Input_market_data market;
-	this->SetBlackScholesPrice(option, market);
-	this->EvaluateErrorBlackScholes(option, market);
 }
 
-__device__ __host__ Output_MC_data::Output_MC_data(const Input_option_data& option, const Input_market_data& market, double EstimatedPriceMC, double ErrorMC, double Tock){
+__device__ __host__ Output_MC_data::Output_MC_data(double EstimatedPriceMC, double ErrorMC, double Tock){
 	this->SetEstimatedPriceMC(EstimatedPriceMC);
 	this->SetErrorMC(ErrorMC);
 	this->SetTick(Tock);
-	this->SetBlackScholesPrice(option, market);
-	this->EvaluateErrorBlackScholes(option, market);
 }
 
-//Methods
+// Standard get/set methods
 __device__ __host__ void Output_MC_data::SetEstimatedPriceMC(double EstimatedPriceMC){
 	_EstimatedPriceMC = EstimatedPriceMC;
 }
@@ -38,18 +32,6 @@ __device__ __host__ double Output_MC_data::GetErrorMC() const{
 	return _ErrorMC;
 }
 
-__device__ __host__ void Output_MC_data::SetErrorBlackScholes(const Input_option_data& option, const Input_market_data& market){
-	_ErrorBlackScholes = abs(this->GetEstimatedPriceMC() - this->GetBlackScholesPrice(option, market)) / this->GetErrorMC();
-}
-
-__device__ __host__ void Output_MC_data::EvaluateErrorBlackScholes(const Input_option_data& option, const Input_market_data& market){
-	this->SetErrorBlackScholes(option, market);
-}
-
-__device__ __host__ double Output_MC_data::GetErrorBlackScholes(){
-	return _ErrorBlackScholes;
-}
-
 __device__ __host__ void Output_MC_data::SetTick(double Tock){
 	_Tick = Tock;
 }
@@ -58,24 +40,29 @@ __device__ __host__ double Output_MC_data::GetTick() const{
 	return _Tick;
 }
 
-__device__ __host__ double Output_MC_data::GetBlackScholesPrice(const Input_option_data& option, const Input_market_data& market){
-	this->SetBlackScholesPrice(option, market);
+// Private methods for Black-Scholes set
+__device__ __host__ void Output_MC_data::SetBlackScholesPrice(double BlackScholesPrice){
+	_BlackScholesPrice = BlackScholesPrice;
+}
+
+__device__ __host__ void Output_MC_data::SetErrorBlackScholes(double errorBlackScholes){
+	_ErrorBlackScholes = errorBlackScholes;
+}
+
+// Public methods for Black-Scholes get
+__device__ __host__ double Output_MC_data::GetBlackScholesPrice(){
 	return _BlackScholesPrice;
 }
 
-__device__ __host__ void Output_MC_data::SetBlackScholesPrice(const Input_option_data& option, const Input_market_data& market){
-	if(option.GetOptionType() == 'c')
-		this->BlackScholesCallOption(option, market);
-	else if(option.GetOptionType() == 'p')
-		this->BlackScholesPutOption(option, market);
-	else
-		_BlackScholesPrice = 0.;
+__device__ __host__ double Output_MC_data::GetErrorBlackScholes(){
+	return _ErrorBlackScholes;
 }
+
+// Private methods for Black-Scholes evaluation
 
 __device__ __host__ void Output_MC_data::BlackScholesCallOption(const Input_option_data& option, const Input_market_data& market){
 
-	double tmp1 = (1./ (market.GetVolatility() * sqrt(static_cast<double>(static_cast<double>(option.GetTimeToMaturity())
-	/ static_cast<double>(option.GetNumberOfIntervals()))))) * (log(market.GetInitialPrice()/option.GetStrikePrice())
+	double tmp1 = (1./ (market.GetVolatility() * sqrt(option.GetTimeToMaturity()))) * (log(market.GetInitialPrice()/option.GetStrikePrice())
 	+ market.GetRiskFreeRate()
 	+ (pow(market.GetVolatility(),2)/2.) * option.GetTimeToMaturity());
 	
@@ -90,12 +77,9 @@ __device__ __host__ void Output_MC_data::BlackScholesCallOption(const Input_opti
 	_BlackScholesPrice = CallPrice;
 }
 
-//static_cast<double>(static_cast<double>(option.GetTimeToMaturity()) / static_cast<double>(option.GetNumberOfIntervals())))
-
 __device__ __host__ void Output_MC_data::BlackScholesPutOption(const Input_option_data& option, const Input_market_data& market){
 
-	double tmp1 = (1./ (market.GetVolatility() * sqrt(static_cast<double>(static_cast<double>(option.GetTimeToMaturity())
-		/ static_cast<double>(option.GetNumberOfIntervals()))))) * (log(market.GetInitialPrice()/option.GetStrikePrice())
+	double tmp1 = (1./ (market.GetVolatility() * sqrt(option.GetTimeToMaturity()))) * (log(market.GetInitialPrice()/option.GetStrikePrice())
 	+ market.GetRiskFreeRate()
 	+ (pow(market.GetVolatility(),2)/2.) * option.GetTimeToMaturity());
 	
@@ -108,4 +92,24 @@ __device__ __host__ void Output_MC_data::BlackScholesPutOption(const Input_optio
 	- option.GetStrikePrice() * exp(- market.GetRiskFreeRate()*option.GetTimeToMaturity()) * (N_tmp2 - 1);
 
 	_BlackScholesPrice = PutPrice;
+}
+
+__device__ __host__ void Output_MC_data::EvaluateBlackScholesPrice(const Input_option_data& option, const Input_market_data& market){
+	if(option.GetOptionType() == 'c')
+		this->BlackScholesCallOption(option, market);
+	else if(option.GetOptionType() == 'p')
+		this->BlackScholesPutOption(option, market);
+	else
+		_BlackScholesPrice = 0.;	
+}
+
+__device__ __host__ void Output_MC_data::EvaluateErrorBlackScholes(){
+	double absoluteValue = fabs(this->GetEstimatedPriceMC() - this->GetBlackScholesPrice());
+	this->SetErrorBlackScholes(absoluteValue / this->GetErrorMC());
+}
+
+// Public methods for Black-Scholes evaluation
+__device__ __host__ void Output_MC_data::CompleteEvaluationOfBlackScholes(const Input_option_data& option, const Input_market_data& market){
+	this->EvaluateBlackScholesPrice(option, market);
+	this->EvaluateErrorBlackScholes();
 }

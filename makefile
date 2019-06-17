@@ -1,5 +1,3 @@
-LIBS=
-
 FLAGS=-std=c++11 -Wno-deprecated-gpu-targets
 
 TARGS= \
@@ -19,12 +17,10 @@ NVCC=nvcc
 ECHO=/bin/echo
 
 all: $(TARGS)
-	$(NVCC) $(FLAGS) $(LIBS) $(TARGS) -o main.x
-
-obj: %.o
+	$(NVCC) $(FLAGS) $(TARGS) -o main.x
 
 %.o: %.cu
-	$(NVCC) $(FLAGS) $(LIBS) -dc $< -o $@
+	$(NVCC) $(FLAGS) -dc $< -o $@
 
 clean:
 	@(cd libraries/InputGPUData && rm -f *.x *.o) 		|| ($(ECHO) "Failed to clean libraries/InputGPUData." && exit 1)

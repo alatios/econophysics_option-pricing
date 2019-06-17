@@ -12,7 +12,7 @@ OUTPUT:
 */
 
 int main(){
-
+/*
 	double SpotPrice = 1.;
 
 	//Variables for testing Eulero formulae
@@ -73,7 +73,7 @@ int main(){
 	Path pathEulero(SpotPriceEulero);
 	pathEulero.EuleroStep(marketEulero, optionEulero);
 	cout << (bool)(pathEulero.GetSpotPrice()==static_cast<double>(1.1)) << endl;
-
+*/
 	return 0;
 
 }

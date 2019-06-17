@@ -23,3 +23,11 @@ __device__ __host__ void Input_gpu_data::SetNumberOfBlocks(unsigned int NumberOf
 __device__ __host__ unsigned int Input_gpu_data::GetNumberOfBlocks() const{
 	return _NumberOfBlocks;
 }
+
+__device__ __host__ unsigned int Input_gpu_data::GetNumberOfThreadsPerBlock() const{
+	return NUMBER_OF_THREADS_PER_BLOCK;
+}
+
+__device__ __host__ unsigned int Input_gpu_data::GetTotalNumberOfThreads() const{
+	return this->GetNumberOfBlocks() * NUMBER_OF_THREADS_PER_BLOCK;
+}

@@ -44,7 +44,7 @@ __device__ __host__ unsigned int Input_option_data::GetNumberOfIntervals() const
 }
 
 __device__ __host__ void Input_option_data::SetTimeToMaturity(double TimeToMaturity){
-		_TimeToMaturity = TimeToMaturity;
+	_TimeToMaturity = TimeToMaturity;
 }
 
 __device__ __host__ double Input_option_data::GetTimeToMaturity() const{
@@ -57,3 +57,7 @@ __device__ __host__ void Input_option_data::SetOptionType(const char OptionType)
 __device__ __host__ char Input_option_data::GetOptionType() const{
 	return _OptionType;
 }
+
+__device__ __host__ double Input_option_data::GetDeltaTime() const{
+	return static_cast<double>(static_cast<double>(this->GetTimeToMaturity()) / static_cast<unsigned int>(this->GetNumberOfIntervals()));	
+}	
