@@ -20,6 +20,6 @@ __device__ __host__ unsigned int Input_MC_data::GetNumberOfMCSimulations() const
 	return _NumberOfMCSimulations;
 }
 
-__device__ __host__ unsigned int Input_MC_data::GetNumberOfSimulationsPerThread(const Input_gpu_data& inputGPU){
+__device__ __host__ unsigned int Input_MC_data::GetNumberOfSimulationsPerThread(const Input_gpu_data& inputGPU) const{
 	return ceil(static_cast<double>(this->GetNumberOfMCSimulations()) / inputGPU.GetTotalNumberOfThreads());
 }

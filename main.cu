@@ -28,6 +28,7 @@ __host__ __device__ void OptionPricingEvaluator_HostDev(Input_gpu_data, Input_op
 __host__ __device__ double EvaluatePayoff(const Path&, const Input_option_data&);
 __host__ __device__ double ActualizePayoff(double payoff, double riskFreeRate, double timeToMaturity);
 __host__ tuple<double, double> EvaluateEstimatedPriceAndError(Output_MC_per_thread*, unsigned int totalNumberOfThreads);
+__host__ void PrintInputData(const Input_gpu_data&, const Input_option_data&, const Input_market_data&, const Input_MC_data&);
 
 int main(){
 	
@@ -50,11 +51,13 @@ int main(){
 	char optionType = 'c';					// Call option
 	Input_option_data inputOption(strikePrice, numberOfIntervals, timeToMaturity, optionType);
 
-
 	// Input Monte Carlo data
 	unsigned int totalNumberOfSimulations = 10000;
 	Input_MC_data inputMC(totalNumberOfSimulations);
 	unsigned int numberOfSimulationsPerThread = inputMC.GetNumberOfSimulationsPerThread(inputGPU);
+	
+	// Print input data (duh)
+	PrintInputData(inputGPU, inputOption, inputMarket, inputMC);
 
 	// Template path for invidual paths created in each thread
 	Path pathTemplate(inputMarket, inputOption, initialPrice);
@@ -159,7 +162,6 @@ __host__ __device__ double ActualizePayoff(double payoff, double riskFreeRate, d
 __host__ tuple<double, double> EvaluateEstimatedPriceAndError(Output_MC_per_thread* threadOutputs, unsigned int totalNumberOfThreads){
 	double totalSumOfPayoffs = 0;
 	double totalSumOfSquaredPayoffs = 0;
-	
 	unsigned int totalPayoffCounter = 0;
 	unsigned int totalSquaredPayoffCounter = 0;
 	
@@ -173,11 +175,29 @@ __host__ tuple<double, double> EvaluateEstimatedPriceAndError(Output_MC_per_thre
 	if(totalPayoffCounter != totalSquaredPayoffCounter)
 		cerr << "WARNING: Count of payoffs and squared payoffs in EvaluateEstimatedPriceAndError() are not equal." << endl;
 		
-	cout << "Total number of actual simulations: " << totalPayoffCounter << endl;
-		
 	double monteCarloEstimatedPrice = totalSumOfPayoffs / totalPayoffCounter;
 	double monteCarloError = sqrt(((totalSumOfSquaredPayoffs/totalSquaredPayoffCounter) - pow(monteCarloEstimatedPrice,2))/totalSquaredPayoffCounter);	
-	
 	return make_tuple(monteCarloEstimatedPrice, monteCarloError);
 }
 
+__host__ void PrintInputData(const Input_gpu_data& inputGPU, const Input_option_data& option, const Input_market_data& market, const Input_MC_data& inputMC){
+	cout << endl << "###### INPUT DATA ######" << endl << endl;
+	cout << "## General input data ##" << endl;
+	cout << "Number of blocks: " << inputGPU.GetNumberOfBlocks() << endl;
+	cout << "Number of threads per block: " << inputGPU.GetNumberOfThreadsPerBlock() << endl;
+	cout << "Total number of threads: " << inputGPU.GetTotalNumberOfThreads() << endl;
+	cout << "Number of simulations: " << inputMC.GetNumberOfMCSimulations() << endl;
+	cout << "Number of simulations per thread (round-up): " << inputMC.GetNumberOfSimulationsPerThread(inputGPU) << endl;
+	
+	cout << "## MARKET DATA ##" << endl;
+	cout << "Initial underlying price [USD]: " << market.GetInitialPrice() << endl;
+	cout << "Market volatility: " << market.GetVolatility() << endl;
+	cout << "Risk free rate: " << market.GetRiskFreeRate() << endl;
+	
+	cout << "## OPTION DATA ##" << endl;
+	cout << "Option strike price [USD]: " << option.GetStrikePrice() << endl;
+	cout << "Time to option maturity [years]: " << option.GetTimeToMaturity() << endl;
+	cout << "Number of intervals for Euler formula computation: " << option.GetNumberOfIntervals() << endl;
+	cout << "Interval time [years]: " << option.GetDeltaTime() << endl;
+	cout << "Option type (c = call, p = put): " << option.GetOptionType() << endl;
+}
