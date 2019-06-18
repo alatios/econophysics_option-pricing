@@ -14,15 +14,14 @@
 #include "libraries/InputOptionData/Input_option_data.cuh"
 #include "libraries/OutputMCData/Output_MC_data.cuh"
 #include "libraries/Path/Path.cuh"
-#include "libraries/PathPerThread/Path_per_thread.cuh"
 #include "libraries/OutputMCPerThread/Output_MC_per_thread.cuh"
 #include "random_generator/rng.cuh"
 
 using namespace std;
 
 // Main evaluators
-__host__ void OptionPricingEvaluator_Host(Input_gpu_data, Input_option_data, Input_market_data, Input_MC_data, Path**, RNGCombinedGenerator*, Output_MC_per_thread*);
-__host__ __device__ void OptionPricingEvaluator_HostDev(Input_gpu_data, Input_option_data, Input_market_data, Input_MC_data, Path**, RNGCombinedGenerator*, Output_MC_per_thread*, unsigned int threadNumber);
+__host__ void OptionPricingEvaluator_Host(Input_gpu_data, Input_option_data, Input_market_data, Input_MC_data, Path, RNGCombinedGenerator*, Output_MC_per_thread*);
+__host__ __device__ void OptionPricingEvaluator_HostDev(Input_gpu_data, Input_option_data, Input_market_data, Input_MC_data, Path, RNGCombinedGenerator*, Output_MC_per_thread*, unsigned int threadNumber);
 
 // Support functions
 __host__ __device__ double EvaluatePayoff(const Path&, const Input_option_data&);
@@ -55,10 +54,8 @@ int main(){
 	Input_MC_data inputMC(totalNumberOfSimulations);
 	unsigned int numberOfSimulationsPerThread = inputMC.GetNumberOfSimulationsPerThread(inputGPU);
 
-	Path **paths = new Path*[totalNumberOfThreads];
-	for(unsigned int threadNumber=0; threadNumber<totalNumberOfThreads; ++threadNumber)
-		paths[threadNumber] = new Path(inputMarket, inputOption, zeroPrice);
-
+	// Template path for invidual paths created in each thread
+	Path pathTemplate(inputMarket, inputOption, initialPrice);
 	
 	// Mersenne random generator of unsigned ints, courtesy of C++11
 	// For reproducibility, replace time(NULL) with a fixed seed
@@ -77,8 +74,7 @@ int main(){
 	Output_MC_per_thread *threadOutputs = new Output_MC_per_thread[totalNumberOfThreads];
 	
 	// Simulating device function
-//	cout << "thread\t path\t payoff" << endl;
-	OptionPricingEvaluator_Host(numberOfBlocks, numberOfThreadsPerBlock, inputMC, paths, randomGenerators, threadOutputs);
+	OptionPricingEvaluator_Host(inputGPU, inputOption, inputMarket, inputMC, pathTemplate, randomGenerators, threadOutputs);
 	
 	// Sum all payoffs from threads, then average them
 	double totalSumOfPayoffs = 0;
@@ -96,7 +92,7 @@ int main(){
 	
 	// Global output MC
 	Output_MC_data outputMC(monteCarloEstimatedPrice, monteCarloError, elapsedTime);
-	outputMC.CompleteEvaluationOfBlackScholes(option, market);
+	outputMC.CompleteEvaluationOfBlackScholes(inputOption, inputMarket);
 	
 	cout << "MC estimated price [USD] = " << outputMC.GetEstimatedPriceMC() << endl;
 	cout << "MC error [USD] = " << outputMC.GetErrorMC() << endl;
@@ -106,10 +102,6 @@ int main(){
 	
 	
 	// Trash bin section, where segfaults come to die
-	for(unsigned int threadNumber=0; threadNumber<totalNumberOfThreads; ++threadNumber)
-		delete paths[threadNumber];
-	
-	delete[] paths;
 	delete[] randomGenerators;
 	delete[] threadOutputs;
 	
@@ -123,7 +115,7 @@ int main(){
 //////////////////////////////////////////
 
 // Main evaluators
-__host__ __device__ void OptionPricingEvaluator_HostDev(Input_gpu_data inputGPU, Input_option_data option, Input_market_data market, Input_MC_data inputMC, Path** paths, RNGCombinedGenerator* randomGenerators, Output_MC_per_thread* threadOutputs, unsigned int threadNumber){
+__host__ __device__ void OptionPricingEvaluator_HostDev(Input_gpu_data inputGPU, Input_option_data option, Input_market_data market, Input_MC_data inputMC, Path pathTemplate, RNGCombinedGenerator* randomGenerators, Output_MC_per_thread* threadOutputs, unsigned int threadNumber){
 	
 	unsigned int numberOfPathsPerThread = inputMC.GetNumberOfSimulationsPerThread(inputGPU);
 	unsigned int numberOfIntervals = option.GetNumberOfIntervals();
@@ -137,10 +129,10 @@ __host__ __device__ void OptionPricingEvaluator_HostDev(Input_gpu_data inputGPU,
 	for(unsigned int pathNumber=0; pathNumber<numberOfPathsPerThread; ++pathNumber){
 		// Check if we're not overflowing. Since we decide a priori the number of simulations, some threads will inevitably work less
 		if(numberOfPathsPerThread * threadNumber + pathNumber < totalNumberOfSimulations){
-			currentPath.SetInternalState(paths[threadNumber]);
+			currentPath.SetInternalState(pathTemplate);
 			
 			// Cycling on steps in each path
-			for(unsigned int stepNumber=0; stepNumber<numberOfIntervalsPerPath; ++stepNumber)
+			for(unsigned int stepNumber=0; stepNumber<numberOfIntervals; ++stepNumber)
 				currentPath.EuleroStep(randomGenerators[threadNumber].GetGauss());
 			
 			payoff = EvaluatePayoff(currentPath, option);
@@ -150,11 +142,11 @@ __host__ __device__ void OptionPricingEvaluator_HostDev(Input_gpu_data inputGPU,
 	}
 }
 
-__host__ void OptionPricingEvaluator_Host(Input_gpu_data inputGPU, Input_option_data option, Input_market_data market, Input_MC_data inputMC, Path** paths, RNGCombinedGenerator* randomGenerators, Output_MC_per_thread* threadOutputs){
+__host__ void OptionPricingEvaluator_Host(Input_gpu_data inputGPU, Input_option_data option, Input_market_data market, Input_MC_data inputMC, Path pathTemplate, RNGCombinedGenerator* randomGenerators, Output_MC_per_thread* threadOutputs){
 	unsigned int totalNumberOfThreads = inputGPU.GetTotalNumberOfThreads();
 	
 	for(unsigned int threadNumber=0; threadNumber<totalNumberOfThreads; ++threadNumber)
-		OptionPricingEvaluator_HostDev(inputGPU, option, market, inputMC, paths, randomGenerators, threadOutputs, threadNumber);
+		OptionPricingEvaluator_HostDev(inputGPU, option, market, inputMC, pathTemplate, randomGenerators, threadOutputs, threadNumber);
 }
 
 // Support functions
@@ -170,6 +162,7 @@ __host__ __device__ double EvaluatePayoff(const Path& path, const Input_option_d
 	else
 		return -10000.;
 }
+
 __host__ __device__ double ActualizePayoff(double payoff, double riskFreeRate, double timeToMaturity){
 	return (payoff * exp(- riskFreeRate*timeToMaturity));
 }

@@ -35,14 +35,14 @@ __device__ __host__ void Path::SetDeltaTime(double deltaTime){
 }
 
 // Public set methods
-__device__ __host__ SetInternalState(const Input_market_data& market, const Input_option_data& option, double SpotPrice){
+__device__ __host__ void Path::SetInternalState(const Input_market_data& market, const Input_option_data& option, double SpotPrice){
 	this->SetSpotPrice(SpotPrice);
 	this->SetRiskFreeRate(market.GetRiskFreeRate());
 	this->SetVolatility(market.GetVolatility());
 	this->SetDeltaTime(option.GetDeltaTime());	
 }
 
-__device__ __host__ SetInternalState(const Path& otherPath){
+__device__ __host__ void Path::SetInternalState(const Path& otherPath){
 	this->SetSpotPrice(otherPath.GetSpotPrice());
 	this->SetRiskFreeRate(otherPath.GetRiskFreeRate());
 	this->SetVolatility(otherPath.GetVolatility());

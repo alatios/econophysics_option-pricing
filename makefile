@@ -7,7 +7,6 @@ libraries/InputMCData/Input_MC_data.o \
 libraries/InputOptionData/Input_option_data.o \
 libraries/OutputMCData/Output_MC_data.o \
 libraries/Path/Path.o \
-libraries/PathPerThread/Path_per_thread.o \
 libraries/OutputMCPerThread/Output_MC_per_thread.o \
 random_generator/rng.o \
 main.o

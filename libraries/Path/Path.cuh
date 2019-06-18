@@ -30,8 +30,8 @@ class Path{
 		__device__ __host__ Path(const Input_market_data&, const Input_option_data&, double SpotPrice);
 		__device__ __host__ ~Path() = default;
 
-		__device__ __host__ SetInternalState(const Input_market_data&, const Input_option_data&, double SpotPrice);
-		__device__ __host__ SetInternalState(const Path&);
+		__device__ __host__ void SetInternalState(const Input_market_data&, const Input_option_data&, double SpotPrice);
+		__device__ __host__ void SetInternalState(const Path&);
 
 		__device__ __host__ double GetSpotPrice() const;
 		__device__ __host__ double GetVolatility() const;
