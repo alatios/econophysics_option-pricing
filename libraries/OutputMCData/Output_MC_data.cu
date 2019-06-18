@@ -113,3 +113,12 @@ __device__ __host__ void Output_MC_data::CompleteEvaluationOfBlackScholes(const 
 	this->EvaluateBlackScholesPrice(option, market);
 	this->EvaluateErrorBlackScholes();
 }
+
+// Public methods for output management
+__host__ void Output_MC_data::PrintResults(){
+	cout << "MC estimated price [USD] = " << this->GetEstimatedPriceMC() << endl;
+	cout << "MC error [USD] = " << this->GetErrorMC() << endl;
+	cout << "Elapsed time [ms] = " << this->GetTick() << endl;
+	cout << "Black-Scholes estimated price [USD] = " << this->GetBlackScholesPrice() << endl;
+	cout << "Black-Scholes to MC discrepancy [unit of MC sigmas] = " << this->GetErrorBlackScholes() << endl;
+}

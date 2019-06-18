@@ -7,6 +7,7 @@
 #include <algorithm>	// min
 #include <fstream>
 #include <cstdio>
+#include <tuple>		// tuple, tie, make_tuple
 
 #include "libraries/InputGPUData/Input_gpu_data.cuh"
 #include "libraries/InputMarketData/Input_market_data.cuh"
@@ -26,6 +27,7 @@ __host__ __device__ void OptionPricingEvaluator_HostDev(Input_gpu_data, Input_op
 // Support functions
 __host__ __device__ double EvaluatePayoff(const Path&, const Input_option_data&);
 __host__ __device__ double ActualizePayoff(double payoff, double riskFreeRate, double timeToMaturity);
+__host__ tuple<double, double> EvaluateEstimatedPriceAndError(Output_MC_per_thread*, unsigned int totalNumberOfThreads);
 
 int main(){
 	
@@ -76,30 +78,17 @@ int main(){
 	// Simulating device function
 	OptionPricingEvaluator_Host(inputGPU, inputOption, inputMarket, inputMC, pathTemplate, randomGenerators, threadOutputs);
 	
-	// Sum all payoffs from threads, then average them
-	double totalSumOfPayoffs = 0;
-	double totalSumOfSquaredPayoffs = 0;
+	// Compute results
+	double monteCarloEstimatedPrice, monteCarloError;
+	tie(monteCarloEstimatedPrice, monteCarloError) = EvaluateEstimatedPriceAndError(threadOutputs, totalNumberOfThreads);
 	
-	for(unsigned int threadNumber=0; threadNumber<totalNumberOfThreads; ++threadNumber){
-		totalSumOfPayoffs += threadOutputs[threadNumber].GetPayoffSum();
-		totalSumOfSquaredPayoffs += threadOutputs[threadNumber].GetSquaredPayoffSum();
-	}
-		
-	double monteCarloEstimatedPrice = totalSumOfPayoffs / totalNumberOfSimulations;
-	double monteCarloError = sqrt(((totalSumOfSquaredPayoffs/totalNumberOfSimulations) - pow(monteCarloEstimatedPrice,2))/totalNumberOfSimulations);
 	// Elapsed time is temporary, will be implemented later
 	double elapsedTime = 0.;
 	
 	// Global output MC
 	Output_MC_data outputMC(monteCarloEstimatedPrice, monteCarloError, elapsedTime);
 	outputMC.CompleteEvaluationOfBlackScholes(inputOption, inputMarket);
-	
-	cout << "MC estimated price [USD] = " << outputMC.GetEstimatedPriceMC() << endl;
-	cout << "MC error [USD] = " << outputMC.GetErrorMC() << endl;
-	cout << "Elapsed time [ms] = " << outputMC.GetTick() << endl;
-	cout << "Black-Scholes estimated price = " << outputMC.GetBlackScholesPrice() << endl;
-	cout << "Black-Scholes discrepancy [MCSigmas] = " << outputMC.GetErrorBlackScholes() << endl;
-	
+	outputMC.PrintResults();
 	
 	// Trash bin section, where segfaults come to die
 	delete[] randomGenerators;
@@ -165,5 +154,30 @@ __host__ __device__ double EvaluatePayoff(const Path& path, const Input_option_d
 
 __host__ __device__ double ActualizePayoff(double payoff, double riskFreeRate, double timeToMaturity){
 	return (payoff * exp(- riskFreeRate*timeToMaturity));
+}
+
+__host__ tuple<double, double> EvaluateEstimatedPriceAndError(Output_MC_per_thread* threadOutputs, unsigned int totalNumberOfThreads){
+	double totalSumOfPayoffs = 0;
+	double totalSumOfSquaredPayoffs = 0;
+	
+	unsigned int totalPayoffCounter = 0;
+	unsigned int totalSquaredPayoffCounter = 0;
+	
+	for(unsigned int threadNumber=0; threadNumber<totalNumberOfThreads; ++threadNumber){
+		totalSumOfPayoffs += threadOutputs[threadNumber].GetPayoffSum();
+		totalPayoffCounter += threadOutputs[threadNumber].GetPayoffCounter();
+		totalSumOfSquaredPayoffs += threadOutputs[threadNumber].GetSquaredPayoffSum();
+		totalSquaredPayoffCounter += threadOutputs[threadNumber].GetSquaredPayoffCounter();
+	}
+	
+	if(totalPayoffCounter != totalSquaredPayoffCounter)
+		cerr << "WARNING: Count of payoffs and squared payoffs in EvaluateEstimatedPriceAndError() are not equal." << endl;
+		
+	cout << "Total number of actual simulations: " << totalPayoffCounter << endl;
+		
+	double monteCarloEstimatedPrice = totalSumOfPayoffs / totalPayoffCounter;
+	double monteCarloError = sqrt(((totalSumOfSquaredPayoffs/totalSquaredPayoffCounter) - pow(monteCarloEstimatedPrice,2))/totalSquaredPayoffCounter);	
+	
+	return make_tuple(monteCarloEstimatedPrice, monteCarloError);
 }
 

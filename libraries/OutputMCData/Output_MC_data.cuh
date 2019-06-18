@@ -44,6 +44,8 @@ class Output_MC_data{
 
 		__device__ __host__ double GetBlackScholesPrice();
 		__device__ __host__ double GetErrorBlackScholes();
+		
+		__host__ void PrintResults();
 
 };
 
