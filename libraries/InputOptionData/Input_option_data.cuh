@@ -31,6 +31,8 @@ public:
 	__device__ __host__ double GetDeltaTime() const;	
 	__device__ __host__ void SetOptionType(const char);
 	__device__ __host__ char GetOptionType() const;
+	
+	__host__ void PrintOptionInput() const;
 
 
 };

@@ -1,0 +1,32 @@
+####### INPUT DATA FOR OPTION PRICING #######
+### Comments beginning with # are ignored ###
+#
+#
+#
+## GPU DATA
+# Number of GPU blocks
+10
+## MARKET DATA
+# Initial underlying price at t = 0 [USD]
+100
+# Market volatility
+0.25
+# Risk-free interest rate
+0.01
+## OPTION DATA
+# Option strike price [USD]
+100
+# Time to maturity [years]
+1
+# Number of intervals in which TTM is divided
+365
+# Option type (c = call, p = put)
+c
+## MONTE CARLO DATA
+# Number of simulations
+10000
+#
+#
+#
+#############################################
+#############################################

@@ -25,6 +25,8 @@ public:
 	
 	__device__ __host__ unsigned int GetNumberOfThreadsPerBlock() const;
 	__device__ __host__ unsigned int GetTotalNumberOfThreads() const;
+	
+	__host__ void PrintGPUInput() const;
 
 };
 #endif

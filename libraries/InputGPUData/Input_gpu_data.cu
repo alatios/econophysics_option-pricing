@@ -31,3 +31,9 @@ __device__ __host__ unsigned int Input_gpu_data::GetNumberOfThreadsPerBlock() co
 __device__ __host__ unsigned int Input_gpu_data::GetTotalNumberOfThreads() const{
 	return this->GetNumberOfBlocks() * NUMBER_OF_THREADS_PER_BLOCK;
 }
+
+__host__ void Input_gpu_data::PrintGPUInput() const{
+	cout << "Number of blocks: " << this->GetNumberOfBlocks() << endl;
+	cout << "Number of threads per block: " << this->GetNumberOfThreadsPerBlock() << endl;
+	cout << "Total number of threads: " << this->GetTotalNumberOfThreads() << endl;	
+}

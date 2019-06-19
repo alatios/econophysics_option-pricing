@@ -29,6 +29,8 @@ public:
 
 	__device__ __host__ void SetRiskFreeRate(double);
 	__device__ __host__ double GetRiskFreeRate() const;
+	
+	__host__ void PrintMarketInput() const;
 
 };
 #endif

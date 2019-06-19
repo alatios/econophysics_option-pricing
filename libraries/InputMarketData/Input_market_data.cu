@@ -48,3 +48,9 @@ __device__ __host__ void Input_market_data::SetRiskFreeRate(double RiskFreeRate)
 __device__ __host__ double Input_market_data::GetRiskFreeRate() const{
 	return _RiskFreeRate;
 }
+
+__host__ void Input_market_data::PrintMarketInput() const{
+	cout << "Initial underlying price [USD]: " << this->GetInitialPrice() << endl;
+	cout << "Market volatility: " << this->GetVolatility() << endl;
+	cout << "Risk free rate: " << this->GetRiskFreeRate() << endl;	
+}

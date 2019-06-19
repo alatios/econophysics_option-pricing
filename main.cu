@@ -1,13 +1,15 @@
 #include <iostream>
 #include <cstdlib>
-#include <ctime>		// time(NULL) for seed
+#include <fstream>		// ifstream
+#include <ctime>		// time(NULL)
 #include <random>		// C++11 Mersenne twister
 #include <climits>		// UINT_MAX
 #include <cmath>		// log, cos, sin, ceil, M_PI
 #include <algorithm>	// min
-#include <fstream>
 #include <cstdio>
 #include <tuple>		// tuple, tie, make_tuple
+#include <vector>		// vector
+#include <string>		// string, stoul, stod, at
 
 #include "libraries/InputGPUData/Input_gpu_data.cuh"
 #include "libraries/InputMarketData/Input_market_data.cuh"
@@ -29,30 +31,35 @@ __host__ __device__ double EvaluatePayoff(const Path&, const Input_option_data&)
 __host__ __device__ double ActualizePayoff(double payoff, double riskFreeRate, double timeToMaturity);
 __host__ tuple<double, double> EvaluateEstimatedPriceAndError(Output_MC_per_thread*, unsigned int totalNumberOfThreads);
 __host__ void PrintInputData(const Input_gpu_data&, const Input_option_data&, const Input_market_data&, const Input_MC_data&);
+__host__ void ReadInputData(vector<string>&, string sourceFile);
 
 int main(){
 	
+	vector<string> inputDataVector;
+	string sourceFile = "input.dat";
+	ReadInputData(inputDataVector, sourceFile);
+	
 	// Input GPU data
-	unsigned int numberOfBlocks = 10;
+	unsigned int numberOfBlocks = stoul(inputDataVector[0]);
 	Input_gpu_data inputGPU(numberOfBlocks);
 	unsigned int numberOfThreadsPerBlock = inputGPU.GetNumberOfThreadsPerBlock();
 	unsigned int totalNumberOfThreads = inputGPU.GetTotalNumberOfThreads();
 	
 	// Input market data
-	double initialPrice = 100.;			// USD
-	double volatility = 0.25;			// Percentage
-	double riskFreeRate = 0.01;			// 50% per year (percentage per unit of time)
+	double initialPrice = stod(inputDataVector[1]);
+	double volatility = stod(inputDataVector[2]);
+	double riskFreeRate = stod(inputDataVector[3]);
 	Input_market_data inputMarket(initialPrice, volatility, riskFreeRate);
 
 	// Input option data
-	double strikePrice = 100.;				// $
-	double timeToMaturity = 1.;				// years
-	unsigned int numberOfIntervals = 365;	// No unit of measure
-	char optionType = 'c';					// Call option
+	double strikePrice = stod(inputDataVector[4]);
+	double timeToMaturity = stod(inputDataVector[5]);
+	unsigned int numberOfIntervals = stoul(inputDataVector[6]);
+	char optionType = inputDataVector[7].at(0);		// Get char in position 0, just as well since this is supposed to be a single char string
 	Input_option_data inputOption(strikePrice, numberOfIntervals, timeToMaturity, optionType);
 
 	// Input Monte Carlo data
-	unsigned int totalNumberOfSimulations = 10000;
+	unsigned int totalNumberOfSimulations = stoul(inputDataVector[8]);
 	Input_MC_data inputMC(totalNumberOfSimulations);
 	unsigned int numberOfSimulationsPerThread = inputMC.GetNumberOfSimulationsPerThread(inputGPU);
 	
@@ -78,8 +85,12 @@ int main(){
 	// Output MC per thread
 	Output_MC_per_thread *threadOutputs = new Output_MC_per_thread[totalNumberOfThreads];
 	
+	
+	cout << "Beginning device simulation through CPU..." << endl;
 	// Simulating device function
 	OptionPricingEvaluator_Host(inputGPU, inputOption, inputMarket, inputMC, pathTemplate, randomGenerators, threadOutputs);
+	cout << endl;
+	
 	
 	// Compute results
 	double monteCarloEstimatedPrice, monteCarloError;
@@ -92,6 +103,7 @@ int main(){
 	Output_MC_data outputMC(monteCarloEstimatedPrice, monteCarloError, elapsedTime);
 	outputMC.CompleteEvaluationOfBlackScholes(inputOption, inputMarket);
 	outputMC.PrintResults();
+	cout << endl;
 	
 	// Trash bin section, where segfaults come to die
 	delete[] randomGenerators;
@@ -182,22 +194,26 @@ __host__ tuple<double, double> EvaluateEstimatedPriceAndError(Output_MC_per_thre
 
 __host__ void PrintInputData(const Input_gpu_data& inputGPU, const Input_option_data& option, const Input_market_data& market, const Input_MC_data& inputMC){
 	cout << endl << "###### INPUT DATA ######" << endl << endl;
-	cout << "## General input data ##" << endl;
-	cout << "Number of blocks: " << inputGPU.GetNumberOfBlocks() << endl;
-	cout << "Number of threads per block: " << inputGPU.GetNumberOfThreadsPerBlock() << endl;
-	cout << "Total number of threads: " << inputGPU.GetTotalNumberOfThreads() << endl;
-	cout << "Number of simulations: " << inputMC.GetNumberOfMCSimulations() << endl;
-	cout << "Number of simulations per thread (round-up): " << inputMC.GetNumberOfSimulationsPerThread(inputGPU) << endl;
-	
+	cout << "## GPU AND MC INPUT DATA ##" << endl;
+	inputGPU.PrintGPUInput();
+	inputMC.PrintMCInput(inputGPU);
+
 	cout << "## MARKET DATA ##" << endl;
-	cout << "Initial underlying price [USD]: " << market.GetInitialPrice() << endl;
-	cout << "Market volatility: " << market.GetVolatility() << endl;
-	cout << "Risk free rate: " << market.GetRiskFreeRate() << endl;
+	market.PrintMarketInput();
 	
 	cout << "## OPTION DATA ##" << endl;
-	cout << "Option strike price [USD]: " << option.GetStrikePrice() << endl;
-	cout << "Time to option maturity [years]: " << option.GetTimeToMaturity() << endl;
-	cout << "Number of intervals for Euler formula computation: " << option.GetNumberOfIntervals() << endl;
-	cout << "Interval time [years]: " << option.GetDeltaTime() << endl;
-	cout << "Option type (c = call, p = put): " << option.GetOptionType() << endl;
+	option.PrintOptionInput();
+	
+	cout << endl;
+}
+
+__host__ void ReadInputData(vector<string>& inputDataVector, string sourceFile){
+	ifstream inputFileStream(sourceFile.c_str());
+	string line;
+	if(inputFileStream.is_open()){
+		while(getline(inputFileStream, line))
+			if(line[0] != '#')
+				inputDataVector.push_back(line);
+	}else
+		cout << "ERROR: Unable to open file " << sourceFile << "." << endl;
 }

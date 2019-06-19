@@ -60,4 +60,12 @@ __device__ __host__ char Input_option_data::GetOptionType() const{
 
 __device__ __host__ double Input_option_data::GetDeltaTime() const{
 	return static_cast<double>(static_cast<double>(this->GetTimeToMaturity()) / static_cast<unsigned int>(this->GetNumberOfIntervals()));	
-}	
+}
+
+__host__ void Input_option_data::PrintOptionInput() const{
+	cout << "Option strike price [USD]: " << this->GetStrikePrice() << endl;
+	cout << "Time to option maturity [years]: " << this->GetTimeToMaturity() << endl;
+	cout << "Number of intervals for Euler formula computation: " << this->GetNumberOfIntervals() << endl;
+	cout << "Interval time [years]: " << this->GetDeltaTime() << endl;
+	cout << "Option type (c = call, p = put): " << this->GetOptionType() << endl;	
+}

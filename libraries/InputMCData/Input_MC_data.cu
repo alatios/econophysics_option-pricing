@@ -23,3 +23,8 @@ __device__ __host__ unsigned int Input_MC_data::GetNumberOfMCSimulations() const
 __device__ __host__ unsigned int Input_MC_data::GetNumberOfSimulationsPerThread(const Input_gpu_data& inputGPU) const{
 	return ceil(static_cast<double>(this->GetNumberOfMCSimulations()) / inputGPU.GetTotalNumberOfThreads());
 }
+
+__host__ void Input_MC_data::PrintMCInput(const Input_gpu_data& inputGPU) const{
+	cout << "Number of simulations: " << this->GetNumberOfMCSimulations() << endl;
+	cout << "Number of simulations per thread (round-up): " << this->GetNumberOfSimulationsPerThread(inputGPU) << endl;
+}

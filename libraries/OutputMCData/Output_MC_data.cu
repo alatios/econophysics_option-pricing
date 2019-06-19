@@ -116,7 +116,7 @@ __device__ __host__ void Output_MC_data::CompleteEvaluationOfBlackScholes(const 
 
 // Public methods for output management
 __host__ void Output_MC_data::PrintResults(){
-	cout << endl << "###### OUTPUT DATA ######" << endl << endl;
+	cout << "###### OUTPUT DATA ######" << endl << endl;
 	cout << "MC estimated price [USD] = " << this->GetEstimatedPriceMC() << endl;
 	cout << "MC error [USD] = " << this->GetErrorMC() << endl;
 	cout << "Elapsed time [ms] = " << this->GetTick() << endl;
