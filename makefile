@@ -9,6 +9,7 @@ libraries/OutputMCData/Output_MC_data.o \
 libraries/Path/Path.o \
 libraries/OutputMCPerThread/Output_MC_per_thread.o \
 random_generator/rng.o \
+general_purpose_functions/Support_functions.o \
 main.o
 
 NVCC=nvcc
@@ -30,6 +31,7 @@ clean:
 	@(cd libraries/Path && rm -f *.x *.o)				|| ($(ECHO) "Failed to clean libraries/Path." && exit 1)
 	@(cd libraries/OutputMCPerThread && rm -f *.x *.o )	|| ($(ECHO) "Failed to clean libraries/OutputMCPerThread." && exit 1)
 	@(cd random_generator && rm -f *.x *.o)				|| ($(ECHO) "Failed to clean random_generator." && exit 1)
+	@(cd general_purpose_functions && rm -f *.x *.o)	|| ($(ECHO) "Failed to clean general_purpose_functions." && exit 1)
 	@rm -f *.x *.o 										|| ($(ECHO) "Failed to clean root directory." && exit 1)
 	@$(ECHO) "Done cleaning."
 
