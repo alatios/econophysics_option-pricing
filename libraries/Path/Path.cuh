@@ -24,6 +24,11 @@ class Path{
 		__device__ __host__ void SetVolatility(double);
 		__device__ __host__ void SetDeltaTime(double);
 
+		__device__ __host__ double GetSpotPrice() const;
+		__device__ __host__ double GetVolatility() const;
+		__device__ __host__ double GetRiskFreeRate() const;
+		__device__ __host__ double GetDeltaTime() const;
+
 	public:
 
 		__device__ __host__ Path();
@@ -32,12 +37,6 @@ class Path{
 
 		__device__ __host__ void SetInternalState(const Input_market_data&, const Input_option_data&, double SpotPrice);
 		__device__ __host__ void SetInternalState(const Path&);
-
-		__device__ __host__ double GetSpotPrice() const;
-		__device__ __host__ double GetVolatility() const;
-		__device__ __host__ double GetRiskFreeRate() const;
-		__device__ __host__ double GetDeltaTime() const;
-
 
 		__device__ __host__ void EuleroStep(double gaussianRandomVariable);
 };

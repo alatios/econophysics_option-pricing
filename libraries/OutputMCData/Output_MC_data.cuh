@@ -15,8 +15,8 @@ class Output_MC_data{
 		double _EstimatedPriceMC;
 		double _ErrorMC;
 		double _BlackScholesPrice;
-		double _ErrorBlackScholes;				//error with respect to the exact result
-		double _Tick;							//calculation time [ms]
+		double _ErrorBlackScholes;				// Discrepancy between BS formula and MC estimate
+		double _Tick;							// Calculation time [ms]
 		
 		__device__ __host__ void BlackScholesCallOption(const Input_option_data&, const Input_market_data&);
 		__device__ __host__ void BlackScholesPutOption(const Input_option_data&, const Input_market_data&);
