@@ -28,7 +28,6 @@ clean:
 	@(cd libraries/InputOptionData && rm -f *.x *.o)	|| ($(ECHO) "Failed to clean libraries/InputOptionData." && exit 1)
 	@(cd libraries/OutputMCData && rm -f *.x *.o)		|| ($(ECHO) "Failed to clean libraries/OutputMCData." && exit 1)
 	@(cd libraries/Path && rm -f *.x *.o)				|| ($(ECHO) "Failed to clean libraries/Path." && exit 1)
-	@(cd libraries/PathPerThread && rm -f *.x *.o )		|| ($(ECHO) "Failed to clean libraries/PathPerThread." && exit 1)
 	@(cd libraries/OutputMCPerThread && rm -f *.x *.o )	|| ($(ECHO) "Failed to clean libraries/OutputMCPerThread." && exit 1)
 	@(cd random_generator && rm -f *.x *.o)				|| ($(ECHO) "Failed to clean random_generator." && exit 1)
 	@rm -f *.x *.o 										|| ($(ECHO) "Failed to clean root directory." && exit 1)
