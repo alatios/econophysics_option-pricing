@@ -49,7 +49,7 @@ int main(){
 */
 	// Mersenne random generator of unsigned ints, courtesy of C++11
 	mt19937 mersenneCoreGenerator(time(NULL));
-	uniform_int_distribution<unsigned int> mersenneDistribution(129, UINT_MAX);
+	uniform_int_distribution<unsigned int> uniformDistribution(129, UINT_MAX);
 	
 	cout << "Maximum unsigned int, aka endpoint of uniform seed distribution: " << UINT_MAX << endl << endl;
 
@@ -60,10 +60,10 @@ int main(){
 //	cout << "Seeds during for cycle (exp. between 0 and " << UINT_MAX << ", from 0 to " << totalNumberOfThreads-1 << "): " << endl;
 //	cout << "thread number\t seedLCGS\t seedTaus1\t seedTaus2\t seedTaus3" << endl;
 	for(unsigned int threadNumber=0; threadNumber<totalNumberOfThreads; ++threadNumber){
-		generators[threadNumber].SetSeedLCGS(mersenneDistribution(mersenneCoreGenerator));
-		generators[threadNumber].SetSeedTaus1(mersenneDistribution(mersenneCoreGenerator));
-		generators[threadNumber].SetSeedTaus2(mersenneDistribution(mersenneCoreGenerator));
-		generators[threadNumber].SetSeedTaus3(mersenneDistribution(mersenneCoreGenerator));
+		generators[threadNumber].SetInternalState(uniformDistribution(mersenneCoreGenerator),
+													uniformDistribution(mersenneCoreGenerator),
+													uniformDistribution(mersenneCoreGenerator),
+													uniformDistribution(mersenneCoreGenerator));
 		
 //		cout << threadNumber
 //		<< "\t" << generators[threadNumber].GetSeedLCGS()

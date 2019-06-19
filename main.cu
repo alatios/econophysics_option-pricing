@@ -72,14 +72,14 @@ int main(){
 	// Mersenne random generator of unsigned ints, courtesy of C++11
 	// For reproducibility, replace time(NULL) with a fixed seed
 	mt19937 mersenneCoreGenerator(time(NULL));
-	uniform_int_distribution<unsigned int> mersenneDistribution(129, UINT_MAX);
+	uniform_int_distribution<unsigned int> uniformDistribution(129, UINT_MAX);
 
 	RNGCombinedGenerator *randomGenerators = new RNGCombinedGenerator[totalNumberOfThreads];
 	for(unsigned int threadNumber=0; threadNumber<totalNumberOfThreads; ++threadNumber){
-		randomGenerators[threadNumber].SetSeedLCGS(mersenneDistribution(mersenneCoreGenerator));
-		randomGenerators[threadNumber].SetSeedTaus1(mersenneDistribution(mersenneCoreGenerator));
-		randomGenerators[threadNumber].SetSeedTaus2(mersenneDistribution(mersenneCoreGenerator));
-		randomGenerators[threadNumber].SetSeedTaus3(mersenneDistribution(mersenneCoreGenerator));
+		randomGenerators[threadNumber].SetInternalState(uniformDistribution(mersenneCoreGenerator),
+														uniformDistribution(mersenneCoreGenerator),
+														uniformDistribution(mersenneCoreGenerator),
+														uniformDistribution(mersenneCoreGenerator));
 	}
 	
 	// Output MC per thread

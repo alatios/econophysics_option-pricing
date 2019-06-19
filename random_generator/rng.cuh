@@ -26,23 +26,9 @@ class RNGCombinedGenerator{
 		__device__ __host__ double GetUnsignedInt();
 		__device__ __host__ double GetUniform();
 		__device__ __host__ double GetGauss();
-		
-		// Single steps (callable from device and host, no need to diversify)
-		__device__ __host__ unsigned int LCGStep();
-		__device__ __host__ unsigned int TausStep1();
-		__device__ __host__ unsigned int TausStep2();
-		__device__ __host__ unsigned int TausStep3();
-		__device__ __host__ unsigned int HybridTausGenerator();
-		
-		// Get/set seeds
-		__device__ __host__ unsigned int GetSeedLCGS() const;
-		__device__ __host__ void SetSeedLCGS(const unsigned int);
-		__device__ __host__ unsigned int GetSeedTaus1() const;
-		__device__ __host__ void SetSeedTaus1(const unsigned int);
-		__device__ __host__ unsigned int GetSeedTaus2() const;
-		__device__ __host__ void SetSeedTaus2(const unsigned int);
-		__device__ __host__ unsigned int GetSeedTaus3() const;
-		__device__ __host__ void SetSeedTaus3(const unsigned int);
+
+		// Public internal state set (unsigned ints between 129 and UINT_MAX)
+		__device__ __host__ void SetInternalState(unsigned int, unsigned int, unsigned int, unsigned int);
 		
 		// Constructor and destructor
 		__device__ __host__ RNGCombinedGenerator();
@@ -56,6 +42,23 @@ class RNGCombinedGenerator{
 		unsigned int _seedTaus1;
 		unsigned int _seedTaus2;
 		unsigned int _seedTaus3;
+		
+		// Get/set seeds
+		__device__ __host__ unsigned int GetSeedLCGS() const;
+		__device__ __host__ void SetSeedLCGS(const unsigned int);
+		__device__ __host__ unsigned int GetSeedTaus1() const;
+		__device__ __host__ void SetSeedTaus1(const unsigned int);
+		__device__ __host__ unsigned int GetSeedTaus2() const;
+		__device__ __host__ void SetSeedTaus2(const unsigned int);
+		__device__ __host__ unsigned int GetSeedTaus3() const;
+		__device__ __host__ void SetSeedTaus3(const unsigned int);
+		
+		// Single steps (callable from device and host, no need to diversify)
+		__device__ __host__ unsigned int LCGStep();
+		__device__ __host__ unsigned int TausStep1();
+		__device__ __host__ unsigned int TausStep2();
+		__device__ __host__ unsigned int TausStep3();
+		__device__ __host__ unsigned int HybridTausGenerator();
 };
 
 #endif

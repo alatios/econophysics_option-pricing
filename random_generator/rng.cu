@@ -125,3 +125,10 @@ __device__ __host__ double RNGCombinedGenerator::GetGauss(){
 
 	return sqrt(-2.*log(u)) * cos(2.*M_PI*v);
 }
+
+__device__ __host__ void RNGCombinedGenerator::SetInternalState(unsigned int seedLGCS, unsigned int seedTaus1, unsigned int seedTaus2, unsigned int seedTaus3){
+	this->SetSeedLCGS(seedLGCS);
+	this->SetSeedTaus1(seedTaus1);
+	this->SetSeedTaus2(seedTaus2);
+	this->SetSeedTaus3(seedTaus3);
+}
