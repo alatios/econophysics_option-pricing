@@ -31,10 +31,10 @@ class Path{
 	public:
 
 		__device__ __host__ Path();
-		__device__ __host__ Path(const Input_market_data&, const Input_option_data&, double SpotPrice);
+		__device__ __host__ Path(const Input_market_data& market, const Input_option_data& option, double SpotPrice);
 		__device__ __host__ ~Path() = default;
 
-		__device__ __host__ void SetInternalState(const Input_market_data&, const Input_option_data&, double SpotPrice);
+		__device__ __host__ void SetInternalState(const Input_market_data& market, const Input_option_data& option, double SpotPrice);
 		__device__ __host__ void SetInternalState(const Path&);
 
 		__device__ __host__ void EuleroStep(double gaussianRandomVariable);

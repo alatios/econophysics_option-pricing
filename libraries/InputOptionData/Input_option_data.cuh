@@ -18,7 +18,7 @@ private:
 public:
 
 	__device__ __host__ Input_option_data(); //Default constructor
-	__device__ __host__ Input_option_data(double, unsigned int, double, char);
+	__device__ __host__ Input_option_data(double StrikePrice, unsigned int NumberOfIntervals, double TimeToMaturity, char OptionType);
 	__device__ __host__ Input_option_data(const Input_option_data&); //Copy constructor
 	__device__ __host__ ~Input_option_data() = default;
 
