@@ -18,10 +18,10 @@ __device__ __host__ Input_market_data::Input_market_data(double InitialPrice, do
 }
 
 //Copy constructor
-__device__ __host__ Input_market_data::Input_market_data(const Input_market_data& data){
-	this->SetInitialPrice(data.GetInitialPrice());
-	this->SetVolatility(data.GetVolatility());
-	this->SetRiskFreeRate(data.GetRiskFreeRate());
+__device__ __host__ Input_market_data::Input_market_data(const Input_market_data& inputData){
+	this->SetInitialPrice(inputData.GetInitialPrice());
+	this->SetVolatility(inputData.GetVolatility());
+	this->SetRiskFreeRate(inputData.GetRiskFreeRate());
 
 }
 //Methods

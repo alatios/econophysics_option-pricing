@@ -12,8 +12,9 @@ OUTPUT:
 */
 
 int main(){
-/*
+
 	double SpotPrice = 1.;
+	bool test;
 
 	//Variables for testing Eulero formulae
 	//Market
@@ -28,35 +29,22 @@ int main(){
 	Input_option_data option(StrikePrice, NumberOfIntervals, TimeToMaturity, 'p');
 
 	Path path1;
-	Path path2(SpotPrice);
+	Path path2(market, option, SpotPrice);
 	Path path3(path1);
 
-	cout << endl << "-------------Path_test-------------" << endl;
-	cout << "Constructors testing" << endl;
+	cout << "\n-------------Path_test-------------\n";
+	cout << "Constructors testing\n";
 	//Constructor testing
-	cout << (bool)(path1.GetGaussianRandomVariable()==static_cast<double>(0.))
-	<< "\t" << (bool)(path1.GetSpotPrice()==static_cast<double>(0.)) << endl;
-
-	cout << (bool)(path2.GetGaussianRandomVariable()==static_cast<double>(0.))
-	<< "\t" << (bool)(path2.GetSpotPrice()==static_cast<double>(1.)) << endl;
-
-	cout << (bool)(path3.GetGaussianRandomVariable()==static_cast<double>(0.))
-	<< "\t" << (bool)(path3.GetSpotPrice()==static_cast<double>(0.)) << endl;
-	
-	cout << endl;
+	test = path1.GetSpotPrice() == static_cast<double>(0.);
+	cout << test << "\t";
+	test = path2.GetSpotPrice() == static_cast<double>(1.);
+	cout << test << "\t";
+	test = path3.GetSpotPrice() == static_cast<double>(0.);
+	cout << test << "\n";
 
 	//Methods testing
-	cout << "Methods testing" << endl;
-	Input_market_data other_market(200., 3., 0.6);
-	Input_option_data other_option(190., 100, 300., 'p');	// DeltaTime = 3.
-
-	path1.SetGaussianRandomVariable(0.3);
-	path1.SetSpotPrice(240.2);
-
-	cout << (bool)(path1.GetGaussianRandomVariable()==static_cast<double>(0.3))
-	<< "\t" << (bool)(path1.GetSpotPrice()==static_cast<double>(240.2)) << endl;
-
-	cout << "Eulero Testing" << endl;
+	cout << "\nMethods testing\n";
+	cout << "Eulero Testing\n";
 	//Variables for testing Eulero formulae
 	//Option
 	double SpotPriceEulero = 1.;
@@ -70,10 +58,16 @@ int main(){
 	Input_market_data marketEulero(InitialPriceEulero, VolatilityEulero, RiskFreeRateEulero);
 	Input_option_data optionEulero(StrikePriceEulero, NumberOfIntervalsEulero, TimeToMaturityEulero, 'p');
 
-	Path pathEulero(SpotPriceEulero);
-	pathEulero.EuleroStep(marketEulero, optionEulero);
-	cout << (bool)(pathEulero.GetSpotPrice()==static_cast<double>(1.1)) << endl;
-*/
+	path1.SetInternalState(marketEulero, optionEulero, SpotPriceEulero);
+	path1.EuleroStep(0.3);
+	
+	path2.SetInternalState(path1);
+
+	test = path1.GetSpotPrice() == static_cast<double>(1.175);
+	cout << test << "\t";
+	test = path2.GetSpotPrice() == static_cast<double>(1.175);
+	cout << test << "\n";
+
 	return 0;
 
 }

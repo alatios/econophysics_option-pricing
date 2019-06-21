@@ -11,6 +11,6 @@ cd  ../OutputMCData/ &&
 make run &&
 cd ../Path &&
 make run &&
-cd ../OutputMCPerThread &&
+cd ../Statistics &&
 make run &&
 cd ../..

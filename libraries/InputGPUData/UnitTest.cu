@@ -21,22 +21,27 @@ int main(){
 	Input_gpu_data GpuData_2 = Input_gpu_data(NumberOfBlocks);
 	Input_gpu_data GpuData_3(GpuData_1);
 
-	cout << endl << "-------------Input_gpu_test-------------" << endl;
-	cout << "Constructors testing" << endl;
+	cout << "\n-------------Input_gpu_test-------------\n";
+	cout << "Constructors testing\n";
 
 	test = (GpuData_1.GetNumberOfBlocks()==static_cast<unsigned int>(14));
-	cout << test << endl;
+	cout << test << "\t";
 	test = (GpuData_2.GetNumberOfBlocks()==static_cast<unsigned int>(100));
-	cout << test << endl;
+	cout << test << "\t";
 	test = (GpuData_3.GetNumberOfBlocks()==static_cast<unsigned int>(14));
-	cout << test << endl;
+	cout << test << "\n";
 
-	cout << "Methods testing" << endl;
+	cout << "\nMethods testing\n";
 	//Methods testing
 	GpuData_1.SetNumberOfBlocks(6);
 
 	test = GpuData_1.GetNumberOfBlocks()==static_cast<unsigned int>(6);
-	cout << test << endl;
+	cout << test << "\t";
+	test = GpuData_1.GetNumberOfThreadsPerBlock()==static_cast<unsigned int>(512);
+	cout << test << "\t";
+	test = GpuData_1.GetTotalNumberOfThreads()==static_cast<unsigned int>(3072);
+	cout << test << "\n";
+
 
 	return 0;
 }
