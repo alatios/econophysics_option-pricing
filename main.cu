@@ -17,7 +17,7 @@
 #include "libraries/InputOptionData/Input_option_data.cuh"
 #include "libraries/OutputMCData/Output_MC_data.cuh"
 #include "libraries/Path/Path.cuh"
-#include "libraries/OutputMCPerThread/Output_MC_per_thread.cuh"
+#include "libraries/Statistics/Statistics.cuh"
 #include "random_generator/rng.cuh"
 #include "general_purpose_functions/Support_functions.cuh"
 
