@@ -21,7 +21,8 @@ int main(){
 	unsigned int numberOfBlocks = 10;
 	unsigned int numberOfThreadsPerBlock = 512;
 	unsigned int totalNumberOfThreads = numberOfBlocks * numberOfThreadsPerBlock;
-	unsigned int totalNumbersToGenerate = 5120;
+	unsigned int totalNumbersToGenerate = 5120000;
+
 	unsigned int numbersToGeneratePerThread = ceil(static_cast<double>(totalNumbersToGenerate) / totalNumberOfThreads);
 	cout << "Total numbers to generate: " << totalNumbersToGenerate << endl;
 	cout << "Total number of threads: " << totalNumberOfThreads << endl;
@@ -87,16 +88,16 @@ int main(){
 		cout << randomNumber << "\t" << unsignedNumbers[randomNumber] << "\t" << uniformNumbers[randomNumber] << "\t" << gaussianNumbers[randomNumber] << endl;
 */
 	cout << endl <<  "############### INTER-STREAM TEST ###############" << endl << endl;
+	int step = 0;					//To choose which step of the random generation you want
 	double uniform_sum = 0;
 	double uniform_sum2 = 0;
 	double gaussian_sum = 0;
 	double gaussian_sum2 = 0;
 	for(int randomNumber=0; randomNumber<totalNumberOfThreads - 1; ++randomNumber){
-		uniform_sum =+ uniformNumbers[randomNumber] * uniformNumbers[randomNumber + 1];
-		gaussian_sum =+ gaussianNumbers[randomNumber] * gaussianNumbers[randomNumber +1];
-	
-		uniform_sum2 =+ pow(uniformNumbers[randomNumber],2) * pow(uniformNumbers[randomNumber + 1],2);
-		gaussian_sum2 =+ pow(gaussianNumbers[randomNumber],2) * pow(gaussianNumbers[randomNumber + 1],2);
+		uniform_sum =+ uniformNumbers[randomNumber * numbersToGeneratePerThread + step] * uniformNumbers[(randomNumber + 1) * numbersToGeneratePerThread + step];
+		gaussian_sum =+ gaussianNumbers[randomNumber * numbersToGeneratePerThread + step] * gaussianNumbers[(randomNumber + 1) * numbersToGeneratePerThread + step];
+		uniform_sum2 =+ pow(uniformNumbers[randomNumber * numbersToGeneratePerThread + step],2) * pow(uniformNumbers[(randomNumber + 1) * numbersToGeneratePerThread + step ],2);
+		gaussian_sum2 =+ pow(gaussianNumbers[randomNumber * numbersToGeneratePerThread + step],2) * pow(gaussianNumbers[(randomNumber + 1) * numbersToGeneratePerThread + step ],2);
 	}
 
 	double uniform_mean = uniform_sum/totalNumberOfThreads;
@@ -107,6 +108,31 @@ int main(){
 	cout << "The value obtained differs from the expected by: " << abs(uniform_mean/uniform_standard_deviation) << " stardard deviation" << endl << endl;
 	cout << "Correlation function of gaussian numbers: " << gaussian_mean << " +- " << gaussian_standard_deviation << endl;
 	cout << "The value obtained differs from the expected by: " << abs(gaussian_mean/gaussian_standard_deviation) << " stardard deviation" << endl << endl;
+
+	cout << endl <<  "############### INTRA-STREAM TEST ###############" << endl << endl;
+
+	int thread_test = 0;			//To choose on which thread make tests
+	cout << "The tests is made only on thread stream no. "  << thread_test << endl;
+	uniform_sum = 0;
+	double uniform_sum_corr = 0.;
+	gaussian_sum = 0;
+	gaussian_sum2 = 0;
+	for(int randomNumber=0; randomNumber<numbersToGeneratePerThread; ++randomNumber){
+		uniform_sum += uniformNumbers[randomNumber + thread_test]; 
+		gaussian_sum += gaussianNumbers[randomNumber + thread_test];
+		gaussian_sum2 += pow(gaussianNumbers[randomNumber + thread_test],2);
+	}
+	for(int randomNumber=0; randomNumber<numbersToGeneratePerThread - 1; ++randomNumber){
+		uniform_sum_corr += uniformNumbers[randomNumber + thread_test] * uniformNumbers[randomNumber + 1 + thread_test];
+	}
+
+
+	uniform_mean = uniform_sum/numbersToGeneratePerThread;
+	double uniform_correlation = uniform_sum_corr/numbersToGeneratePerThread;
+	gaussian_mean = gaussian_sum/numbersToGeneratePerThread;
+	gaussian_standard_deviation = sqrt(gaussian_sum2/numbersToGeneratePerThread - pow(gaussian_sum/totalNumberOfThreads,2));
+	cout << "Uniform mean: " << uniform_mean << "| Uniform Correlation intrastram: " << uniform_correlation << endl;
+	cout << "Gaussian mean: " << gaussian_mean << "| Gaussian standard deviation: " << gaussian_standard_deviation << endl << endl;
 
 	delete[] generators;
 	delete[] unsignedNumbers;
