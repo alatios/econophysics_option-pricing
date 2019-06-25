@@ -21,7 +21,7 @@ int main(){
 	unsigned int numberOfBlocks = 10;
 	unsigned int numberOfThreadsPerBlock = 512;
 	unsigned int totalNumberOfThreads = numberOfBlocks * numberOfThreadsPerBlock;
-	unsigned int totalNumbersToGenerate = 20;
+	unsigned int totalNumbersToGenerate = 5120;
 	unsigned int numbersToGeneratePerThread = ceil(static_cast<double>(totalNumbersToGenerate) / totalNumberOfThreads);
 	cout << "Total numbers to generate: " << totalNumbersToGenerate << endl;
 	cout << "Total number of threads: " << totalNumberOfThreads << endl;
@@ -76,7 +76,7 @@ int main(){
 	cudaFree(device_gaussianNumbers);
 	///////////////////////////////////////////////////
 //*/
-
+/*
 	cout << "############### OUTPUT NUMBERS ################" << endl << endl;
 	cout << "RNG (exp. uniform [0,1] and gaussian (0,1), from 0 to 23): " << endl;
 	cout << "thread number\t uniform\t gauss3" << endl;
@@ -85,6 +85,28 @@ int main(){
 
 	for(int randomNumber=0; randomNumber<totalNumbersToGenerate; ++randomNumber)
 		cout << randomNumber << "\t" << unsignedNumbers[randomNumber] << "\t" << uniformNumbers[randomNumber] << "\t" << gaussianNumbers[randomNumber] << endl;
+*/
+	cout << endl <<  "############### INTER-STREAM TEST ###############" << endl << endl;
+	double uniform_sum = 0;
+	double uniform_sum2 = 0;
+	double gaussian_sum = 0;
+	double gaussian_sum2 = 0;
+	for(int randomNumber=0; randomNumber<totalNumberOfThreads - 1; ++randomNumber){
+		uniform_sum =+ uniformNumbers[randomNumber] * uniformNumbers[randomNumber + 1];
+		gaussian_sum =+ gaussianNumbers[randomNumber] * gaussianNumbers[randomNumber +1];
+	
+		uniform_sum2 =+ pow(uniformNumbers[randomNumber],2) * pow(uniformNumbers[randomNumber + 1],2);
+		gaussian_sum2 =+ pow(gaussianNumbers[randomNumber],2) * pow(gaussianNumbers[randomNumber + 1],2);
+	}
+
+	double uniform_mean = uniform_sum/totalNumberOfThreads;
+	double uniform_standard_deviation = sqrt(uniform_sum2/totalNumberOfThreads - pow(uniform_mean,2));
+	double gaussian_mean = gaussian_sum/totalNumberOfThreads;
+	double gaussian_standard_deviation = sqrt(gaussian_sum2/totalNumberOfThreads - pow(gaussian_sum/totalNumberOfThreads,2));
+	cout << "Correlation function of uniform numbers: " << uniform_mean << " +- " << uniform_standard_deviation << endl;
+	cout << "The value obtained differs from the expected by: " << abs(uniform_mean/uniform_standard_deviation) << " stardard deviation" << endl << endl;
+	cout << "Correlation function of gaussian numbers: " << gaussian_mean << " +- " << gaussian_standard_deviation << endl;
+	cout << "The value obtained differs from the expected by: " << abs(gaussian_mean/gaussian_standard_deviation) << " stardard deviation" << endl << endl;
 
 	delete[] generators;
 	delete[] unsignedNumbers;
