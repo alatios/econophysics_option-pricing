@@ -24,6 +24,7 @@ __device__ __host__ Input_market_data::Input_market_data(const Input_market_data
 	this->SetRiskFreeRate(inputData.GetRiskFreeRate());
 
 }
+
 //Methods
 __device__ __host__ void Input_market_data::SetInitialPrice(double InitialPrice){
 	_InitialPrice = InitialPrice;

@@ -59,7 +59,6 @@ __device__ __host__ double Output_MC_data::GetErrorBlackScholes(){
 }
 
 // Private methods for Black-Scholes evaluation
-
 __device__ __host__ void Output_MC_data::BlackScholesCallOption(const Input_option_data& option, const Input_market_data& market){
 
 	double tmp1 = (1./ (market.GetVolatility() * sqrt(option.GetTimeToMaturity()))) * (log(market.GetInitialPrice()/option.GetStrikePrice())

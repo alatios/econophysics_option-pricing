@@ -10,7 +10,6 @@ __device__ __host__ Input_gpu_data::Input_gpu_data(){         //Set the possible
 __device__ __host__ Input_gpu_data::Input_gpu_data(unsigned int NumberOfBlocks){
 	this->SetNumberOfBlocks(NumberOfBlocks);
 }
-
 //Copy constructor
 __device__ __host__ Input_gpu_data::Input_gpu_data(const Input_gpu_data& data){
 	this->SetNumberOfBlocks(data.GetNumberOfBlocks());

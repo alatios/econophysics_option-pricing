@@ -20,7 +20,6 @@ int main(){
 	double RiskFreeRate = 2.;
 	bool test;
 
-//	Input_market_data MarketData_1 = Input_market_data();
 	Input_market_data MarketData_1;
 	Input_market_data MarketData_2 = Input_market_data(InitialPrice, Volatility, RiskFreeRate);
 	Input_market_data MarketData_3(MarketData_1);

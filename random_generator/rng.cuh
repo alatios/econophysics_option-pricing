@@ -12,7 +12,7 @@ class RNG{
 	public:
 		// Virtual functions from base class
 		__device__ __host__ virtual void ResetSeed() = 0;
-		__device__ __host__ virtual double GetUnsignedInt()= 0;
+		__device__ __host__ virtual double GetUnsignedInt() = 0;
 		__device__ __host__ virtual double GetUniform() = 0;
 		__device__ __host__ virtual double GetGauss() = 0;
 		
