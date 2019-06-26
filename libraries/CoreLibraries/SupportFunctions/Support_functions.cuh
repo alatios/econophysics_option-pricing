@@ -3,7 +3,6 @@
 
 #include <iostream>
 #include <vector>	// vector
-#include <tuple>	// tuple
 #include <string>	// string
 
 #include "../libraries/InputGPUData/Input_gpu_data.cuh"
@@ -26,8 +25,5 @@ __host__ __device__ double ActualizePayoff(double payoff, double riskFreeRate, d
 // Input processing
 __host__ void PrintInputData(const Input_gpu_data&, const Input_option_data&, const Input_market_data&, const Input_MC_data&);
 __host__ void ReadInputData(vector<string>&, string sourceFile);
-
-// Output processing
-__host__ tuple<double, double> EvaluateEstimatedPriceAndError(Output_MC_per_thread*, unsigned int totalNumberOfThreads);
 
 #endif

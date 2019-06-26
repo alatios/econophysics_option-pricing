@@ -1,5 +1,5 @@
-#ifndef RNG__H
-#define RNG__H
+#ifndef _RNG__H
+#define _RNG__H
 
 #include <iostream>
 #include <cstdlib>
@@ -15,10 +15,11 @@ class RNG{
 		__device__ __host__ virtual double GetUnsignedInt() = 0;
 		__device__ __host__ virtual double GetUniform() = 0;
 		__device__ __host__ virtual double GetGauss() = 0;
+		__device__ __host__ virtual void SetInternalState(unsigned int, unsigned int, unsigned int, unsigned int) = 0;
 		
 };
 
-class RNGCombinedGenerator{
+class RNG_CombinedGenerator: public RNG{
 	
 	public:
 		// Virtual functions from base class
@@ -31,27 +32,16 @@ class RNGCombinedGenerator{
 		__device__ __host__ void SetInternalState(unsigned int, unsigned int, unsigned int, unsigned int);
 		
 		// Constructor and destructor
-		__device__ __host__ RNGCombinedGenerator();
-		__device__ __host__ RNGCombinedGenerator(const RNGCombinedGenerator&);
-		__device__ __host__ RNGCombinedGenerator(const unsigned int, const unsigned int, const unsigned int, const unsigned int);
-		__device__ __host__ ~RNGCombinedGenerator() = default;
+		__device__ __host__ RNG_CombinedGenerator();
+		__device__ __host__ RNG_CombinedGenerator(const unsigned int, const unsigned int, const unsigned int, const unsigned int);
+		__device__ __host__ ~RNG_CombinedGenerator() = default;
 	
 	private:
 		// Seeds: 3 taus + 1 LCGS
-		unsigned int _seedLCGS;
-		unsigned int _seedTaus1;
-		unsigned int _seedTaus2;
-		unsigned int _seedTaus3;
-		
-		// Get/set seeds
-		__device__ __host__ unsigned int GetSeedLCGS() const;
-		__device__ __host__ void SetSeedLCGS(const unsigned int);
-		__device__ __host__ unsigned int GetSeedTaus1() const;
-		__device__ __host__ void SetSeedTaus1(const unsigned int);
-		__device__ __host__ unsigned int GetSeedTaus2() const;
-		__device__ __host__ void SetSeedTaus2(const unsigned int);
-		__device__ __host__ unsigned int GetSeedTaus3() const;
-		__device__ __host__ void SetSeedTaus3(const unsigned int);
+		unsigned int _SeedLCGS;
+		unsigned int _SeedTaus1;
+		unsigned int _SeedTaus2;
+		unsigned int _SeedTaus3;
 		
 		// Single steps (callable from device and host, no need to diversify)
 		__device__ __host__ unsigned int LCGStep();

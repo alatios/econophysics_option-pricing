@@ -20,8 +20,12 @@
 1
 # Number of intervals in which TTM is divided
 365
-# Option type (c = call, p = put)
-c
+# Option type
+# fw = forward contract
+# vc = plain vanilla call option
+# vp = plain vanilla put option
+# pc = performance corridor option
+vc
 ## MONTE CARLO DATA
 # Number of simulations
 50000000
