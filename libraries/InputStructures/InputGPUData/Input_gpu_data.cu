@@ -7,5 +7,5 @@ __device__ __host__ unsigned int Input_gpu_data::GetNumberOfThreadsPerBlock() co
 }
 
 __device__ __host__ unsigned int Input_gpu_data::GetTotalNumberOfThreads() const{
-	return this->_NumberOfBlocks * NUMBER_OF_THREADS_PER_BLOCK;
+	return this->NumberOfBlocks * NUMBER_OF_THREADS_PER_BLOCK;
 }

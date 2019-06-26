@@ -6,8 +6,8 @@ using namespace std;
 // Constructors
 __device__ __host__ Path::Path(const Input_market_data& market, const Input_option_data& option, double SpotPrice){
 	this->_SpotPrice = SpotPrice;
-	this->_RiskFreeRate = market._RiskFreeRate;
-	this->_Volatility = market._Volatility;
+	this->_RiskFreeRate = market.RiskFreeRate;
+	this->_Volatility = market.Volatility;
 	this->_DeltaTime = option.GetDeltaTime();
 	
 	this->_B = 0;
@@ -18,8 +18,8 @@ __device__ __host__ Path::Path(const Input_market_data& market, const Input_opti
 
 __device__ __host__ Path::Path(const Input_market_data& market, const Input_option_data_PlainVanilla& option, double SpotPrice){
 	this->_SpotPrice = SpotPrice;
-	this->_RiskFreeRate = market._RiskFreeRate;
-	this->_Volatility = market._Volatility;
+	this->_RiskFreeRate = market.RiskFreeRate;
+	this->_Volatility = market.Volatility;
 	this->_DeltaTime = option.GetDeltaTime();
 	
 	this->_B = 0;
@@ -29,20 +29,20 @@ __device__ __host__ Path::Path(const Input_market_data& market, const Input_opti
 }
 __device__ __host__ Path::Path(const Input_market_data& market, const Input_option_data_PerformanceCorridor& option, double SpotPrice){
 	this->_SpotPrice = SpotPrice;
-	this->_RiskFreeRate = market._RiskFreeRate;
-	this->_Volatility = market._Volatility;
+	this->_RiskFreeRate = market.RiskFreeRate;
+	this->_Volatility = market.Volatility;
 	this->_DeltaTime = option.GetDeltaTime();
-	this->_B = option._B;
-	this->_N = option._N;
-	this->_K = option._K;
+	this->_B = option.B;
+	this->_N = option.N;
+	this->_K = option.K;
 	this->_PerformanceCorridorBarrierCounter = 0;
 }
 
 // Public set methods
 __device__ __host__ void Path::SetInternalData(const Input_market_data& market, const Input_option_data& option, double SpotPrice){
 	this->_SpotPrice = SpotPrice;
-	this->_RiskFreeRate = market._RiskFreeRate;
-	this->_Volatility = market._Volatility;
+	this->_RiskFreeRate = market.RiskFreeRate;
+	this->_Volatility = market.Volatility;
 	this->_DeltaTime = option.GetDeltaTime();
 
 	this->_B = 0;
@@ -53,8 +53,8 @@ __device__ __host__ void Path::SetInternalData(const Input_market_data& market, 
 
 __device__ __host__ void Path::SetInternalData(const Input_market_data& market, const Input_option_data_PlainVanilla& option, double SpotPrice){
 	this->_SpotPrice = SpotPrice;
-	this->_RiskFreeRate = market._RiskFreeRate;
-	this->_Volatility = market._Volatility;
+	this->_RiskFreeRate = market.RiskFreeRate;
+	this->_Volatility = market.Volatility;
 	this->_DeltaTime = option.GetDeltaTime();
 
 	this->_B = 0;
@@ -65,12 +65,12 @@ __device__ __host__ void Path::SetInternalData(const Input_market_data& market, 
 
 __device__ __host__ void Path::SetInternalData(const Input_market_data& market, const Input_option_data_PerformanceCorridor& option, double SpotPrice){
 	this->_SpotPrice = SpotPrice;
-	this->_RiskFreeRate = market._RiskFreeRate;
-	this->_Volatility = market._Volatility;
+	this->_RiskFreeRate = market.RiskFreeRate;
+	this->_Volatility = market.Volatility;
 	this->_DeltaTime = option.GetDeltaTime();
-	this->_B = option._B;
-	this->_N = option._N;
-	this->_K = option._K;
+	this->_B = option.B;
+	this->_N = option.N;
+	this->_K = option.K;
 	this->_PerformanceCorridorBarrierCounter = 0;
 }
 

@@ -5,9 +5,9 @@
 
 struct Input_market_data{
 	
-	double _InitialPrice;				// Initial price of the asset
-	double _Volatility;					// Volatility
-	double _RiskFreeRate;				// Risk-free interest
+	double InitialPrice;				// Initial price of the asset
+	double Volatility;					// Volatility
+	double RiskFreeRate;				// Risk-free interest
 
 };
 #endif

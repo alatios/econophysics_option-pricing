@@ -5,11 +5,11 @@
 
 struct Output_MC_data{
 	
-	double _EstimatedPriceMCEuler;
-	double _ErrorMCEuler;
-	double _EstimatedPriceMCExact;
-	double _ErrorMCExact;
-	double _Tick;							// Calculation time [ms]
+	double EstimatedPriceMCEuler;
+	double ErrorMCEuler;
+	double EstimatedPriceMCExact;
+	double ErrorMCExact;
+	double Tick;							// Calculation time [ms]
 
 };
 

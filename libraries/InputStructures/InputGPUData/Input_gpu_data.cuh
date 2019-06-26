@@ -7,7 +7,7 @@
 #define NUMBER_OF_THREADS_PER_BLOCK 512
 
 struct Input_gpu_data{
-	unsigned int _NumberOfBlocks;
+	unsigned int NumberOfBlocks;
 
 	__device__ __host__ unsigned int GetNumberOfThreadsPerBlock() const;
 	__device__ __host__ unsigned int GetTotalNumberOfThreads() const;
