@@ -3,6 +3,7 @@ Econophysics option pricing CUDA project simulating evolutions of the underlying
 
 ## Tree structure
 ```
+econophysics_option-pricing/
 ├── [ 671]  input.dat
 ├── [4.0K]  libraries
 │   ├── [4.0K]  CoreLibraries
