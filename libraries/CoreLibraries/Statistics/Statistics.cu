@@ -14,6 +14,7 @@ __device__ __host__ Statistics::Statistics(){
 __device__ __host__ void Statistics::AddPayoff(double payoff){
 	this->_PayoffSum += payoff;
 	this->_SquaredPayoffSum += pow(payoff,2);
+	++(this->_PayoffCounter);
 }
 
 // Public methods for sum resetting
@@ -24,15 +25,15 @@ __device__ __host__ void Statistics::ResetSums(){
 }
 
 // Public get methods
-__device__ __host__ double Statistics::GetPayoffSum(){
+__device__ __host__ double Statistics::GetPayoffSum() const{
 	return this->_PayoffSum;
 }
 
-__device__ __host__ double Statistics::GetSquaredPayoffSum(){
+__device__ __host__ double Statistics::GetSquaredPayoffSum() const{
 	return this->_SquaredPayoffSum;
 }
 
-__device__ __host__ unsigned int Statistics::GetPayoffCounter(){
+__device__ __host__ unsigned int Statistics::GetPayoffCounter() const{
 	return this->_PayoffCounter;
 }
 
@@ -42,23 +43,24 @@ __device__ __host__ void Statistics::EvaluateEstimatedPriceAndError(){
 	this->_PayoffError = sqrt((this->_SquaredPayoffSum / this->_PayoffCounter - pow(this->_PayoffAverage,2))/ this->_PayoffCounter);
 }
 
-__device__ __host__ double Statistics::GetPayoffAverage(){
+__device__ __host__ double Statistics::GetPayoffAverage() const{
 	return this->_PayoffAverage;
 }
 
 
-__device__ __host__ double Statistics::GetPayoffError(){
+__device__ __host__ double Statistics::GetPayoffError() const{
 	return this->_PayoffError;
 }
 
 // Operator+= overload
-__device__ __host__ Statistics& Statistics::operator+=(const Statistics& otherStatistics){
+__host__ Statistics& Statistics::operator+=(const Statistics& otherStatistics){
 
-	if(std::isinf(otherStatistics.GetPayoffSum()) || std::isinf(otherStatistics.GetSquaredPayoffSum())){
-		this->_PayoffSum += otherStatistics.GetPayoffSum();
-		this->_SquaredPayoffSum += otherStatistics.GetSquaredPayoffSum();
-		this->_PayoffCounter += otherStatistics.GetPayoffCounter();
-	}
+	if(std::isinf(otherStatistics.GetPayoffSum()) || std::isinf(otherStatistics.GetSquaredPayoffSum()))
+		return *this;
+	
+	this->_PayoffSum += otherStatistics.GetPayoffSum();
+	this->_SquaredPayoffSum += otherStatistics.GetSquaredPayoffSum();
+	this->_PayoffCounter += otherStatistics.GetPayoffCounter();
 	
 	return *this;
 }

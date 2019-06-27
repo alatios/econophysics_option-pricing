@@ -27,17 +27,17 @@ class Statistics{
 		__device__ __host__ void ResetSums();
 				
 		// Return value of payoffSum or squaredPayoffSum (and respective counters)
-		__device__ __host__ double GetPayoffSum();
-		__device__ __host__ double GetSquaredPayoffSum();
-		__device__ __host__ unsigned int GetPayoffCounter();
+		__device__ __host__ double GetPayoffSum() const;
+		__device__ __host__ double GetSquaredPayoffSum() const;
+		__device__ __host__ unsigned int GetPayoffCounter() const;
 		
 		// Evaluate average and error
 		__device__ __host__ void EvaluateEstimatedPriceAndError();
-		__device__ __host__ double GetPayoffAverage();
-		__device__ __host__ double GetPayoffError();
+		__device__ __host__ double GetPayoffAverage() const;
+		__device__ __host__ double GetPayoffError() const;
 		
 		// Overload of += operator
-		__device__ __host__ Statistics& operator+=(const Statistics&);
+		__host__ Statistics& operator+=(const Statistics&);	// Host-only because of isinf, at least for now
 
 };
 

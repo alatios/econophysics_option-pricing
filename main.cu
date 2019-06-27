@@ -11,15 +11,15 @@
 #include <vector>		// vector
 #include <string>		// string, stoul, stod, at
 
-#include "libraries/InputGPUData/Input_gpu_data.cuh"
-#include "libraries/InputMarketData/Input_market_data.cuh"
-#include "libraries/InputMCData/Input_MC_data.cuh"
-#include "libraries/InputOptionData/Input_option_data.cuh"
-#include "libraries/OutputMCData/Output_MC_data.cuh"
-#include "libraries/Path/Path.cuh"
-#include "libraries/Statistics/Statistics.cuh"
-#include "random_generator/rng.cuh"
-#include "general_purpose_functions/Support_functions.cuh"
+#include "libraries/InputStructures/InputGPUData/Input_gpu_data.cuh"
+#include "libraries/InputStructures/InputMarketData/Input_market_data.cuh"
+#include "libraries/InputStructures/InputMCData/Input_MC_data.cuh"
+#include "libraries/InputStructures/InputOptionData/Input_option_data.cuh"
+#include "libraries/CoreLibraries/Statistics/Statistics.cuh"
+#include "libraries/CoreLibraries/Path/Path.cuh"
+#include "libraries/CoreLibraries/RandomGenerator/rng.cuh"
+#include "libraries/CoreLibraries/SupportFunctions/Support_functions.cuh"
+#include "libraries/OutputStructures/OutputMCData/Output_MC_data.cuh"
 
 using namespace std;
 
@@ -30,61 +30,49 @@ int main(){
 	ReadInputData(inputDataVector, sourceFile);
 	
 	// Input GPU data
-	unsigned int numberOfBlocks = stoul(inputDataVector[0]);
-	Input_gpu_data inputGPU(numberOfBlocks);
+	Input_gpu_data inputGPU;
+	inputGPU.NumberOfBlocks = stoul(inputDataVector[0]);
 	unsigned int numberOfThreadsPerBlock = inputGPU.GetNumberOfThreadsPerBlock();
 	unsigned int totalNumberOfThreads = inputGPU.GetTotalNumberOfThreads();
 	
 	// Input market data
-	double initialPrice = stod(inputDataVector[1]);
-	double volatility = stod(inputDataVector[2]);
-	double riskFreeRate = stod(inputDataVector[3]);
-	Input_market_data inputMarket(initialPrice, volatility, riskFreeRate);
+	Input_market_data inputMarket;
+	inputMarket.InitialPrice = stod(inputDataVector[1]);
+	inputMarket.Volatility = stod(inputDataVector[2]);
+	inputMarket.RiskFreeRate = stod(inputDataVector[3]);
 
 	// Input option data
-	double strikePrice = stod(inputDataVector[4]);
-	double timeToMaturity = stod(inputDataVector[5]);
-	unsigned int numberOfIntervals = stoul(inputDataVector[6]);
-	char optionType = inputDataVector[7].at(0);		// Get char in position 0, just as well since this is supposed to be a single char string
-	Input_option_data inputOption(strikePrice, numberOfIntervals, timeToMaturity, optionType);
+	Input_option_data inputOption;
+	inputOption.TimeToMaturity = stod(inputDataVector[4]);
+	inputOption.NumberOfIntervals = stoul(inputDataVector[5]);
+	inputOption.OptionType = inputDataVector[6].at(0);
+	inputOption.StrikePrice = stod(inputDataVector[7]);
+	inputOption.B = stod(inputDataVector[8]);
+	inputOption.K = stod(inputDataVector[9]);
+	inputOption.N = stod(inputDataVector[10]);
 
 	// Input Monte Carlo data
-	unsigned int totalNumberOfSimulations = stoul(inputDataVector[8]);
-	Input_MC_data inputMC(totalNumberOfSimulations);
+	Input_MC_data inputMC;
+	inputMC.NumberOfMCSimulations = stoul(inputDataVector[11]);
 	unsigned int numberOfSimulationsPerThread = inputMC.GetNumberOfSimulationsPerThread(inputGPU);
 	
 	// Print input data (duh)
 	PrintInputData(inputGPU, inputOption, inputMarket, inputMC);
+															
+	// Statistics
+	Statistics *exactOutputs = new Statistics[totalNumberOfThreads];
+	Statistics *eulerOutputs = new Statistics[totalNumberOfThreads];
 
-	// Template path for invidual paths created in each thread
-	Path pathTemplate(inputMarket, inputOption, initialPrice);
-	
-	// Mersenne random generator of unsigned ints, courtesy of C++11
-	// For reproducibility, replace time(NULL) with a fixed seed
-	mt19937 mersenneCoreGenerator(time(NULL));
-	uniform_int_distribution<unsigned int> uniformDistribution(129, UINT_MAX);
-
-	RNGCombinedGenerator *randomGenerators = new RNGCombinedGenerator[totalNumberOfThreads];
-	for(unsigned int threadNumber=0; threadNumber<totalNumberOfThreads; ++threadNumber){
-		randomGenerators[threadNumber].SetInternalState(uniformDistribution(mersenneCoreGenerator),
-														uniformDistribution(mersenneCoreGenerator),
-														uniformDistribution(mersenneCoreGenerator),
-														uniformDistribution(mersenneCoreGenerator));
-	}
-	
-	// Output MC per thread
-	Output_MC_per_thread *threadOutputs = new Output_MC_per_thread[totalNumberOfThreads];
-	
-/*
+///*
 	////////////// HOST-SIDE GENERATOR //////////////	
 	cout << "Beginning device simulation through CPU..." << endl;
 	// Simulating device function
-	OptionPricingEvaluator_Host(inputGPU, inputOption, inputMarket, inputMC, pathTemplate, randomGenerators, threadOutputs);
+	OptionPricingEvaluator_Host(inputGPU, inputOption, inputMarket, inputMC, exactOutputs, eulerOutputs);
 	cout << endl;
 	/////////////////////////////////////////////////
-*/
+//*/
 
-///*
+/*
 	////////////// DEVICE-SIDE GENERATOR //////////////
 	RNGCombinedGenerator *device_randomGenerators;
 	Output_MC_per_thread *device_threadOutputs;
@@ -103,25 +91,37 @@ int main(){
 	cudaFree(device_randomGenerators);
 	cudaFree(device_threadOutputs);
 	///////////////////////////////////////////////////
-//*/
-	
+*/
 	
 	// Compute results
-	double monteCarloEstimatedPrice, monteCarloError;
-	tie(monteCarloEstimatedPrice, monteCarloError) = EvaluateEstimatedPriceAndError(threadOutputs, totalNumberOfThreads);
+	Statistics exactResults;
+	Statistics eulerResults;
+	
+	for(unsigned int threadNumber=0; threadNumber<totalNumberOfThreads; ++threadNumber){
+		exactResults += exactOutputs[threadNumber];
+		eulerResults += eulerOutputs[threadNumber];
+	}
+	
+	exactResults.EvaluateEstimatedPriceAndError();
+	eulerResults.EvaluateEstimatedPriceAndError();
 	
 	// Elapsed time is temporary, will be implemented later
 	double elapsedTime = 0.;
 	
 	// Global output MC
-	Output_MC_data outputMC(monteCarloEstimatedPrice, monteCarloError, elapsedTime);
-	outputMC.CompleteEvaluationOfBlackScholes(inputOption, inputMarket);
-	outputMC.PrintResults();
+	Output_MC_data outputMC;
+	outputMC.EstimatedPriceMCExact = exactResults.GetPayoffAverage();
+	outputMC.ErrorMCExact = exactResults.GetPayoffError();
+	outputMC.EstimatedPriceMCEuler = eulerResults.GetPayoffAverage();
+	outputMC.ErrorMCEuler = eulerResults.GetPayoffError();
+	outputMC.Tick = elapsedTime;
+	
+	PrintOutputData(outputMC);
 	cout << endl;
 	
 	// Trash bin section, where segfaults come to die
-	delete[] randomGenerators;
-	delete[] threadOutputs;
-	
+	delete[] exactOutputs;
+	delete[] eulerOutputs;
+
 	return 0;
 }

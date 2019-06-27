@@ -9,7 +9,7 @@ struct Output_MC_data{
 	double ErrorMCEuler;
 	double EstimatedPriceMCExact;
 	double ErrorMCExact;
-	double Tick;							// Calculation time [ms]
+	double Tick;	// Calculation time [ms]
 
 };
 

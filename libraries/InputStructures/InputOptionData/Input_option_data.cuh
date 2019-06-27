@@ -7,30 +7,27 @@
 using namespace std;
 
 struct Input_option_data{
+	
+	// Common to all option types
 
-	// fw = forward contract
-	// vc = plain vanilla call option
-	// vp = plain vanilla put option
-	// pc = performance corridor option
-	char OptionType[2];
+
+	char OptionType;		// f = forward contract
+							// c = plain vanilla call option
+							// p = plain vanilla put option
+							// e = performance corridor option
 	unsigned int NumberOfIntervals;
-	double TimeToMaturity;				// Time passed from the initial istant [years]
+	double TimeToMaturity;
 
 	__device__ __host__ double GetDeltaTime() const;
-
-};
-
-struct Input_option_data_PlainVanilla: public Input_option_data{
 	
+	// Specific to plain vanilla options
 	double StrikePrice;
-
-};
-
-struct Input_option_data_PerformanceCorridor: public Input_option_data{
-	
+		
+	// Specific to performance corridor options
 	double B;
 	double K;
 	double N;
 
 };
+
 #endif

@@ -1,15 +1,13 @@
 FLAGS=-std=c++11 -Wno-deprecated-gpu-targets
 
 TARGS= \
-libraries/InputGPUData/Input_gpu_data.o \
-libraries/InputMarketData/Input_market_data.o \
-libraries/InputMCData/Input_MC_data.o \
-libraries/InputOptionData/Input_option_data.o \
-libraries/OutputMCData/Output_MC_data.o \
-libraries/Path/Path.o \
-libraries/OutputMCPerThread/Output_MC_per_thread.o \
-random_generator/rng.o \
-general_purpose_functions/Support_functions.o \
+libraries/InputStructures/InputGPUData/Input_gpu_data.o \
+libraries/InputStructures/InputMCData/Input_MC_data.o \
+libraries/InputStructures/InputOptionData/Input_option_data.o \
+libraries/CoreLibraries/Statistics/Statistics.o \
+libraries/CoreLibraries/Path/Path.o \
+libraries/CoreLibraries/RandomGenerator/rng.o \
+libraries/CoreLibraries/SupportFunctions/Support_functions.o \
 main.o
 
 NVCC=nvcc
@@ -23,16 +21,16 @@ all: $(TARGS)
 	$(NVCC) $(FLAGS) -dc $< -o $@
 
 clean:
-	@(cd libraries/InputGPUData && rm -f *.x *.o) 		|| ($(ECHO) "Failed to clean libraries/InputGPUData." && exit 1)
-	@(cd libraries/InputMarketData && rm -f *.x *.o)	|| ($(ECHO) "Failed to clean libraries/InputMarketData." && exit 1)
-	@(cd libraries/InputMCData && rm -f *.x *.o)		|| ($(ECHO) "Failed to clean libraries/InputMCData." && exit 1)
-	@(cd libraries/InputOptionData && rm -f *.x *.o)	|| ($(ECHO) "Failed to clean libraries/InputOptionData." && exit 1)
-	@(cd libraries/OutputMCData && rm -f *.x *.o)		|| ($(ECHO) "Failed to clean libraries/OutputMCData." && exit 1)
-	@(cd libraries/Path && rm -f *.x *.o)				|| ($(ECHO) "Failed to clean libraries/Path." && exit 1)
-	@(cd libraries/OutputMCPerThread && rm -f *.x *.o )	|| ($(ECHO) "Failed to clean libraries/OutputMCPerThread." && exit 1)
-	@(cd random_generator && rm -f *.x *.o)				|| ($(ECHO) "Failed to clean random_generator." && exit 1)
-	@(cd general_purpose_functions && rm -f *.x *.o)	|| ($(ECHO) "Failed to clean general_purpose_functions." && exit 1)
-	@rm -f *.x *.o 										|| ($(ECHO) "Failed to clean root directory." && exit 1)
+	@(cd libraries/InputStructures/InputGPUData && rm -f *.x *.o) 		|| ($(ECHO) "Failed to clean libraries/InputStructures/InputGPUData." && exit 1)
+	@(cd libraries/InputStructures/InputMarketData && rm -f *.x *.o)	|| ($(ECHO) "Failed to clean libraries/InputStructures/InputMarketData." && exit 1)
+	@(cd libraries/InputStructures/InputMCData && rm -f *.x *.o)		|| ($(ECHO) "Failed to clean libraries/InputStructures/InputMCData." && exit 1)
+	@(cd libraries/InputStructures/InputOptionData && rm -f *.x *.o)	|| ($(ECHO) "Failed to clean libraries/InputStructures/InputOptionData." && exit 1)
+	@(cd libraries/CoreLibraries/Statistics && rm -f *.x *.o)			|| ($(ECHO) "Failed to clean libraries/CoreLibraries/Statistics." && exit 1)
+	@(cd libraries/CoreLibraries/Path && rm -f *.x *.o)					|| ($(ECHO) "Failed to clean libraries/CoreLibraries/Path." && exit 1)
+	@(cd libraries/CoreLibraries/RandomGenerator && rm -f *.x *.o)		|| ($(ECHO) "Failed to clean libraries/CoreLibraries/RandomGenerator." && exit 1)
+	@(cd libraries/CoreLibraries/SupportFunctions && rm -f *.x *.o)		|| ($(ECHO) "Failed to clean libraries/CoreLibraries/SupportFunctions." && exit 1)
+	@(cd libraries/OutputStructures/OutputMCData && rm -f *.x *.o )		|| ($(ECHO) "Failed to clean libraries/OutputStructures/OutputMCData." && exit 1)
+	@rm -f *.x *.o 														|| ($(ECHO) "Failed to clean root directory." && exit 1)
 	@$(ECHO) "Done cleaning."
 
 run:
