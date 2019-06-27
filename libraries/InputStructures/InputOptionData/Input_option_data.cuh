@@ -28,7 +28,6 @@ struct Input_option_data_PlainVanilla: public Input_option_data{
 
 struct Input_option_data_PerformanceCorridor: public Input_option_data{
 	
-	double StrikePrice;
 	double B;
 	double K;
 	double N;
