@@ -8,7 +8,7 @@
 #include "../../InputStructures/InputMarketData/Input_market_data.cuh"
 #include "../../InputStructures/InputMCData/Input_MC_data.cuh"
 #include "../../InputStructures/InputOptionData/Input_option_data.cuh"
-#include "..//Statistics/Statistics.cuh"
+#include "../Statistics/Statistics.cuh"
 #include "../../OutputStructures/OutputMCData/Output_MC_data.cuh"
 
 class Data_stream_manager{
