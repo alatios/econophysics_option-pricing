@@ -1,5 +1,5 @@
 FLAGS=-std=c++11 -Wno-deprecated-gpu-targets
-TARGS=main.o rng.o
+TARGS=main.o rng.o correlationtest.o
 NVCC=nvcc
 
 ECHO=/bin/echo
