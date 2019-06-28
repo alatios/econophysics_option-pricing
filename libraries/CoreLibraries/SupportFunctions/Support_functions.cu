@@ -15,24 +15,24 @@ __host__ __device__ void OptionPricingEvaluator_HostDev(Input_gpu_data inputGPU,
 	unsigned int totalNumberOfSimulations = inputMC.NumberOfMCSimulations;
 	
 	RNG *randomGenerator = new RNG_CombinedGenerator;
-	randomGenerator->SetInternalState(11+threadNumber,1129+threadNumber,1130+threadNumber,1131+threadNumber);
+	randomGenerator->SetInternalState(1+threadNumber,129+threadNumber,130+threadNumber,131+threadNumber);
 	
 	// Dummy variables to reduce memory accesses
 	Path exactPath, eulerPath;
 	double payoff;
-	
 	// Cycling through paths, overwriting the same dummy path with the same template path
 	for(unsigned int pathNumber=0; pathNumber<numberOfPathsPerThread; ++pathNumber){
 		// Check if we're not overflowing. Since we decide a priori the number of simulations, some threads will inevitably work less
 		if(numberOfPathsPerThread * threadNumber + pathNumber < totalNumberOfSimulations){
 			exactPath.ResetToInitialState(market, option);
 			eulerPath.ResetToInitialState(market, option);
-			
+
 			// Cycling through steps in each path
 			for(unsigned int stepNumber=0; stepNumber<numberOfIntervals; ++stepNumber){
 				exactPath.ExactLogNormalStep(randomGenerator->GetGauss());
 				eulerPath.EulerLogNormalStep(randomGenerator->GetGauss());
 			}
+
 			payoff = EvaluatePayoff(exactPath, option);
 			exactOutputs[threadNumber].AddPayoff(ActualizePayoff(payoff, market.RiskFreeRate, option.TimeToMaturity));
 			payoff = EvaluatePayoff(eulerPath, option);

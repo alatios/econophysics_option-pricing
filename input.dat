@@ -5,7 +5,7 @@
 #
 ## GPU DATA
 # Number of GPU blocks
-50
+1
 ## MARKET DATA
 # Initial underlying price at t = 0 [USD]
 100
@@ -28,20 +28,20 @@
 # c = plain vanilla call option
 # p = plain vanilla put option
 # e = performance corridor option
-c
+e
 ## PLAIN VANILLA OPTION DATA
 # Option strike price [USD]
 100
 ## PERFORMANCE CORRIDOR OPTION DATA
 # B
-0.25
+2
 # K [percentage, i.e. 0.1 = 10%]
-0.1
+0.5
 # N [EUR]
 1
 ## MONTE CARLO DATA
 # Number of simulations
-5000000
+5000
 #
 #
 #

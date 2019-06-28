@@ -74,22 +74,23 @@ int main(){
 
 /*
 	////////////// DEVICE-SIDE GENERATOR //////////////
-	RNGCombinedGenerator *device_randomGenerators;
-	Output_MC_per_thread *device_threadOutputs;
+	Statistics *device_exactOutputs;
+	Statistics *device_eulerOutputs;
 	
-	cudaMalloc((void **)&device_randomGenerators, totalNumberOfThreads*sizeof(RNGCombinedGenerator));
-	cudaMalloc((void **)&device_threadOutputs, totalNumberOfThreads*sizeof(Output_MC_per_thread));
+	cudaMalloc((void **)&device_exactOutputs, totalNumberOfThreads*sizeof(Statistics));
+	cudaMalloc((void **)&device_eulerOutputs, totalNumberOfThreads*sizeof(Statistics));
 	
-	cudaMemcpy(device_randomGenerators, randomGenerators, totalNumberOfThreads*sizeof(RNGCombinedGenerator), cudaMemcpyHostToDevice);
-	cudaMemcpy(device_threadOutputs, threadOutputs, totalNumberOfThreads*sizeof(Output_MC_per_thread), cudaMemcpyHostToDevice);
+	cudaMemcpy(device_exactOutputs, exactOutputs, totalNumberOfThreads*sizeof(Statistics), cudaMemcpyHostToDevice);
+	cudaMemcpy(device_eulerOutputs, eulerOutputs, totalNumberOfThreads*sizeof(Statistics), cudaMemcpyHostToDevice);
 
 	cout << "Beginning GPU computation..." << endl;
-	OptionPricingEvaluator_Global<<<numberOfBlocks,numberOfThreadsPerBlock>>>(inputGPU, inputOption, inputMarket, inputMC, pathTemplate, device_randomGenerators, device_threadOutputs);
+	OptionPricingEvaluator_Global<<<inputGPU.NumberOfBlocks,numberOfThreadsPerBlock>>>(inputGPU, inputOption, inputMarket, inputMC, device_exactOutputs, device_eulerOutputs);
 
-	cudaMemcpy(threadOutputs, device_threadOutputs, totalNumberOfThreads*sizeof(Output_MC_per_thread), cudaMemcpyDeviceToHost);
+	cudaMemcpy(exactOutputs, device_exactOutputs, totalNumberOfThreads*sizeof(Statistics), cudaMemcpyDeviceToHost);
+	cudaMemcpy(eulerOutputs, device_eulerOutputs, totalNumberOfThreads*sizeof(Statistics), cudaMemcpyDeviceToHost);
 
-	cudaFree(device_randomGenerators);
-	cudaFree(device_threadOutputs);
+	cudaFree(device_exactOutputs);
+	cudaFree(device_eulerOutputs);
 	///////////////////////////////////////////////////
 */
 	

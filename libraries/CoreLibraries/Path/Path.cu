@@ -5,6 +5,7 @@ using namespace std;
 
 // Constructors
 __device__ __host__ Path::Path(const Input_market_data& market, const Input_option_data& option){
+	this->_OptionType = option.OptionType;
 	this->_SpotPrice = market.InitialPrice;
 	this->_RiskFreeRate = market.RiskFreeRate;
 	this->_Volatility = market.Volatility;
@@ -39,6 +40,7 @@ __device__ __host__ Path::Path(const Input_market_data& market, const Input_opti
 
 // Public set methods
 __device__ __host__ void Path::ResetToInitialState(const Input_market_data& market, const Input_option_data& option){
+	this->_OptionType = option.OptionType;
 	this->_SpotPrice = market.InitialPrice;
 	this->_RiskFreeRate = market.RiskFreeRate;
 	this->_Volatility = market.Volatility;
@@ -73,6 +75,7 @@ __device__ __host__ void Path::SetInternalData(const Input_market_data& market, 
 */
 
 __device__ __host__ void Path::ResetToInitialState(const Path& otherPath){
+	this->_OptionType = otherPath._OptionType;
 	this->_SpotPrice = otherPath._SpotPrice;
 	this->_RiskFreeRate = otherPath._RiskFreeRate;
 	this->_Volatility = otherPath._Volatility;
@@ -109,7 +112,7 @@ __device__ __host__ void Path::ExactLogNormalStep(double gaussianRandomVariable)
 	SpotPrice_i = (this->_SpotPrice) * exp((this->_RiskFreeRate
 	- 0.5 * pow(this->_Volatility,2)) * this->_DeltaTime
 	+ this->_Volatility * gaussianRandomVariable * sqrt(this->_DeltaTime));
-
+	
 	if(_OptionType == 'e')
 		this->CheckPerformanceCorridorCondition(this->_SpotPrice, SpotPrice_i);
 	
@@ -120,7 +123,7 @@ __device__ __host__ void Path::ExactLogNormalStep(double gaussianRandomVariable)
 __device__ __host__ void Path::CheckPerformanceCorridorCondition(double currentSpotPrice, double nextSpotPrice){
 	double modulusArgument = 1./(sqrt(this->_DeltaTime)) * log(nextSpotPrice / currentSpotPrice);
 	double barrier = this->_B * this->_Volatility;
-	
+
 	if(fabs(modulusArgument) < barrier)
 		++(this->_PerformanceCorridorBarrierCounter);
 }
