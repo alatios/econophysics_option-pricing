@@ -9,34 +9,15 @@ __device__ __host__ Path::Path(const Input_market_data& market, const Input_opti
 	this->_SpotPrice = market.InitialPrice;
 	this->_RiskFreeRate = market.RiskFreeRate;
 	this->_Volatility = market.Volatility;
+	this->_TimeToMaturity = option.TimeToMaturity;
+	this->_NumberOfIntervals = option.NumberOfIntervals;
 	this->_DeltaTime = option.GetDeltaTime();
-	this->_B = option.B;
-	this->_PerformanceCorridorBarrierCounter = 0;
-}
-/*
-__device__ __host__ Path::Path(const Input_market_data& market, const Input_option_data_PlainVanilla& option, double SpotPrice){
-	this->_SpotPrice = SpotPrice;
-	this->_RiskFreeRate = market.RiskFreeRate;
-	this->_Volatility = market.Volatility;
-	this->_DeltaTime = option.GetDeltaTime();
-	
-	this->_B = 0;
-	this->_N = 0;
-	this->_K = 0;
-	this->_PerformanceCorridorBarrierCounter = 0;
-}
-
-__device__ __host__ Path::Path(const Input_market_data& market, const Input_option_data_PerformanceCorridor& option, double SpotPrice){
-	this->_SpotPrice = SpotPrice;
-	this->_RiskFreeRate = market.RiskFreeRate;
-	this->_Volatility = market.Volatility;
-	this->_DeltaTime = option.GetDeltaTime();
+	this->_StrikePrice = option.StrikePrice;
 	this->_B = option.B;
 	this->_N = option.N;
 	this->_K = option.K;
 	this->_PerformanceCorridorBarrierCounter = 0;
 }
-*/
 
 // Public set methods
 __device__ __host__ void Path::ResetToInitialState(const Input_market_data& market, const Input_option_data& option){
@@ -44,43 +25,28 @@ __device__ __host__ void Path::ResetToInitialState(const Input_market_data& mark
 	this->_SpotPrice = market.InitialPrice;
 	this->_RiskFreeRate = market.RiskFreeRate;
 	this->_Volatility = market.Volatility;
+	this->_TimeToMaturity = option.TimeToMaturity;
+	this->_NumberOfIntervals = option.NumberOfIntervals;
 	this->_DeltaTime = option.GetDeltaTime();
-	this->_B = option.B;
-	this->_PerformanceCorridorBarrierCounter = 0;
-}
-
-/*
-__device__ __host__ void Path::SetInternalData(const Input_market_data& market, const Input_option_data_PlainVanilla& option, double SpotPrice){
-	this->_SpotPrice = SpotPrice;
-	this->_RiskFreeRate = market.RiskFreeRate;
-	this->_Volatility = market.Volatility;
-	this->_DeltaTime = option.GetDeltaTime();
-
-	this->_B = 0;
-	this->_N = 0;
-	this->_K = 0;
-	this->_PerformanceCorridorBarrierCounter = 0;
-}
-
-__device__ __host__ void Path::SetInternalData(const Input_market_data& market, const Input_option_data_PerformanceCorridor& option, double SpotPrice){
-	this->_SpotPrice = SpotPrice;
-	this->_RiskFreeRate = market.RiskFreeRate;
-	this->_Volatility = market.Volatility;
-	this->_DeltaTime = option.GetDeltaTime();
+	this->_StrikePrice = option.StrikePrice;
 	this->_B = option.B;
 	this->_N = option.N;
 	this->_K = option.K;
 	this->_PerformanceCorridorBarrierCounter = 0;
 }
-*/
 
 __device__ __host__ void Path::ResetToInitialState(const Path& otherPath){
 	this->_OptionType = otherPath._OptionType;
 	this->_SpotPrice = otherPath._SpotPrice;
 	this->_RiskFreeRate = otherPath._RiskFreeRate;
 	this->_Volatility = otherPath._Volatility;
+	this->_TimeToMaturity = otherPath._TimeToMaturity;
+	this->_NumberOfIntervals = otherPath._NumberOfIntervals;
 	this->_DeltaTime = otherPath._DeltaTime;
+	this->_StrikePrice = otherPath._StrikePrice;
 	this->_B = otherPath._B;
+	this->_N = otherPath._N;
+	this->_K = otherPath._K;
 	this->_PerformanceCorridorBarrierCounter = otherPath._PerformanceCorridorBarrierCounter;
 }
 
@@ -126,4 +92,33 @@ __device__ __host__ void Path::CheckPerformanceCorridorCondition(double currentS
 
 	if(fabs(modulusArgument) < barrier)
 		++(this->_PerformanceCorridorBarrierCounter);
+}
+
+// Evaluate atualized payoff
+__device__ __host__ double Path::GetActualizedPayoff() const{
+	double payoff;
+	
+	switch(this->_OptionType){
+		case 'f':
+			payoff = this->_SpotPrice;
+			break;
+		
+		case 'c':
+			payoff = fmax(this->_SpotPrice - this->_StrikePrice, 0.);
+			break;
+		
+		case 'p':
+			payoff = fmax(this->_StrikePrice - this->_SpotPrice, 0.);
+			break;
+		
+		case 'e':
+			payoff = this->_N * fmax((static_cast<double>(this->_PerformanceCorridorBarrierCounter) / this->_NumberOfIntervals) - this->_K, 0.);
+			break;
+			
+		default:
+			payoff = -10000.;
+			break;
+	}	
+	
+	return (payoff * exp(- this->_RiskFreeRate * this->_TimeToMaturity));
 }

@@ -18,12 +18,19 @@ class Path{
 		double _RiskFreeRate;
 		double _Volatility;
 
-		// Base European option data
+		// Base European option/contract data
 		char _OptionType;
+		unsigned int _TimeToMaturity;
+		unsigned int _NumberOfIntervals;
 		double _DeltaTime;
+		
+		// Plain vanilla option data
+		double _StrikePrice;
 		
 		// Performance corridor data
 		double _B;
+		double _N;
+		double _K;
 		unsigned int _PerformanceCorridorBarrierCounter;
 		
 		__device__ __host__ void CheckPerformanceCorridorCondition(double currentSpotPrice, double nextSpotPrice);
@@ -32,13 +39,9 @@ class Path{
 
 		__device__ __host__ Path() = default;
 		__device__ __host__ Path(const Input_market_data& market, const Input_option_data& option);
-//		__device__ __host__ Path(const Input_market_data& market, const Input_option_data_PlainVanilla& option, double SpotPrice);
-//		__device__ __host__ Path(const Input_market_data& market, const Input_option_data_PerformanceCorridor& option, double SpotPrice);
 		__device__ __host__ ~Path() = default;
 
 		__device__ __host__ void ResetToInitialState(const Input_market_data& market, const Input_option_data& option);
-//		__device__ __host__ void SetInternalData(const Input_market_data& market, const Input_option_data_PlainVanilla& option, double SpotPrice);
-//		__device__ __host__ void SetInternalData(const Input_market_data& market, const Input_option_data_PerformanceCorridor& option, double SpotPrice);
 		__device__ __host__ void ResetToInitialState(const Path&);
 
 		__device__ __host__ void EulerLogNormalStep(double gaussianRandomVariable);
@@ -46,5 +49,9 @@ class Path{
 		
 		__device__ __host__ double GetSpotPrice() const;
 		__device__ __host__ unsigned int GetPerformanceCorridorBarrierCounter() const;
+		
+		// Payoff evaluation
+		__device__ __host__ double GetActualizedPayoff() const;
 };
+
 #endif

@@ -19,15 +19,4 @@ __host__ void OptionPricingEvaluator_Host(Input_gpu_data, Input_option_data, Inp
 __host__ __device__ void OptionPricingEvaluator_HostDev(Input_gpu_data, Input_option_data, Input_market_data, Input_MC_data, Statistics* exactOutputs, Statistics* eulerOutputs, unsigned int threadNumber);
 __global__ void OptionPricingEvaluator_Global(Input_gpu_data, Input_option_data, Input_market_data, Input_MC_data, Statistics* exactOutputs, Statistics* eulerOutputs);
 
-// Payoff evaluation
-__host__ __device__ double EvaluatePayoff(const Path&, const Input_option_data&);
-__host__ __device__ double ActualizePayoff(double payoff, double riskFreeRate, double timeToMaturity);
-
-// Input processing
-__host__ void PrintInputData(const Input_gpu_data&, const Input_option_data&, const Input_market_data&, const Input_MC_data&);
-__host__ void ReadInputData(vector<string>&, string sourceFile);
-
-// Output processing
-__host__ void PrintOutputData(const Output_MC_data&);
-
 #endif

@@ -4,6 +4,7 @@ TARGS= \
 libraries/InputStructures/InputGPUData/Input_gpu_data.o \
 libraries/InputStructures/InputMCData/Input_MC_data.o \
 libraries/InputStructures/InputOptionData/Input_option_data.o \
+libraries/CoreLibraries/DataStreamManager/Data_stream_manager.o \
 libraries/CoreLibraries/Statistics/Statistics.o \
 libraries/CoreLibraries/Path/Path.o \
 libraries/CoreLibraries/RandomGenerator/rng.o \
@@ -25,6 +26,7 @@ clean:
 	@(cd libraries/InputStructures/InputMarketData && rm -f *.x *.o)	|| ($(ECHO) "Failed to clean libraries/InputStructures/InputMarketData." && exit 1)
 	@(cd libraries/InputStructures/InputMCData && rm -f *.x *.o)		|| ($(ECHO) "Failed to clean libraries/InputStructures/InputMCData." && exit 1)
 	@(cd libraries/InputStructures/InputOptionData && rm -f *.x *.o)	|| ($(ECHO) "Failed to clean libraries/InputStructures/InputOptionData." && exit 1)
+	@(cd libraries/CoreLibraries/DataStreamManager && rm -f *.x *.o)	|| ($(ECHO) "Failed to clean libraries/CoreLibraries/DataStreamManager." && exit 1)
 	@(cd libraries/CoreLibraries/Statistics && rm -f *.x *.o)			|| ($(ECHO) "Failed to clean libraries/CoreLibraries/Statistics." && exit 1)
 	@(cd libraries/CoreLibraries/Path && rm -f *.x *.o)					|| ($(ECHO) "Failed to clean libraries/CoreLibraries/Path." && exit 1)
 	@(cd libraries/CoreLibraries/RandomGenerator && rm -f *.x *.o)		|| ($(ECHO) "Failed to clean libraries/CoreLibraries/RandomGenerator." && exit 1)

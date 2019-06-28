@@ -5,7 +5,7 @@
 #
 ## GPU DATA
 # Number of GPU blocks
-1
+10
 ## MARKET DATA
 # Initial underlying price at t = 0 [USD]
 100
@@ -36,12 +36,12 @@ e
 # B
 2
 # K [percentage, i.e. 0.1 = 10%]
-0.5
+0.3
 # N [EUR]
 1
 ## MONTE CARLO DATA
 # Number of simulations
-5000
+5000000
 #
 #
 #
