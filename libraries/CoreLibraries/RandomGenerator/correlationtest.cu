@@ -1,12 +1,81 @@
+//
+//	INTER- AND INTRA-STREAM CORRELATION TEST
+//
+//	Tests correlation of random generated numbers within single streams
+//	as well as across all streams.
+//
+
 #include <iostream>
-#include <cmath>		// sqrt
-#include "rng.cuh"
-#include "correlationtest.cuh"
+#include <ctime>		// time(NULL) for seed
+#include <climits>		// UINT_MAX
+
+#include "RNG.cuh"
+#include "CorrelationToolbox.cuh"
 
 using namespace std;
 
-void correlationTest(unsigned int totalNumberOfThreads, unsigned int numbersToGeneratePerThread, double* uniformNumbers, double* gaussianNumbers){
+int main(){
+	
+	unsigned int numberOfBlocks = 1;
+	unsigned int numberOfThreadsPerBlock = 512;
+	unsigned int totalNumberOfThreads = numberOfBlocks * numberOfThreadsPerBlock;
+	unsigned int numbersToGeneratePerThread = 1000;
+	unsigned int totalNumbersToGenerate = totalNumberOfThreads * numbersToGeneratePerThread;
 
+	cout << "Total numbers to generate: " << totalNumbersToGenerate << endl;
+	cout << "Total number of threads: " << totalNumberOfThreads << endl;
+	cout << "Total numbers to generate per thread: " << numbersToGeneratePerThread << endl;
+	
+	double **uniformNumbers = new double*[totalNumbersToGenerate];
+	double **gaussianNumbers = new double*[totalNumbersToGenerate];
+	
+	for(unsigned int threadIndex=0; threadIndex<totalNumberOfThreads; ++threadIndex){
+		uniformNumbers[threadIndex] = new double[numbersToGeneratePerThread];
+		gaussianNumbers[threadIndex] = new double[numbersToGeneratePerThread];
+	}
+
+	// Seed for tausworthe support generator
+	unsigned int seed;	
+	do
+		seed = time(NULL);
+	while(seed < 129 || seed > UINT_MAX - totalNumberOfThreads);
+	
+
+	RandomNumberGeneration(numberOfBlocks, numberOfThreadsPerBlock, uniformNumbers, gaussianNumbers, totalNumbersToGenerate, numbersToGeneratePerThread, seed);
+	
+	cout << endl <<  "############### INTRA-STREAM TEST ###############" << endl;
+	
+	// Average, exp. 0.5 for uniform numbers, 0 for gaussian numbers
+	double *uniformAverages = new double[totalNumberOfThreads];
+	double *gaussAverages = new double[totalNumberOfThreads];
+	
+	cout << endl << "Uniform averages (exp. 0.5):" << endl;
+	EvaluateStreamAverage(uniformNumbers, uniformAverages, totalNumberOfThreads, numbersToGeneratePerThread, false);
+	cout << endl << "Gaussian averages (exp. 0):" << endl;
+	EvaluateStreamAverage(gaussianNumbers, gaussAverages, totalNumberOfThreads, numbersToGeneratePerThread, false);
+
+	// Gaussian variance, exp. 1
+	double *gaussVariances = new double[totalNumberOfThreads];
+	cout << endl << "Gaussian variances (exp. 1):" << endl;
+	EvaluateStreamVariance(gaussianNumbers, gaussAverages, gaussVariances, totalNumberOfThreads, numbersToGeneratePerThread, false);
+	
+	// Gaussian kurtosis, exp. 3
+	double *gaussKurtosises = new double[totalNumberOfThreads];
+	cout << endl << "Gaussian kurtosises (exp. 3):" << endl;
+	EvaluateStreamKurtosis(gaussianNumbers, gaussAverages, gaussVariances, gaussKurtosises, totalNumberOfThreads, numbersToGeneratePerThread, false);
+
+	// Autocorrelation i/i+1, exp. 0.25 for uniform numbers, 0 for gaussian numbers
+	double *uniformCorrelations = new double[totalNumberOfThreads];
+	double *gaussCorrelations = new double[totalNumberOfThreads];
+
+	cout << endl << "Uniform autocorrelations i/i+k (exp. 0.25):" << endl;
+	EvaluateCompleteAutocorrelation(uniformNumbers, uniformCorrelations, totalNumberOfThreads, numbersToGeneratePerThread, true);
+	cout << endl << "Gaussian autocorrelations i/i+k (exp. 0):" << endl;
+	EvaluateCompleteAutocorrelation(gaussianNumbers, gaussCorrelations, totalNumberOfThreads, numbersToGeneratePerThread, true);
+
+	
+/** Per riferimento, i test precedenti
+ 
 	cout << endl <<  "############### INTER-STREAM TEST ###############" << endl << endl;
 	int streamStep = 0;					// To choose which step of the random generation you want
 	double sumOfUniformNumbers = 0.;
@@ -77,4 +146,24 @@ void correlationTest(unsigned int totalNumberOfThreads, unsigned int numbersToGe
 	cout << "The value obtained differs from the expected by: " << abs(averageOfUniformNumbers/standardDeviationOfUniformNumbers) << " stardard deviation" << endl << endl;
 	cout << "Correlation function of gaussian numbers: " << averageOfGaussianNumbers << " +- " << standardDeviationOfGaussianNumbers << endl;
 	cout << "The value obtained differs from the expected by: " << abs(averageOfGaussianNumbers/standardDeviationOfGaussianNumbers) << " stardard deviation" << endl << endl;
+
+*/
+
+	delete[] uniformAverages;
+	delete[] gaussAverages;
+	delete[] gaussVariances;
+	delete[] gaussKurtosises;
+	delete[] uniformCorrelations;
+	delete[] gaussCorrelations;
+
+	for(unsigned int threadIndex=0; threadIndex<totalNumberOfThreads; ++threadIndex){
+		delete[] uniformNumbers[threadIndex];
+		delete[] gaussianNumbers[threadIndex];
+	}
+
+	delete[] uniformNumbers;
+	delete[] gaussianNumbers;
+
+	return 0;
+
 }

@@ -1,6 +1,81 @@
-#include "rng.cuh"
+#include <cmath>		// log, cos, sin, M_PI
+
+#include "RNG.cuh"
 
 using namespace std;
+
+//
+//	TAUSWORTHE GENERATOR
+//
+
+// Constructor and destructor
+__device__ __host__ RNG_Tausworthe::RNG_Tausworthe(){
+	_Seed = 129;
+}
+__device__ __host__ RNG_Tausworthe::RNG_Tausworthe(const unsigned int seed){
+	_Seed = seed;
+}
+
+// Private functions
+__device__ __host__ unsigned int RNG_Tausworthe::TausStep(){
+	int S1 = 23, S2 = 5, S3 = 29;
+	unsigned int M = 4294967240UL;
+	unsigned int z = this->_Seed;
+	
+	unsigned b = (((z << S1) ^ z) >> S2);
+
+	this->_Seed = (((z & M) << S3) ^ b);
+	return _Seed;		
+}
+
+// Virtual functions from base class
+__device__ __host__ void RNG_Tausworthe::ResetSeed(){
+	_Seed = 129;	
+}
+
+__device__ __host__ unsigned int RNG_Tausworthe::GetUnsignedInt(){
+	return this->TausStep();
+}
+
+__device__ __host__ double RNG_Tausworthe::GetUniform(){
+	return 2.3283064365387e-10 * this->GetUnsignedInt();	
+}
+
+__device__ __host__ double RNG_Tausworthe::GetGauss(){
+	double u = this->GetUniform();
+	double v = this->GetUniform();
+
+	return sqrt(-2.*log(u)) * cos(2.*M_PI*v);	
+}
+
+__device__ __host__ double RNG_Tausworthe::GetBimodal(){
+	double uniform;
+
+	do{
+		uniform = this->GetUniform();
+		
+		if(uniform > 0.5)
+			return 0.5;
+		else if(uniform < 0.5)
+			return -0.5;
+	}while(uniform == 0.5);
+	
+	return -1000.;	// If this ever gets called, we're in trouble
+}
+
+__device__ __host__ void RNG_Tausworthe::SetInternalState(RNG* supportGenerator){
+	unsigned int seed;
+	
+	do
+		seed = supportGenerator->GetUnsignedInt();
+	while(seed < 129);
+	
+	this->_Seed = seed;
+}
+
+//
+//	COMBINED GENERATOR
+//
 
 __device__ __host__ RNG_CombinedGenerator::RNG_CombinedGenerator(const unsigned int seed1, const unsigned int seed2, const unsigned int seed3, const unsigned int seed4){
 	this->_SeedLCGS = seed1;
@@ -72,7 +147,7 @@ __device__ __host__ void RNG_CombinedGenerator::ResetSeed(){
 	this->_SeedTaus3 = 131;
 }
 
-__device__ __host__ double RNG_CombinedGenerator::GetUnsignedInt(){
+__device__ __host__ unsigned int RNG_CombinedGenerator::GetUnsignedInt(){
 	return this->HybridTausGenerator();
 }
 
@@ -87,8 +162,38 @@ __device__ __host__ double RNG_CombinedGenerator::GetGauss(){
 	return sqrt(-2.*log(u)) * cos(2.*M_PI*v);
 }
 
-__device__ __host__ void RNG_CombinedGenerator::SetInternalState(unsigned int seedLGCS, unsigned int seedTaus1, unsigned int seedTaus2, unsigned int seedTaus3){
-	this->_SeedLCGS = seedLGCS;
+__device__ __host__ double RNG_CombinedGenerator::GetBimodal(){
+	double uniform;
+
+	do{
+		uniform = this->GetUniform();
+		
+		if(uniform > 0.5)
+			return 0.5;
+		else if(uniform < 0.5)
+			return -0.5;
+	}while(uniform == 0.5);
+	
+	return -1000.;	// If this ever gets called, we're in trouble
+}
+
+__device__ __host__ void RNG_CombinedGenerator::SetInternalState(RNG* supportGenerator){
+	this->_SeedLCGS = supportGenerator->GetUnsignedInt();
+	
+	unsigned int seedTaus1, seedTaus2, seedTaus3;
+	
+	do
+		seedTaus1 = supportGenerator->GetUnsignedInt();
+	while(seedTaus1 < 129);
+	
+	do
+		seedTaus2 = supportGenerator->GetUnsignedInt();
+	while(seedTaus2 < 129);
+	
+	do
+		seedTaus3 = supportGenerator->GetUnsignedInt();
+	while(seedTaus3 < 129);
+	
 	this->_SeedTaus1 = seedTaus1;
 	this->_SeedTaus2 = seedTaus2;
 	this->_SeedTaus3 = seedTaus3;
