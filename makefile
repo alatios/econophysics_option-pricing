@@ -7,7 +7,7 @@ libraries/InputStructures/InputOptionData/Input_option_data.o \
 libraries/CoreLibraries/DataStreamManager/Data_stream_manager.o \
 libraries/CoreLibraries/Statistics/Statistics.o \
 libraries/CoreLibraries/Path/Path.o \
-libraries/CoreLibraries/RandomGenerator/rng.o \
+libraries/CoreLibraries/RandomGenerator/RNG.o \
 libraries/CoreLibraries/SupportFunctions/Support_functions.o \
 main.o
 

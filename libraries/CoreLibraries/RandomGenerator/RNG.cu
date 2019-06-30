@@ -49,16 +49,16 @@ __device__ __host__ double RNG_Tausworthe::GetGauss(){
 }
 
 __device__ __host__ double RNG_Tausworthe::GetBimodal(){
-	double uniform;
+	double gaussian;
 
 	do{
-		uniform = this->GetUniform();
+		gaussian = this->GetGauss();
 		
-		if(uniform > 0.5)
+		if(gaussian > 0.)
 			return 0.5;
-		else if(uniform < 0.5)
+		else if(gaussian < 0.)
 			return -0.5;
-	}while(uniform == 0.5);
+	}while(gaussian == 0.);
 	
 	return -1000.;	// If this ever gets called, we're in trouble
 }
@@ -163,16 +163,16 @@ __device__ __host__ double RNG_CombinedGenerator::GetGauss(){
 }
 
 __device__ __host__ double RNG_CombinedGenerator::GetBimodal(){
-	double uniform;
+	double gaussian;
 
 	do{
-		uniform = this->GetUniform();
+		gaussian = this->GetGauss();
 		
-		if(uniform > 0.5)
+		if(gaussian > 0.)
 			return 0.5;
-		else if(uniform < 0.5)
+		else if(gaussian < 0.)
 			return -0.5;
-	}while(uniform == 0.5);
+	}while(gaussian == 0.);
 	
 	return -1000.;	// If this ever gets called, we're in trouble
 }

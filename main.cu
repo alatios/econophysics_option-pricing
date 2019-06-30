@@ -15,7 +15,7 @@
 #include "libraries/CoreLibraries/DataStreamManager/Data_stream_manager.cuh"
 #include "libraries/CoreLibraries/Statistics/Statistics.cuh"
 #include "libraries/CoreLibraries/Path/Path.cuh"
-#include "libraries/CoreLibraries/RandomGenerator/rng.cuh"
+#include "libraries/CoreLibraries/RandomGenerator/RNG.cuh"
 #include "libraries/CoreLibraries/SupportFunctions/Support_functions.cuh"
 #include "libraries/OutputStructures/OutputMCData/Output_MC_data.cuh"
 
