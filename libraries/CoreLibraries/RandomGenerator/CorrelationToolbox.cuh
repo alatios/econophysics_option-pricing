@@ -6,11 +6,19 @@
 // Random number generator
 __host__ void RandomNumberGeneration(unsigned int numberOfBlocks, unsigned int numberOfThreadsPerBlock, double **uniformNumbers, double **gaussianNumbers, unsigned int totalNumbersToGenerate, unsigned int numbersToGeneratePerThread, unsigned int seed);
 
-// Toolbox to test correlation of a stream of totalNumberOfThreads, each generating numbersToGeneratePerThread random numbers. A positive verbose variable will, well, print the output for further testing
-__host__ void EvaluateStreamAverage(double **inputStreams, double *outputStreamAverages, unsigned int totalNumberOfThreads, unsigned int numbersToGeneratePerThread, bool verbose);
-__host__ void EvaluateStreamVariance(double **inputStreams, double *inputStreamAverages, double *outputStreamVariances, unsigned int totalNumberOfThreads, unsigned int numbersToGeneratePerThread, bool verbose);
-__host__ void EvaluateStreamKurtosis(double **inputStreams, double *inputStreamAverages, double *inputStreamVariances, double *outputStreamKurtosises, unsigned int totalNumberOfThreads, unsigned int numbersToGeneratePerThread, bool verbose);
+// Single stream toolbox. A true verbose variable will print the output for further testing
+__host__ double GetAverage_SingleStream(double *inputStream, unsigned int streamSize);
+__host__ double GetVariance_SingleStream(double *inputStream, double streamAverage, unsigned int streamSize);
+__host__ double GetKurtosis_SingleStream(double *inputStream, double streamAverage, double streamVariance, unsigned int streamSize);
+__host__ double GetAutocorrelationK_SingleStream(double *inputStream, unsigned int autocorrelationOffset, unsigned int streamSize);
+	// Accepts two vectors: one is streamSize sized, the other is streamSize-2
+__host__ void EvaluateCompleteAutocorrelation_SingleStream(double *inputStream, double *outputCorrelations, unsigned int streamSize, bool verbose);
 
-__host__ void EvaluateSingleAutocorrelation(double **inputStreams, double *outputStreamCorrelations, double autocorrelationOffset, unsigned int totalNumberOfThreads, unsigned int numbersToGeneratePerThread, bool verbose);
-__host__ void EvaluateCompleteAutocorrelation(double **inputStreams, double *outputStreamCorrelations, unsigned int totalNumberOfThreads, unsigned int numbersToGeneratePerThread, bool verbose);
+
+// Many-streams toolbox. A true verbose variable will print the output for further testing
+__host__ void EvaluateAverage_MultipleStreams(double **inputStreams, double *outputStreamAverages, unsigned int totalNumberOfThreads, unsigned int numbersToGeneratePerThread, bool verbose);
+__host__ void EvaluateVariance_MultipleStreams(double **inputStreams, double *inputStreamAverages, double *outputStreamVariances, unsigned int totalNumberOfThreads, unsigned int numbersToGeneratePerThread, bool verbose);
+__host__ void EvaluateKurtosis_MultipleStreams(double **inputStreams, double *inputStreamAverages, double *inputStreamVariances, double *outputStreamKurtosises, unsigned int totalNumberOfThreads, unsigned int numbersToGeneratePerThread, bool verbose);
+	// Accepts two matrixes with totalNumberOfThreads as first index and numbersToGeneratePerThread or numbersToGeneratePerThread-2 as second index respectively
+__host__ void EvaluateCompleteAutocorrelation_MultipleStreams(double **inputStreams, double **outputStreamCorrelations, unsigned int totalNumberOfThreads, unsigned int numbersToGeneratePerThread, bool verbose);
 #endif

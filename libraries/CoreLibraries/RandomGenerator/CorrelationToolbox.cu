@@ -21,106 +21,99 @@ __host__ void RandomNumberGeneration(unsigned int numberOfBlocks, unsigned int n
 	}
 }
 
+// Single stream toolbox
+__host__ double GetAverage_SingleStream(double *inputStream, unsigned int streamSize){
+	double streamSum = 0.;
+	unsigned int streamCounter = 0;
+	
+	for(unsigned int RNGIndex=0; RNGIndex<streamSize; ++RNGIndex){
+		streamSum += inputStream[RNGIndex];
+		++streamCounter;
+	}
+	
+	return streamSum / streamCounter;
+}
+
+__host__ double GetVariance_SingleStream(double *inputStream, double streamAverage, unsigned int streamSize){
+	double streamSquaredDiscrepancyFromAverage = 0.;
+	unsigned int streamCounter = 0;
+
+	for(unsigned int RNGIndex=0; RNGIndex<streamSize; ++RNGIndex){
+		streamSquaredDiscrepancyFromAverage += pow(inputStream[RNGIndex] - streamAverage,2);
+		++streamCounter;
+	}
+	
+	return streamSquaredDiscrepancyFromAverage / streamCounter;	
+}
+
+__host__ double GetKurtosis_SingleStream(double *inputStream, double streamAverage, double streamVariance, unsigned int streamSize){
+	double streamQuarticDiscrepancyFromAverage = 0.;
+	unsigned int streamCounter = 0;
+	
+	for(unsigned int RNGIndex=0; RNGIndex<streamSize; ++RNGIndex){
+		streamQuarticDiscrepancyFromAverage += pow(inputStream[RNGIndex] - streamAverage,4);
+		++streamCounter;
+	}
+	
+	return streamQuarticDiscrepancyFromAverage / (streamCounter * pow(streamVariance,4));
+
+}
+
+__host__ double GetAutocorrelationK_SingleStream(double *inputStream, unsigned int autocorrelationOffset, unsigned int streamSize){
+	double streamCorrelationSum = 0.;
+	unsigned int streamCounter = 0;
+
+	for(unsigned int RNGIndex=0; RNGIndex<streamSize-autocorrelationOffset; ++RNGIndex){
+		streamCorrelationSum += inputStream[RNGIndex] * inputStream[RNGIndex+autocorrelationOffset];
+		++streamCounter;
+	}
+	
+	return streamCorrelationSum / streamCounter;
+}
+
+__host__ void EvaluateCompleteAutocorrelation_SingleStream(double *inputStream, double *outputCorrelations, unsigned int streamSize, bool verbose){
+	for(unsigned int autocorrelationOffset=1; autocorrelationOffset<streamSize-1; ++autocorrelationOffset){
+		outputCorrelations[autocorrelationOffset-1] = GetAutocorrelationK_SingleStream(inputStream, autocorrelationOffset, streamSize);
+		
+		if(verbose)
+			if(autocorrelationOffset % 20 == 0)
+				cout << "<xi*xi+" << autocorrelationOffset << ">:\t" << outputCorrelations[autocorrelationOffset-1] << endl;
+	}
+}
+
+
 // Toolbox to test correlation of a stream of totalNumberOfThreads, each generating numbersToGeneratePerThread random numbers. A positive verbose variable will, well, print the output for further testing
 
-__host__ void EvaluateStreamAverage(double **inputStreams, double *outputStreamAverages, unsigned int totalNumberOfThreads, unsigned int numbersToGeneratePerThread, bool verbose){
-	double *streamSums = new double[totalNumberOfThreads];
-	unsigned int *streamCounters = new unsigned int[totalNumberOfThreads];
-
+__host__ void EvaluateAverage_MultipleStreams(double **inputStreams, double *outputStreamAverages, unsigned int totalNumberOfThreads, unsigned int numbersToGeneratePerThread, bool verbose){
 	for(unsigned int threadIndex=0; threadIndex<totalNumberOfThreads; ++threadIndex){
-		streamSums[threadIndex] = 0.;
-		streamCounters[threadIndex] = 0;
-		
-		for(unsigned int RNGNumber=0; RNGNumber<numbersToGeneratePerThread; ++RNGNumber){
-			streamSums[threadIndex] += inputStreams[threadIndex][RNGNumber];
-			++streamCounters[threadIndex];
-		}
-		
-		outputStreamAverages[threadIndex] = streamSums[threadIndex] / streamCounters[threadIndex];
-		
+		outputStreamAverages[threadIndex] = GetAverage_SingleStream(inputStreams[threadIndex],numbersToGeneratePerThread);	
 		if(verbose)
 			cout << "<xi>@thread" << threadIndex << ":\t" << outputStreamAverages[threadIndex] << endl;
 	}
-	
-	delete[] streamSums;
-	delete[] streamCounters;
 }
 
-__host__ void EvaluateStreamVariance(double **inputStreams, double *inputStreamAverages, double *outputStreamVariances, unsigned int totalNumberOfThreads, unsigned int numbersToGeneratePerThread, bool verbose){
-	double *streamSquaredDiscrepanciesFromAverage = new double[totalNumberOfThreads];
-	unsigned int *streamCounters = new unsigned int[totalNumberOfThreads];
-	
+__host__ void EvaluateVariance_MultipleStreams(double **inputStreams, double *inputStreamAverages, double *outputStreamVariances, unsigned int totalNumberOfThreads, unsigned int numbersToGeneratePerThread, bool verbose){
 	for(unsigned int threadIndex=0; threadIndex<totalNumberOfThreads; ++threadIndex){
-		streamSquaredDiscrepanciesFromAverage[threadIndex] = 0.;
-	
-		for(unsigned int RNGNumber=0; RNGNumber<numbersToGeneratePerThread; ++RNGNumber){
-			streamSquaredDiscrepanciesFromAverage[threadIndex] += pow(inputStreams[threadIndex][RNGNumber] - inputStreamAverages[threadIndex],2);
-			++streamCounters[threadIndex];
-		}
-		
-		outputStreamVariances[threadIndex] = streamSquaredDiscrepanciesFromAverage[threadIndex] / streamCounters[threadIndex];
-
+		outputStreamVariances[threadIndex] = GetVariance_SingleStream(inputStreams[threadIndex], inputStreamAverages[threadIndex], numbersToGeneratePerThread);
 		if(verbose)
 			cout << "var(xi)@thread" << threadIndex << ":\t" << outputStreamVariances[threadIndex] << endl;
 	}
-	
-	delete[] streamSquaredDiscrepanciesFromAverage;
-	delete[] streamCounters;
 }
 
-__host__ void EvaluateStreamKurtosis(double **inputStreams, double *inputStreamAverages, double *inputStreamVariances, double *outputStreamKurtosises, unsigned int totalNumberOfThreads, unsigned int numbersToGeneratePerThread, bool verbose){
-	double *streamQuarticDiscrepanciesFromAverage = new double[totalNumberOfThreads];
-	unsigned int *streamCounters = new unsigned int[totalNumberOfThreads];
-	
+__host__ void EvaluateKurtosis_MultipleStreams(double **inputStreams, double *inputStreamAverages, double *inputStreamVariances, double *outputStreamKurtosises, unsigned int totalNumberOfThreads, unsigned int numbersToGeneratePerThread, bool verbose){
 	for(unsigned int threadIndex=0; threadIndex<totalNumberOfThreads; ++threadIndex){
-		streamQuarticDiscrepanciesFromAverage[threadIndex] = 0.;
-	
-		for(unsigned int RNGNumber=0; RNGNumber<numbersToGeneratePerThread; ++RNGNumber){
-			streamQuarticDiscrepanciesFromAverage[threadIndex] += pow(inputStreams[threadIndex][RNGNumber] - inputStreamAverages[threadIndex],4);
-			++streamCounters[threadIndex];
-		}
-		
-		outputStreamKurtosises[threadIndex] = streamQuarticDiscrepanciesFromAverage[threadIndex] / (streamCounters[threadIndex] * pow(inputStreamVariances[threadIndex],4));
+		outputStreamKurtosises[threadIndex] = GetKurtosis_SingleStream(inputStreams[threadIndex], inputStreamAverages[threadIndex], inputStreamVariances[threadIndex], numbersToGeneratePerThread);
 		if(verbose)
 			cout << "kurt(xi)@thread" << threadIndex << ":\t" << outputStreamKurtosises[threadIndex] << endl;
 	}
-	
-	delete[] streamQuarticDiscrepanciesFromAverage;
-	delete[] streamCounters;
 }
 
-__host__ void EvaluateSingleAutocorrelation(double **inputStreams, double *outputStreamCorrelations, unsigned int autocorrelationOffset, unsigned int totalNumberOfThreads, unsigned int numbersToGeneratePerThread, bool verbose){
-	double *streamCorrelationSums = new double[totalNumberOfThreads];
-	unsigned int *streamCorrelationCounters = new unsigned int[totalNumberOfThreads];
-	
+__host__ void EvaluateCompleteAutocorrelation_MultipleStreams(double **inputStreams, double **outputStreamCorrelations, unsigned int totalNumberOfThreads, unsigned int numbersToGeneratePerThread, bool verbose){
 	for(unsigned int threadIndex=0; threadIndex<totalNumberOfThreads; ++threadIndex){
-		streamCorrelationSums[threadIndex] = 0.;
-		streamCorrelationCounters[threadIndex] = 0;
-		
-		for(unsigned int RNGNumber=0; RNGNumber<numbersToGeneratePerThread-autocorrelationOffset; ++RNGNumber){
-			streamCorrelationSums[threadIndex] += inputStreams[threadIndex][RNGNumber] * inputStreams[threadIndex][RNGNumber+autocorrelationOffset];
-			++streamCorrelationCounters[threadIndex];
-		}
-		
-		outputStreamCorrelations[threadIndex] = streamCorrelationSums[threadIndex] / streamCorrelationCounters[threadIndex];
-		
+				
 		if(verbose)
-			if(threadIndex % 100 == 0)
-				cout << "<xi*xi+" << autocorrelationOffset << ">@thread" << threadIndex << ":\t" << outputStreamCorrelations[threadIndex] << endl;
-	}
-	
-	delete[] streamCorrelationSums;
-	delete[] streamCorrelationCounters;
-}
+			cout << "@thread" << threadIndex << ":" << endl;
 
-__host__ void EvaluateCompleteAutocorrelation(double **inputStreams, double *outputStreamCorrelations, unsigned int totalNumberOfThreads, unsigned int numbersToGeneratePerThread, bool verbose){
-	for(unsigned int autocorrelationOffset=1; autocorrelationOffset<numbersToGeneratePerThread-1; ++autocorrelationOffset){
-		if(verbose)
-			if(autocorrelationOffset % 20 == 0){
-				EvaluateSingleAutocorrelation(inputStreams, outputStreamCorrelations, autocorrelationOffset, totalNumberOfThreads, numbersToGeneratePerThread, true);
-				continue;
-			}
-		
-		EvaluateSingleAutocorrelation(inputStreams, outputStreamCorrelations, autocorrelationOffset, totalNumberOfThreads, numbersToGeneratePerThread, false);
+		EvaluateCompleteAutocorrelation_SingleStream(inputStreams[threadIndex], outputStreamCorrelations[threadIndex], numbersToGeneratePerThread, verbose);
 	}
 }
