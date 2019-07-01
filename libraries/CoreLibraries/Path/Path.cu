@@ -4,6 +4,21 @@
 using namespace std;
 
 // Constructors
+__device__ __host__ Path::Path(){
+	this->_OptionType = 'c';
+	this->_SpotPrice = 0.;
+	this->_RiskFreeRate = 0.;
+	this->_Volatility = 0.;
+	this->_TimeToMaturity = 0;
+	this->_NumberOfIntervals = 0;
+	this->_DeltaTime = 0.;
+	this->_StrikePrice = 0.;
+	this->_B = 0.;
+	this->_N = 0.;
+	this->_K = 0.;
+	this->_PerformanceCorridorBarrierCounter = 0;
+}
+
 __device__ __host__ Path::Path(const Input_market_data& market, const Input_option_data& option){
 	this->_OptionType = option.OptionType;
 	this->_SpotPrice = market.InitialPrice;

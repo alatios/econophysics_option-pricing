@@ -20,8 +20,8 @@ class Path{
 
 		// Base European option/contract data
 		char _OptionType;
-		unsigned int _TimeToMaturity;
 		unsigned int _NumberOfIntervals;
+		double _TimeToMaturity;
 		double _DeltaTime;
 		
 		// Plain vanilla option data
@@ -29,15 +29,15 @@ class Path{
 		
 		// Performance corridor data
 		double _B;
-		double _N;
 		double _K;
+		double _N;
 		unsigned int _PerformanceCorridorBarrierCounter;
 		
 		__device__ __host__ void CheckPerformanceCorridorCondition(double currentSpotPrice, double nextSpotPrice);
 		
 	public:
 
-		__device__ __host__ Path() = default;
+		__device__ __host__ Path();
 		__device__ __host__ Path(const Input_market_data& market, const Input_option_data& option);
 		__device__ __host__ ~Path() = default;
 
