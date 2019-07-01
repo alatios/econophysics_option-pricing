@@ -1,5 +1,5 @@
 FLAGS=-std=c++11 -Wno-deprecated-gpu-targets
-TARGS=UnitTest.o ../InputOptionData/Input_option_data.o ../InputMarketData/Input_market_data.o Path.o
+TARGS=UnitTest.o ../../InputStructures/InputMarketData/Input_market_data.o ../../InputStructures/InputOptionData/Input_option_data.o
 NVCC=nvcc
 
 ECHO=/bin/echo
