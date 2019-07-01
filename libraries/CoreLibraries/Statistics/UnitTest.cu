@@ -2,18 +2,10 @@
 #include <iostream>
 
 using namespace std;
-/*
-
-OUTPUT:
-
-  No problem ----> 1
-  There is a problem ----> 0
-
-*/
 
 int main(){
 
-/*	bool test;
+	bool test;
 
 	cout << "\n-------------Statistics_test-------------\n";
 	cout << "Constructors testing\n";
@@ -25,48 +17,53 @@ int main(){
 	test = statistics.GetSquaredPayoffSum() == static_cast<double>(0.);
 	cout << test << "\t";
 	test = statistics.GetPayoffCounter() == static_cast<unsigned int>(0);
-	cout << test << "\t";
-	test = statistics.GetSquaredPayoffCounter() == static_cast<unsigned int>(0);
 	cout << test << "\n";
 
 	cout << "\nMethods testing\n";
 
-	statistics.AddToPayoffSum(5.);
-	statistics.AddToSquaredPayoffSum(25.);
+	statistics.AddPayoff(5.);
 
 	test = statistics.GetPayoffSum() == static_cast<double>(5.);
 	cout << test << "\t";
 	test = statistics.GetSquaredPayoffSum() == static_cast<double>(25.);
 	cout << test << "\t";
 	test = statistics.GetPayoffCounter() == static_cast<unsigned int>(1);
-	cout << test << "\t";
-	test = statistics.GetSquaredPayoffCounter() == static_cast<unsigned int>(1);
 	cout << test << "\n";
 
-	statistics.ResetPayoffSum();
-	statistics.ResetSquaredPayoffSum();
-	statistics.AddToAll(3.);
-	statistics.AddToAll(1.);
-
-	test = statistics.GetPayoffSum() == static_cast<double>(4.);
-	cout << test << "\t";
-	test = statistics.GetSquaredPayoffSum() == static_cast<double>(10.);
-	cout << test << "\t";
-	test = statistics.GetPayoffCounter() == static_cast<unsigned int>(2);
-	cout << test << "\t";
-	test = statistics.GetSquaredPayoffCounter() == static_cast<unsigned int>(2);
-	cout << test << "\n";
-
-	statistics.ResetAllSums();
+	statistics.ResetSums();
 
 	test = statistics.GetPayoffSum() == static_cast<double>(0.);
 	cout << test << "\t";
 	test = statistics.GetSquaredPayoffSum() == static_cast<double>(0.);
 	cout << test << "\t";
 	test = statistics.GetPayoffCounter() == static_cast<unsigned int>(0);
-	cout << test << "\t";
-	test = statistics.GetSquaredPayoffCounter() == static_cast<unsigned int>(0);
 	cout << test << "\n";
-*/
+
+	statistics.AddPayoff(2.);
+	statistics.AddPayoff(2.);
+	statistics.EvaluateEstimatedPriceAndError();
+
+	test = statistics.GetPayoffAverage() == static_cast<double>(2.);
+	cout << test << "\t";
+	test = statistics.GetPayoffError() == static_cast<double>(0.);
+	cout << test << "\n";
+
+	statistics.ResetSums();
+	statistics.AddPayoff(2.);
+
+	Statistics statistics_1;
+	statistics_1.AddPayoff(5.);
+
+	Statistics statistics_sum;
+
+	statistics_sum = statistics += statistics_1;
+
+	test = statistics_sum.GetPayoffSum() == static_cast<double>(7.);
+	cout << test << "\t";
+	test = statistics_sum.GetSquaredPayoffSum() == static_cast<double>(29.);
+	cout << test << "\t";
+	test = statistics_sum.GetPayoffCounter() == static_cast<unsigned int>(2);
+	cout << test << "\n";
+
 	return 0;
 }

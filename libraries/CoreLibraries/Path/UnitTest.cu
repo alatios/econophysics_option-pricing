@@ -3,14 +3,6 @@
 #include <iostream>
 
 using namespace std;
-/*
-
-OUTPUT:
-
-  No problem ----> 1
-  There is a problem ----> 0
-
-*/
 
 int main(){
 
