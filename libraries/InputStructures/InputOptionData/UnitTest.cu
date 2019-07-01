@@ -12,7 +12,7 @@ OUTPUT:
 */
 
 int main(){
-
+/*
 //Random choice only for testing
 	double StrikePrice = 0.;
 	unsigned int NumberOfIntervals = 1;
@@ -63,6 +63,6 @@ int main(){
 	cout << test << "\t";
 	test = OptionData_1.GetDeltaTime()==static_cast<double>(1.25);
 	cout << test << "\n";
-
+*/
 	return 0;
 }

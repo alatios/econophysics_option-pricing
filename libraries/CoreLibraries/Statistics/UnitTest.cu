@@ -13,7 +13,7 @@ OUTPUT:
 
 int main(){
 
-	bool test;
+/*	bool test;
 
 	cout << "\n-------------Statistics_test-------------\n";
 	cout << "Constructors testing\n";
@@ -67,6 +67,6 @@ int main(){
 	cout << test << "\t";
 	test = statistics.GetSquaredPayoffCounter() == static_cast<unsigned int>(0);
 	cout << test << "\n";
-
+*/
 	return 0;
 }

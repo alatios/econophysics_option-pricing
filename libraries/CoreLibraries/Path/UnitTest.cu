@@ -13,7 +13,7 @@ OUTPUT:
 
 int main(){
 
-	double SpotPrice = 1.;
+/*	double SpotPrice = 1.;
 	bool test;
 
 	//Variables for testing Eulero formulae
@@ -67,7 +67,7 @@ int main(){
 	cout << test << "\t";
 	test = path2.GetSpotPrice() == static_cast<double>(1.175);
 	cout << test << "\n";
-
+*/
 	return 0;
 
 }
