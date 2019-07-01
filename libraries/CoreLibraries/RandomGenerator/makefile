@@ -8,13 +8,22 @@ ECHO=/bin/echo
 all: output corr
 
 output:  $(TARGS_OUTPUT)
-	$(NVCC) $(FLAGS) $(TARGS_OUTPUT) -o OutputTest
+	$(NVCC) $(FLAGS) $(TARGS_OUTPUT) -o OutputTest.x
 
 corr:  $(TARGS_CORRELATION)
-	$(NVCC) $(FLAGS) $(TARGS_CORRELATION) -o CorrelationTest
+	$(NVCC) $(FLAGS) $(TARGS_CORRELATION) -o CorrelationTest.x
 
 %.o: %.cu
 	$(NVCC) $(FLAGS) -dc $< -o $@
 
 clean:
 	@rm -f *.x *.o && echo "Done cleaning."
+
+
+run: clean
+	@make --no-print-directory
+	@$(ECHO) "Running RandomGenerator output test..."
+	@./OutputTest.x
+	@$(ECHO) "Running RandomGenerator correlation test..."
+	@./CorrelationTest.x
+

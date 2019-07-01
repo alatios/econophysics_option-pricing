@@ -13,7 +13,7 @@ OUTPUT:
 
 int main(){
 
-	//Random choice only for testing
+/*	//Random choice only for testing
 	unsigned int NumberOfBlocks = 100;
 	bool test;
 
@@ -42,6 +42,6 @@ int main(){
 	test = GpuData_1.GetTotalNumberOfThreads()==static_cast<unsigned int>(3072);
 	cout << test << "\n";
 
-
+*/
 	return 0;
 }
