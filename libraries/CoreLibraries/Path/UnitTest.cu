@@ -17,14 +17,12 @@ int main(){
 	char optionType = 'e';
 	unsigned int numberOfIntervals = 4;		// DeltaTime = 50
 	double timeToMaturity = 200.;	
-	double deltaTime = 50;
 	// Plain vanilla option data
 	double strikePrice = 200.;
 	// Performance corridor data
 	double b = 1;
 	double k = 2;
 	double n = 4;
-	unsigned int performanceCorridorBarrierCounter = 0;
 
 	Input_market_data market = {initialPrice, volatility, riskFreeRate};
 
@@ -48,7 +46,6 @@ int main(){
 	cout << "\nMethods testing\n";
 
 	//Option
-	double spotPriceLogNormal = 1.;
 	double strikePriceLogNormal = 100.;
 	unsigned int numberOfIntervalsLogNormal = 1;
 	double timeToMaturityLogNormal = 1.;

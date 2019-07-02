@@ -3,14 +3,15 @@
 using namespace std;
 
 // Main evaluators
-__host__ __device__ void OptionPricingEvaluator_HostDev(Input_gpu_data inputGPU, Input_option_data option, Input_market_data market, Input_MC_data inputMC, Statistics* exactOutputs, Statistics* eulerOutputs, unsigned int threadNumber){
+__host__ __device__ void OptionPricingEvaluator_HostDev(Input_gpu_data inputGPU, Input_option_data option, Input_market_data market, Input_MC_data inputMC, Statistics* exactOutputs, Statistics* eulerOutputs, unsigned int seed, unsigned int threadNumber){
 	
 	unsigned int numberOfPathsPerThread = inputMC.GetNumberOfSimulationsPerThread(inputGPU);
 	unsigned int numberOfIntervals = option.NumberOfIntervals;
 	unsigned int totalNumberOfSimulations = inputMC.NumberOfMCSimulations;
-	
-	RNG *randomGenerator = new RNG_CombinedGenerator;
-	randomGenerator->SetInternalState(1+threadNumber,129+threadNumber,130+threadNumber,131+threadNumber);
+
+	RNG *supportGenerator = new RNG_Tausworthe(seed+threadNumber);
+	RNG *mainGenerator = new RNG_CombinedGenerator;
+	mainGenerator->SetInternalState(supportGenerator);
 	
 	// Dummy variables to reduce memory accesses
 	Path exactPath, eulerPath;
@@ -25,8 +26,8 @@ __host__ __device__ void OptionPricingEvaluator_HostDev(Input_gpu_data inputGPU,
 
 			// Cycling through steps in each path
 			for(unsigned int stepNumber=0; stepNumber<numberOfIntervals; ++stepNumber){
-				exactPath.ExactLogNormalStep(randomGenerator->GetGauss());
-				eulerPath.EulerLogNormalStep(randomGenerator->GetGauss());
+				exactPath.ExactLogNormalStep(mainGenerator->GetGauss());
+				eulerPath.EulerLogNormalStep(mainGenerator->GetGauss());
 			}
 
 			exactOutputs[threadNumber].AddPayoff(exactPath.GetActualizedPayoff());
@@ -35,14 +36,14 @@ __host__ __device__ void OptionPricingEvaluator_HostDev(Input_gpu_data inputGPU,
 	}
 }
 
-__host__ void OptionPricingEvaluator_Host(Input_gpu_data inputGPU, Input_option_data option, Input_market_data market, Input_MC_data inputMC, Statistics* exactOutputs, Statistics* eulerOutputs){
+__host__ void OptionPricingEvaluator_Host(Input_gpu_data inputGPU, Input_option_data option, Input_market_data market, Input_MC_data inputMC, Statistics* exactOutputs, Statistics* eulerOutputs, unsigned int seed){
 	unsigned int totalNumberOfThreads = inputGPU.GetTotalNumberOfThreads();
 	
 	for(unsigned int threadNumber=0; threadNumber<totalNumberOfThreads; ++threadNumber)
-		OptionPricingEvaluator_HostDev(inputGPU, option, market, inputMC, exactOutputs, eulerOutputs, threadNumber);
+		OptionPricingEvaluator_HostDev(inputGPU, option, market, inputMC, exactOutputs, eulerOutputs, seed, threadNumber);
 }
 
-__global__ void OptionPricingEvaluator_Global(Input_gpu_data inputGPU, Input_option_data option, Input_market_data market, Input_MC_data inputMC, Statistics* exactOutputs, Statistics* eulerOutputs){
+__global__ void OptionPricingEvaluator_Global(Input_gpu_data inputGPU, Input_option_data option, Input_market_data market, Input_MC_data inputMC, Statistics* exactOutputs, Statistics* eulerOutputs, unsigned int seed){
 	unsigned int threadNumber = threadIdx.x + blockDim.x * blockIdx.x;
-	OptionPricingEvaluator_HostDev(inputGPU, option, market, inputMC, exactOutputs, eulerOutputs, threadNumber);
+	OptionPricingEvaluator_HostDev(inputGPU, option, market, inputMC, exactOutputs, eulerOutputs, seed, threadNumber);
 }

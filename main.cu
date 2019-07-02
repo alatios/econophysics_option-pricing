@@ -41,12 +41,19 @@ int main(){
 	// Output arrays
 	Statistics *exactOutputs = new Statistics[totalNumberOfThreads];
 	Statistics *eulerOutputs = new Statistics[totalNumberOfThreads];
+	
+	// Seed for random number generation
+	// Fix it to a value between 129 and UINT_MAX-totalNumberOfThreads or let time(NULL) do its magic
+	unsigned int seed;	
+	do
+		seed = time(NULL);
+	while(seed < 129 || seed > UINT_MAX - totalNumberOfThreads);
 
 /*
 	////////////// HOST-SIDE GENERATOR //////////////	
 	cout << "Beginning device simulation through CPU..." << endl;
 	// Simulating device function
-	OptionPricingEvaluator_Host(inputGPU, inputOption, inputMarket, inputMC, exactOutputs, eulerOutputs);
+	OptionPricingEvaluator_Host(inputGPU, inputOption, inputMarket, inputMC, exactOutputs, eulerOutputs, seed);
 	cout << endl;
 	/////////////////////////////////////////////////
 */
@@ -63,7 +70,7 @@ int main(){
 	cudaMemcpy(device_eulerOutputs, eulerOutputs, totalNumberOfThreads*sizeof(Statistics), cudaMemcpyHostToDevice);
 
 	cout << "Beginning GPU computation..." << endl;
-	OptionPricingEvaluator_Global<<<inputGPU.NumberOfBlocks,numberOfThreadsPerBlock>>>(inputGPU, inputOption, inputMarket, inputMC, device_exactOutputs, device_eulerOutputs);
+	OptionPricingEvaluator_Global<<<inputGPU.NumberOfBlocks,numberOfThreadsPerBlock>>>(inputGPU, inputOption, inputMarket, inputMC, device_exactOutputs, device_eulerOutputs, seed);
 
 	cudaMemcpy(exactOutputs, device_exactOutputs, totalNumberOfThreads*sizeof(Statistics), cudaMemcpyDeviceToHost);
 	cudaMemcpy(eulerOutputs, device_eulerOutputs, totalNumberOfThreads*sizeof(Statistics), cudaMemcpyDeviceToHost);
