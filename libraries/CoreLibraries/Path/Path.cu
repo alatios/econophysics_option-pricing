@@ -5,48 +5,48 @@ using namespace std;
 
 // Constructors
 __device__ __host__ Path::Path(){
-	this->_OptionType = 'c';
+	this->_OptionType = NULL;
 	this->_SpotPrice = 0.;
-	this->_RiskFreeRate = 0.;
-	this->_Volatility = 0.;
-	this->_TimeToMaturity = 0;
-	this->_NumberOfIntervals = 0;
+	this->_RiskFreeRate = NULL;
+	this->_Volatility = NULL;
+	this->_TimeToMaturity = NULL;
+	this->_NumberOfIntervals = NULL;
 	this->_DeltaTime = 0.;
-	this->_StrikePrice = 0.;
-	this->_B = 0.;
-	this->_N = 0.;
-	this->_K = 0.;
+	this->_StrikePrice = NULL;
+	this->_B = NULL;
+	this->_N = NULL;
+	this->_K = NULL;
 	this->_PerformanceCorridorBarrierCounter = 0;
 }
 
 __device__ __host__ Path::Path(const Input_market_data& market, const Input_option_data& option){
-	this->_OptionType = option.OptionType;
+	this->_OptionType = &(option.OptionType);
 	this->_SpotPrice = market.InitialPrice;
-	this->_RiskFreeRate = market.RiskFreeRate;
-	this->_Volatility = market.Volatility;
-	this->_TimeToMaturity = option.TimeToMaturity;
-	this->_NumberOfIntervals = option.NumberOfIntervals;
+	this->_RiskFreeRate = &(market.RiskFreeRate);
+	this->_Volatility = &(market.Volatility);
+	this->_TimeToMaturity = &(option.TimeToMaturity);
+	this->_NumberOfIntervals = &(option.NumberOfIntervals);
 	this->_DeltaTime = option.GetDeltaTime();
-	this->_StrikePrice = option.StrikePrice;
-	this->_B = option.B;
-	this->_N = option.N;
-	this->_K = option.K;
+	this->_StrikePrice = &(option.StrikePrice);
+	this->_B = &(option.B);
+	this->_N = &(option.N);
+	this->_K = &(option.K);
 	this->_PerformanceCorridorBarrierCounter = 0;
 }
 
 // Public set methods
 __device__ __host__ void Path::ResetToInitialState(const Input_market_data& market, const Input_option_data& option){
-	this->_OptionType = option.OptionType;
+	this->_OptionType = &(option.OptionType);
 	this->_SpotPrice = market.InitialPrice;
-	this->_RiskFreeRate = market.RiskFreeRate;
-	this->_Volatility = market.Volatility;
-	this->_TimeToMaturity = option.TimeToMaturity;
-	this->_NumberOfIntervals = option.NumberOfIntervals;
+	this->_RiskFreeRate = &(market.RiskFreeRate);
+	this->_Volatility = &(market.Volatility);
+	this->_TimeToMaturity = &(option.TimeToMaturity);
+	this->_NumberOfIntervals = &(option.NumberOfIntervals);
 	this->_DeltaTime = option.GetDeltaTime();
-	this->_StrikePrice = option.StrikePrice;
-	this->_B = option.B;
-	this->_N = option.N;
-	this->_K = option.K;
+	this->_StrikePrice = &(option.StrikePrice);
+	this->_B = &(option.B);
+	this->_N = &(option.N);
+	this->_K = &(option.K);
 	this->_PerformanceCorridorBarrierCounter = 0;
 }
 
@@ -79,10 +79,10 @@ __device__ __host__ unsigned int Path::GetPerformanceCorridorBarrierCounter() co
 __device__ __host__ void Path::EulerLogNormalStep(double gaussianRandomVariable){
 	double SpotPrice_i;		//The price at the next step
 	SpotPrice_i = (this->_SpotPrice) *
-	(1 + this->_RiskFreeRate * this->_DeltaTime
-	+ this->_Volatility * sqrt(this->_DeltaTime) * gaussianRandomVariable);
+	(1 + *(this->_RiskFreeRate) * this->_DeltaTime
+	+ *(this->_Volatility) * sqrt(this->_DeltaTime) * gaussianRandomVariable);
 	
-	if(_OptionType == 'e')
+	if(*(_OptionType) == 'e')
 		this->CheckPerformanceCorridorCondition(this->_SpotPrice, SpotPrice_i);
 	
 	this->_SpotPrice = SpotPrice_i;
@@ -90,11 +90,11 @@ __device__ __host__ void Path::EulerLogNormalStep(double gaussianRandomVariable)
 
 __device__ __host__ void Path::ExactLogNormalStep(double gaussianRandomVariable){
 	double SpotPrice_i;		//The price at the next step
-	SpotPrice_i = (this->_SpotPrice) * exp((this->_RiskFreeRate
-	- 0.5 * pow(this->_Volatility,2)) * this->_DeltaTime
-	+ this->_Volatility * gaussianRandomVariable * sqrt(this->_DeltaTime));
+	SpotPrice_i = (this->_SpotPrice) * exp((*(this->_RiskFreeRate)
+	- 0.5 * pow(*(this->_Volatility),2)) * this->_DeltaTime
+	+ *(this->_Volatility) * gaussianRandomVariable * sqrt(this->_DeltaTime));
 	
-	if(_OptionType == 'e')
+	if(*(_OptionType) == 'e')
 		this->CheckPerformanceCorridorCondition(this->_SpotPrice, SpotPrice_i);
 	
 	this->_SpotPrice = SpotPrice_i;
@@ -103,7 +103,7 @@ __device__ __host__ void Path::ExactLogNormalStep(double gaussianRandomVariable)
 // Check performance corridor condition
 __device__ __host__ void Path::CheckPerformanceCorridorCondition(double currentSpotPrice, double nextSpotPrice){
 	double modulusArgument = 1./(sqrt(this->_DeltaTime)) * log(nextSpotPrice / currentSpotPrice);
-	double barrier = this->_B * this->_Volatility;
+	double barrier = *(this->_B) * *(this->_Volatility);
 
 	if(fabs(modulusArgument) < barrier)
 		++(this->_PerformanceCorridorBarrierCounter);
@@ -113,21 +113,21 @@ __device__ __host__ void Path::CheckPerformanceCorridorCondition(double currentS
 __device__ __host__ double Path::GetActualizedPayoff() const{
 	double payoff;
 	
-	switch(this->_OptionType){
+	switch(*(this->_OptionType)){
 		case 'f':
 			payoff = this->_SpotPrice;
 			break;
 		
 		case 'c':
-			payoff = fmax(this->_SpotPrice - this->_StrikePrice, 0.);
+			payoff = fmax(this->_SpotPrice - *(this->_StrikePrice), 0.);
 			break;
 		
 		case 'p':
-			payoff = fmax(this->_StrikePrice - this->_SpotPrice, 0.);
+			payoff = fmax(*(this->_StrikePrice) - this->_SpotPrice, 0.);
 			break;
 		
 		case 'e':
-			payoff = this->_N * fmax((static_cast<double>(this->_PerformanceCorridorBarrierCounter) / this->_NumberOfIntervals) - this->_K, 0.);
+			payoff = *(this->_N) * fmax((static_cast<double>(this->_PerformanceCorridorBarrierCounter) / *(this->_NumberOfIntervals)) - *(this->_K), 0.);
 			break;
 			
 		default:
@@ -135,5 +135,5 @@ __device__ __host__ double Path::GetActualizedPayoff() const{
 			break;
 	}	
 	
-	return (payoff * exp(- this->_RiskFreeRate * this->_TimeToMaturity));
+	return (payoff * exp(- *(this->_RiskFreeRate) * *(this->_TimeToMaturity)));
 }

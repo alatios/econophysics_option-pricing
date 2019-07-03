@@ -23,6 +23,11 @@ using namespace std;
 
 int main(){
 	
+	cudaEvent_t eventStart, eventStop;
+	float elapsedTime;
+	cudaEventCreate(&eventStart);
+	cudaEventCreate(&eventStop);
+	
 	// Read & print input data from file
 	Data_stream_manager streamManager("input.dat");
 	
@@ -49,16 +54,19 @@ int main(){
 		seed = time(NULL);
 	while(seed < 129 || seed > UINT_MAX - totalNumberOfThreads);
 
-/*
+
+	cudaEventRecord(eventStart,0);
+
+///*
 	////////////// HOST-SIDE GENERATOR //////////////	
 	cout << "Beginning device simulation through CPU..." << endl;
 	// Simulating device function
 	OptionPricingEvaluator_Host(inputGPU, inputOption, inputMarket, inputMC, exactOutputs, eulerOutputs, seed);
 	cout << endl;
 	/////////////////////////////////////////////////
-*/
+//*/
 
-///*
+/*
 	////////////// DEVICE-SIDE GENERATOR //////////////
 	Statistics *device_exactOutputs;
 	Statistics *device_eulerOutputs;
@@ -78,7 +86,11 @@ int main(){
 	cudaFree(device_exactOutputs);
 	cudaFree(device_eulerOutputs);
 	///////////////////////////////////////////////////
-//*/
+*/
+
+	cudaEventRecord(eventStop,0);
+	cudaEventSynchronize(eventStop);
+	cudaEventElapsedTime(&elapsedTime, eventStart, eventStop);
 	
 	// Compute results
 	Statistics exactResults;
@@ -92,9 +104,6 @@ int main(){
 	exactResults.EvaluateEstimatedPriceAndError();
 	eulerResults.EvaluateEstimatedPriceAndError();
 	
-	// Elapsed time is temporary, will be implemented later
-	double elapsedTime = 0.;
-	
 	// Global output MC
 	Output_MC_data outputMC;
 	streamManager.StoreOutputData(outputMC, exactResults, eulerResults, elapsedTime);
@@ -103,6 +112,9 @@ int main(){
 	// Trash bin section, where segfaults come to die
 	delete[] exactOutputs;
 	delete[] eulerOutputs;
+	
+	cudaEventDestroy(eventStart);
+	cudaEventDestroy(eventStop);
 
 	return 0;
 }

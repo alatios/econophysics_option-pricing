@@ -15,22 +15,22 @@ class Path{
 		double _SpotPrice;		// The step (spotprice) required to generate the next one
 
 		// Market data
-		double _RiskFreeRate;
-		double _Volatility;
+		const double* _RiskFreeRate;
+		const double* _Volatility;
 
 		// Base European option/contract data
-		char _OptionType;
-		unsigned int _NumberOfIntervals;
-		double _TimeToMaturity;
+		const char* _OptionType;
+		const unsigned int* _NumberOfIntervals;
+		const double* _TimeToMaturity;
 		double _DeltaTime;
 		
 		// Plain vanilla option data
-		double _StrikePrice;
+		const double* _StrikePrice;
 		
 		// Performance corridor data
-		double _B;
-		double _K;
-		double _N;
+		const double* _B;
+		const double* _K;
+		const double* _N;
 		unsigned int _PerformanceCorridorBarrierCounter;
 		
 		__device__ __host__ void CheckPerformanceCorridorCondition(double currentSpotPrice, double nextSpotPrice);
