@@ -50,6 +50,7 @@ __host__ void Data_stream_manager::ReadInputData(Input_gpu_data& inputGPU, Input
 
 	// Input Monte Carlo data
 	inputMC.NumberOfMCSimulations = stoul(inputDataVector[11]);
+	inputMC.CpuOrGpu = inputDataVector[12].at(0);
 }
 
 __host__ void Data_stream_manager::PrintInputData(const Input_gpu_data& inputGPU, const Input_option_data& inputOption, const Input_market_data& inputMarket, const Input_MC_data& inputMC) const{
@@ -60,6 +61,7 @@ __host__ void Data_stream_manager::PrintInputData(const Input_gpu_data& inputGPU
 	cout << "Total number of threads: " << inputGPU.GetTotalNumberOfThreads() << endl; 
 	cout << "Number of simulations: " << inputMC.NumberOfMCSimulations << endl;
 	cout << "Number of simulations per thread (round-up): " << inputMC.GetNumberOfSimulationsPerThread(inputGPU) << endl;
+	cout << "CPU v. GPU parameter: " << inputMC.CpuOrGpu << endl;
 	
 	cout << "## MARKET DATA ##" << endl;
 	cout << "Initial underlying price [USD]: " << inputMarket.InitialPrice << endl;
@@ -91,20 +93,31 @@ __host__ void Data_stream_manager::PrintInputData(const Input_gpu_data& inputGPU
 }
 
 // Output processing
-__host__ void Data_stream_manager::StoreOutputData(Output_MC_data& outputMC, const Statistics exactResults, const Statistics eulerResults, double elapsedTime) const{
+__host__ void Data_stream_manager::StoreOutputData(Output_MC_data& outputMC, const Statistics exactResults, const Statistics eulerResults, double elapsedTime, char hostOrDevice) const{
 	outputMC.EstimatedPriceMCExact = exactResults.GetPayoffAverage();
 	outputMC.ErrorMCExact = exactResults.GetPayoffError();
 	outputMC.EstimatedPriceMCEuler = eulerResults.GetPayoffAverage();
 	outputMC.ErrorMCEuler = eulerResults.GetPayoffError();
 	outputMC.Tick = elapsedTime;
+	outputMC.HostOrDevice = hostOrDevice;
 }
 
 __host__ void Data_stream_manager::PrintOutputData(const Output_MC_data& outputMC) const{
-	cout << endl << "## OUTPUT MONTE CARLO DATA ##" << endl;
+	cout << endl << "## ";
+	if(outputMC.HostOrDevice == 'h')
+		cout << "HOST";
+	else if(outputMC.HostOrDevice == 'd')
+		cout << "DEVICE";
+	else
+		cout << "MISSINGNO.";
+	
+	cout << " OUTPUT MONTE CARLO DATA ##" << endl;
 	cout << "Monte Carlo estimated price via exact formula [EUR]: " << outputMC.EstimatedPriceMCExact << endl;
 	cout << "Monte Carlo estimated error via exact formula [EUR]: " << outputMC.ErrorMCExact << endl;
+	cout << "Monte Carlo relative error via exact formula [EUR]: " << outputMC.GetRelativeErrorExact() << endl;
 	cout << "Monte Carlo estimated price via Euler formula [EUR]: " << outputMC.EstimatedPriceMCEuler << endl;
 	cout << "Monte Carlo estimated error via Euler formula [EUR]: " << outputMC.ErrorMCEuler << endl;
+	cout << "Monte Carlo relative error via Euler formula [EUR]: " << outputMC.GetRelativeErrorEuler() << endl;
 	cout << "Computation time [ms]: " << outputMC.Tick << endl;
 	
 	cout << endl;	

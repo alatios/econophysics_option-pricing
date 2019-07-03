@@ -55,9 +55,9 @@ __device__ __host__ double RNG_Tausworthe::GetBimodal(){
 		gaussian = this->GetGauss();
 		
 		if(gaussian > 0.)
-			return 0.5;
+			return 1.;
 		else if(gaussian < 0.)
-			return -0.5;
+			return -1.;
 	}while(gaussian == 0.);
 	
 	return -1000.;	// If this ever gets called, we're in trouble
@@ -169,9 +169,9 @@ __device__ __host__ double RNG_CombinedGenerator::GetBimodal(){
 		gaussian = this->GetGauss();
 		
 		if(gaussian > 0.)
-			return 0.5;
+			return 1.;
 		else if(gaussian < 0.)
-			return -0.5;
+			return -1.;
 	}while(gaussian == 0.);
 	
 	return -1000.;	// If this ever gets called, we're in trouble

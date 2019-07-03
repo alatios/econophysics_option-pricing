@@ -5,11 +5,15 @@
 
 struct Output_MC_data{
 	
+	char HostOrDevice;
 	double EstimatedPriceMCEuler;
 	double ErrorMCEuler;
 	double EstimatedPriceMCExact;
 	double ErrorMCExact;
 	double Tick;	// Calculation time [ms]
+	
+	__device__ __host__ double GetRelativeErrorEuler() const;
+	__device__ __host__ double GetRelativeErrorExact() const;
 
 };
 

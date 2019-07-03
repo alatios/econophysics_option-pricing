@@ -31,7 +31,7 @@ class Data_stream_manager{
 		__host__ void PrintInputData(const Input_gpu_data&, const Input_option_data&, const Input_market_data&, const Input_MC_data&) const;
 
 		// Output processing
-		__host__ void StoreOutputData(Output_MC_data&, const Statistics exactResults, const Statistics eulerResults, double elapsedTime) const;
+		__host__ void StoreOutputData(Output_MC_data&, const Statistics exactResults, const Statistics eulerResults, double elapsedTime, char hostOrDevice) const;
 		__host__ void PrintOutputData(const Output_MC_data&) const;		
 		
 	

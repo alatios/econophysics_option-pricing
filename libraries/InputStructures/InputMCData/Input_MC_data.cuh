@@ -7,6 +7,7 @@
 struct Input_MC_data{
 
 	unsigned int NumberOfMCSimulations;
+	char CpuOrGpu;
 	__device__ __host__ unsigned int GetNumberOfSimulationsPerThread(const Input_gpu_data&) const;
 
 };

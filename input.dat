@@ -41,7 +41,12 @@ e
 1
 ## MONTE CARLO DATA
 # Number of simulations
-5000000
+5000
+## CPU/GPU COMPARISON
+# c = cpu-only
+# g = gpu-only
+# b = both
+b
 #
 #
 #

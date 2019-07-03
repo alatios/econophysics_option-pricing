@@ -9,6 +9,7 @@ libraries/CoreLibraries/Statistics/Statistics.o \
 libraries/CoreLibraries/Path/Path.o \
 libraries/CoreLibraries/RandomGenerator/RNG.o \
 libraries/CoreLibraries/SupportFunctions/Support_functions.o \
+libraries/OutputStructures/OutputMCData/Output_MC_data.o \
 main.o
 
 NVCC=nvcc

@@ -9,6 +9,7 @@
 #include "../../InputStructures/InputMarketData/Input_market_data.cuh"
 #include "../../InputStructures/InputMCData/Input_MC_data.cuh"
 #include "../../InputStructures/InputOptionData/Input_option_data.cuh"
+#include "../DataStreamManager/Data_stream_manager.cuh"
 #include "../Path/Path.cuh"
 #include "../Statistics/Statistics.cuh"
 #include "../RandomGenerator/RNG.cuh"
@@ -18,5 +19,9 @@
 __host__ void OptionPricingEvaluator_Host(Input_gpu_data, Input_option_data, Input_market_data, Input_MC_data, Statistics* exactOutputs, Statistics* eulerOutputs, unsigned int seed);
 __host__ __device__ void OptionPricingEvaluator_HostDev(Input_gpu_data, Input_option_data, Input_market_data, Input_MC_data, Statistics* exactOutputs, Statistics* eulerOutputs, unsigned int seed, unsigned int threadNumber);
 __global__ void OptionPricingEvaluator_Global(Input_gpu_data, Input_option_data, Input_market_data, Input_MC_data, Statistics* exactOutputs, Statistics* eulerOutputs, unsigned int seed);
+
+// CPU and GPU algorithms
+__host__ void CPUOptionPricingMonteCarloAlgorithm(Data_stream_manager, Input_gpu_data, Input_option_data, Input_market_data, Input_MC_data, unsigned int seed);
+__host__ void GPUOptionPricingMonteCarloAlgorithm(Data_stream_manager, Input_gpu_data, Input_option_data, Input_market_data, Input_MC_data, unsigned int seed);
 
 #endif

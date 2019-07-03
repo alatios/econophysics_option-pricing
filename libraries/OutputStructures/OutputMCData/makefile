@@ -1,5 +1,5 @@
 FLAGS=-std=c++11 -Wno-deprecated-gpu-targets
-TARGS=UnitTest.o
+TARGS=Output_MC_data.o UnitTest.o
 NVCC=nvcc
 
 ECHO=/bin/echo
