@@ -1,6 +1,7 @@
 #include <fstream>	// ifstream
 #include <string>	// string, stoul, stod, at
 #include <vector>	// vector
+#include <iomanip>	// setprecision
 
 #include "Data_stream_manager.cuh"
 
@@ -51,6 +52,7 @@ __host__ void Data_stream_manager::ReadInputData(Input_gpu_data& inputGPU, Input
 	// Input Monte Carlo data
 	inputMC.NumberOfMCSimulations = stoul(inputDataVector[11]);
 	inputMC.CpuOrGpu = inputDataVector[12].at(0);
+	inputMC.GaussianOrBimodal = inputDataVector[13].at(0);
 }
 
 __host__ void Data_stream_manager::PrintInputData(const Input_gpu_data& inputGPU, const Input_option_data& inputOption, const Input_market_data& inputMarket, const Input_MC_data& inputMC) const{
@@ -62,6 +64,7 @@ __host__ void Data_stream_manager::PrintInputData(const Input_gpu_data& inputGPU
 	cout << "Number of simulations: " << inputMC.NumberOfMCSimulations << endl;
 	cout << "Number of simulations per thread (round-up): " << inputMC.GetNumberOfSimulationsPerThread(inputGPU) << endl;
 	cout << "CPU v. GPU parameter: " << inputMC.CpuOrGpu << endl;
+	cout << "Gaussian or bimodal random variable: " << inputMC.GaussianOrBimodal << endl;
 	
 	cout << "## MARKET DATA ##" << endl;
 	cout << "Initial underlying price [USD]: " << inputMarket.InitialPrice << endl;
@@ -112,13 +115,14 @@ __host__ void Data_stream_manager::PrintOutputData(const Output_MC_data& outputM
 		cout << "MISSINGNO.";
 	
 	cout << " OUTPUT MONTE CARLO DATA ##" << endl;
-	cout << "Monte Carlo estimated price via exact formula [EUR]: " << outputMC.EstimatedPriceMCExact << endl;
-	cout << "Monte Carlo estimated error via exact formula [EUR]: " << outputMC.ErrorMCExact << endl;
-	cout << "Monte Carlo relative error via exact formula [EUR]: " << outputMC.GetRelativeErrorExact() << endl;
-	cout << "Monte Carlo estimated price via Euler formula [EUR]: " << outputMC.EstimatedPriceMCEuler << endl;
-	cout << "Monte Carlo estimated error via Euler formula [EUR]: " << outputMC.ErrorMCEuler << endl;
-	cout << "Monte Carlo relative error via Euler formula [EUR]: " << outputMC.GetRelativeErrorEuler() << endl;
-	cout << "Computation time [ms]: " << outputMC.Tick << endl;
+	cout << "Monte Carlo estimated price via exact formula [EUR]: " << setprecision(20) << outputMC.EstimatedPriceMCExact << endl;
+	cout << "Monte Carlo estimated error via exact formula [EUR]: " << setprecision(20) << outputMC.ErrorMCExact << endl;
+	cout << "Monte Carlo relative error via exact formula [EUR]: " << setprecision(20) << outputMC.GetRelativeErrorExact() << endl;
+	cout << "Monte Carlo estimated price via Euler formula [EUR]: " << setprecision(20) << outputMC.EstimatedPriceMCEuler << endl;
+	cout << "Monte Carlo estimated error via Euler formula [EUR]: " << setprecision(20) << outputMC.ErrorMCEuler << endl;
+	cout << "Monte Carlo relative error via Euler formula [EUR]: " << setprecision(20) << outputMC.GetRelativeErrorEuler() << endl;
+	cout << "Discrepancy between Euler and exact results [units of sigma]: " << setprecision(20) << outputMC.GetEulerToExactDiscrepancy() << endl;
+	cout << "Computation time [ms]: " << setprecision(20) << outputMC.Tick << endl;
 	
 	cout << endl;	
 }

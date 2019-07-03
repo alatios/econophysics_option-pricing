@@ -1,5 +1,5 @@
 #include <cmath>		// log, cos, sin, M_PI
-
+#include <iostream>
 #include "RNG.cuh"
 
 using namespace std;
@@ -173,7 +173,7 @@ __device__ __host__ double RNG_CombinedGenerator::GetBimodal(){
 		else if(gaussian < 0.)
 			return -1.;
 	}while(gaussian == 0.);
-	
+
 	return -1000.;	// If this ever gets called, we're in trouble
 }
 

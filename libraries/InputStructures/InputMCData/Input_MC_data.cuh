@@ -8,6 +8,7 @@ struct Input_MC_data{
 
 	unsigned int NumberOfMCSimulations;
 	char CpuOrGpu;
+	char GaussianOrBimodal;
 	__device__ __host__ unsigned int GetNumberOfSimulationsPerThread(const Input_gpu_data&) const;
 
 };

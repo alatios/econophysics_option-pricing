@@ -34,7 +34,7 @@ e
 100
 ## PERFORMANCE CORRIDOR OPTION DATA
 # B
-2
+1
 # K [percentage, i.e. 0.1 = 10%]
 0.3
 # N [EUR]
@@ -42,12 +42,15 @@ e
 ## MONTE CARLO DATA
 # Number of simulations
 5000
-## CPU/GPU COMPARISON
+# CPU/GPU comparison
 # c = cpu-only
 # g = gpu-only
 # b = both
 b
-#
+# Gaussian or bimodal (1/-1) random variable
+# g = gaussian
+# b = bimodal
+b
 #
 #
 #############################################

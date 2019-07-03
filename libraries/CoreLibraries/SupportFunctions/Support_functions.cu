@@ -26,8 +26,13 @@ __host__ __device__ void OptionPricingEvaluator_HostDev(Input_gpu_data inputGPU,
 
 			// Cycling through steps in each path
 			for(unsigned int stepNumber=0; stepNumber<numberOfIntervals; ++stepNumber){
-				exactPath.ExactLogNormalStep(mainGenerator->GetGauss());
-				eulerPath.EulerLogNormalStep(mainGenerator->GetGauss());
+				if(inputMC.GaussianOrBimodal == 'g'){
+					exactPath.ExactLogNormalStep(mainGenerator->GetGauss());
+					eulerPath.EulerLogNormalStep(mainGenerator->GetGauss());
+				}else if(inputMC.GaussianOrBimodal == 'b'){
+					exactPath.ExactLogNormalStep(mainGenerator->GetBimodal());
+					eulerPath.EulerLogNormalStep(mainGenerator->GetBimodal());
+				}
 			}
 
 			exactOutputs[threadNumber].AddPayoff(exactPath.GetActualizedPayoff());

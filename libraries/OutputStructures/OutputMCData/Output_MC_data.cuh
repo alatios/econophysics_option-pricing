@@ -14,6 +14,7 @@ struct Output_MC_data{
 	
 	__device__ __host__ double GetRelativeErrorEuler() const;
 	__device__ __host__ double GetRelativeErrorExact() const;
+	__device__ __host__ double GetEulerToExactDiscrepancy() const;
 
 };
 
