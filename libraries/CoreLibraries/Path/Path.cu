@@ -1,5 +1,8 @@
+#include <cmath>	// sqrt, pow, fmax, log, exp, fabs
+
 #include "Path.cuh"
-#include <cmath>
+#include "../../InputStructures/InputMarketData/Input_market_data.cuh"
+#include "../../InputStructures/InputOptionData/Input_option_data.cuh"
 
 using namespace std;
 

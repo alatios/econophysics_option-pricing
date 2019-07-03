@@ -4,8 +4,6 @@
 #include "../../InputStructures/InputMarketData/Input_market_data.cuh"
 #include "../../InputStructures/InputOptionData/Input_option_data.cuh"
 
-#include <iostream>
-
 class Path{
 
 	private:
@@ -52,6 +50,7 @@ class Path{
 		
 		// Payoff evaluation
 		__device__ __host__ double GetActualizedPayoff() const;
+
 };
 
 #endif

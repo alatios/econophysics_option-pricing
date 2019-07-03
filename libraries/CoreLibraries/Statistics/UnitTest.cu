@@ -1,5 +1,6 @@
-#include "Statistics.cuh"
 #include <iostream>
+
+#include "Statistics.cuh"
 
 using namespace std;
 

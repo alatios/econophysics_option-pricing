@@ -21,4 +21,5 @@ __host__ void EvaluateVariance_MultipleStreams(double **inputStreams, double *in
 __host__ void EvaluateKurtosis_MultipleStreams(double **inputStreams, double *inputStreamAverages, double *inputStreamVariances, double *outputStreamKurtosises, unsigned int totalNumberOfThreads, unsigned int numbersToGeneratePerThread, bool verbose);
 	// Accepts two matrixes with totalNumberOfThreads as first index and numbersToGeneratePerThread or numbersToGeneratePerThread-2 as second index respectively
 __host__ void EvaluateCompleteAutocorrelation_MultipleStreams(double **inputStreams, double **outputStreamCorrelations, unsigned int totalNumberOfThreads, unsigned int numbersToGeneratePerThread, bool verbose);
+
 #endif

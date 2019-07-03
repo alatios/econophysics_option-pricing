@@ -1,6 +1,8 @@
+#include <iostream>
 
 #include "Path.cuh"
-#include <iostream>
+#include "../../InputStructures/InputMarketData/Input_market_data.cuh"
+#include "../../InputStructures/InputOptionData/Input_option_data.cuh"
 
 using namespace std;
 
@@ -8,7 +10,7 @@ int main(){
 
 	bool test;
 
-	//Variables for testing Eulero formulae
+	//Variables to test Euler formulae
 	//Market
 	double initialPrice = 150.;
 	double volatility = 0.35;

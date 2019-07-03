@@ -1,5 +1,6 @@
-#include "Input_market_data.cuh"
 #include <iostream>
+
+#include "Input_market_data.cuh"
 
 using namespace std;
 

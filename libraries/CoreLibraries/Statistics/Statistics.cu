@@ -1,4 +1,5 @@
 #include <cmath>	// pow, sqrt
+
 #include "Statistics.cuh"
 
 using namespace std;

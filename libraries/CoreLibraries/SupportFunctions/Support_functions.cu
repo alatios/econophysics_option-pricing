@@ -1,4 +1,15 @@
+#include <iostream>
+
 #include "Support_functions.cuh"
+#include "../../InputStructures/InputGPUData/Input_gpu_data.cuh"
+#include "../../InputStructures/InputMarketData/Input_market_data.cuh"
+#include "../../InputStructures/InputMCData/Input_MC_data.cuh"
+#include "../../InputStructures/InputOptionData/Input_option_data.cuh"
+#include "../DataStreamManager/Data_stream_manager.cuh"
+#include "../Path/Path.cuh"
+#include "../Statistics/Statistics.cuh"
+#include "../RandomGenerator/RNG.cuh"
+#include "../../OutputStructures/OutputMCData/Output_MC_data.cuh"
 
 using namespace std;
 

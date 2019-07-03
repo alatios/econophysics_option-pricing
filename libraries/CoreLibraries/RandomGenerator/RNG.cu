@@ -1,5 +1,5 @@
 #include <cmath>		// log, cos, sin, M_PI
-#include <iostream>
+
 #include "RNG.cuh"
 
 using namespace std;

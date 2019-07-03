@@ -1,8 +1,6 @@
 #ifndef __Statistics_h__
 #define __Statistics_h__
 
-#include <iostream>
-
 class Statistics{
 
 	private:

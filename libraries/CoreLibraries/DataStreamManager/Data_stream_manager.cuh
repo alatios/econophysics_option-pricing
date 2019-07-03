@@ -1,7 +1,6 @@
 #ifndef _DATA__STREAM__MANAGER_H_
 #define _DATA__STREAM__MANAGER_H_
 
-#include <iostream>
 #include <string>	// string
 
 #include "../../InputStructures/InputGPUData/Input_gpu_data.cuh"
@@ -15,16 +14,16 @@ class Data_stream_manager{
 	
 	private:
 	
-		string _InputFile;
+		std::string _InputFile;
 	
 	public:
 	
 		__host__ Data_stream_manager();
-		__host__ Data_stream_manager(string inputFile);
+		__host__ Data_stream_manager(std::string inputFile);
 		__host__ ~Data_stream_manager() = default;
 		
 		// Set input file
-		__host__ void SetInputFile(string);
+		__host__ void SetInputFile(std::string);
 	
 		// Input processing
 		__host__ void ReadInputData(Input_gpu_data&, Input_option_data&, Input_market_data&, Input_MC_data&) const;

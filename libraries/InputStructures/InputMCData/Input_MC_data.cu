@@ -1,5 +1,7 @@
 #include <cmath>	// ceil
+
 #include "Input_MC_data.cuh"
+#include "../InputGPUData/Input_gpu_data.cuh"
 
 using namespace std;
 

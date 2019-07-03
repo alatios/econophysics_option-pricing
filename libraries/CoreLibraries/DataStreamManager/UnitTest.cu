@@ -1,5 +1,14 @@
-#include "Data_stream_manager.cuh"
 #include <iostream>
+
+#include "Data_stream_manager.cuh"
+#include "../../InputStructures/InputGPUData/Input_gpu_data.cuh"
+#include "../../InputStructures/InputMarketData/Input_market_data.cuh"
+#include "../../InputStructures/InputMCData/Input_MC_data.cuh"
+#include "../../InputStructures/InputOptionData/Input_option_data.cuh"
+#include "../Statistics/Statistics.cuh"
+#include "../../OutputStructures/OutputMCData/Output_MC_data.cuh"
+
+using namespace std;
 
 int main(){
 
@@ -38,7 +47,7 @@ int main(){
 	cout << test << "\t";
 	test = (inputOption.StrikePrice == static_cast<double>(100.));
 	cout << test << "\t";
-    	test = (inputOption.B == static_cast<double>(2.));
+    	test = (inputOption.B == static_cast<double>(1.));
 	cout << test << "\t";
 	test = (inputOption.N == static_cast<double>(1.));
 	cout << test << "\t";

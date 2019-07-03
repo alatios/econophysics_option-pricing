@@ -1,7 +1,6 @@
 #ifndef _SUPPORT_FUNCTIONS_H_
 #define _SUPPORT_FUNCTIONS_H_
 
-#include <iostream>
 #include <vector>	// vector
 #include <string>	// string
 
@@ -10,10 +9,7 @@
 #include "../../InputStructures/InputMCData/Input_MC_data.cuh"
 #include "../../InputStructures/InputOptionData/Input_option_data.cuh"
 #include "../DataStreamManager/Data_stream_manager.cuh"
-#include "../Path/Path.cuh"
 #include "../Statistics/Statistics.cuh"
-#include "../RandomGenerator/RNG.cuh"
-#include "../../OutputStructures/OutputMCData/Output_MC_data.cuh"
 
 // Main evaluators (host-device paradigm)
 __host__ void OptionPricingEvaluator_Host(Input_gpu_data, Input_option_data, Input_market_data, Input_MC_data, Statistics* exactOutputs, Statistics* eulerOutputs, unsigned int seed);

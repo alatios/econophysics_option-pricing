@@ -1,5 +1,6 @@
-#include "Input_gpu_data.cuh"
 #include <iostream>
+
+#include "Input_gpu_data.cuh"
 
 using namespace std;
 

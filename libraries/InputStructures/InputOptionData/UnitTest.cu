@@ -1,5 +1,6 @@
-#include "Input_option_data.cuh"
 #include <iostream>
+
+#include "Input_option_data.cuh"
 
 using namespace std;
 

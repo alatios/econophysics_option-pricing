@@ -1,9 +1,16 @@
+#include <iostream>
 #include <fstream>	// ifstream
 #include <string>	// string, stoul, stod, at
 #include <vector>	// vector
 #include <iomanip>	// setprecision
 
 #include "Data_stream_manager.cuh"
+#include "../../InputStructures/InputGPUData/Input_gpu_data.cuh"
+#include "../../InputStructures/InputMarketData/Input_market_data.cuh"
+#include "../../InputStructures/InputMCData/Input_MC_data.cuh"
+#include "../../InputStructures/InputOptionData/Input_option_data.cuh"
+#include "../Statistics/Statistics.cuh"
+#include "../../OutputStructures/OutputMCData/Output_MC_data.cuh"
 
 using namespace std;
 
