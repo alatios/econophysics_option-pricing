@@ -1,0 +1,57 @@
+####### INPUT DATA FOR OPTION PRICING #######
+### Comments beginning with # are ignored ###
+#
+#
+#
+## GPU DATA
+# Number of GPU blocks
+_gpu_blocks_
+## MARKET DATA
+# Initial underlying price at t = 0 [USD]
+_underlying_initial_price_
+# Market volatility
+_volatility_
+# Risk-free interest rate [percentage, i.e. 0.1 = 10%]
+_riskfreerate_
+## OPTION DATA
+## NOTE: for flexibility, all option data are read even if they will not be used
+## (e.g. because forward contract does not have a strike price)
+## Please don't leave any line empty, use arbitrary values instead
+#
+## BASE/FORWARD CONTRACT DATA
+# Time to maturity [years]
+_ttm_
+# Number of intervals in which TTM is divided
+_intervals_
+# Option type
+# f = forward contract
+# c = plain vanilla call option
+# p = plain vanilla put option
+# e = performance corridor option
+_option_type_
+## PLAIN VANILLA OPTION DATA
+# Option strike price [USD]
+_strike_price_
+## PERFORMANCE CORRIDOR OPTION DATA
+# B
+_B_
+# K [percentage, i.e. 0.1 = 10%]
+_K_
+# N [EUR]
+_N_
+## MONTE CARLO DATA
+# Number of simulations
+_simulations_
+# CPU/GPU comparison
+# c = cpu-only
+# g = gpu-only
+# b = both
+_cpugpu_
+# Gaussian or bimodal (1/-1) random variable
+# g = gaussian
+# b = bimodal
+_gauss_bimodal_
+#
+#
+#############################################
+#############################################
