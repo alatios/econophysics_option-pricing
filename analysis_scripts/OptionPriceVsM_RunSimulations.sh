@@ -16,7 +16,7 @@ for N in "${NARRAY[@]}"; do
 			-e "s/_riskfreerate_/0.01/g" \
 			-e "s/_ttm_/1/g" \
 			-e "s/_intervals_/$m/g" \
-			-e "s/_option_type_/e/g" \
+			-e "s/_option_type_/c/g" \
 			-e "s/_strike_price_/100/g" \
 			-e "s/_B_/1/g" \
 			-e "s/_K_/0.3/g" \
