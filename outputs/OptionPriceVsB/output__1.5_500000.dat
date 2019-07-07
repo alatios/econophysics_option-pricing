@@ -12,24 +12,26 @@ Gaussian or bimodal random variable: g
 ## MARKET DATA ##
 Initial underlying price [USD]: 100
 Market volatility: 0.25
-Risk free rate: 0.01
+Risk free rate: 0.0001
 ## OPTION DATA ##
-Option type: c
+Option type: e
 Time to option maturity [years]: 1
 Number of intervals for Euler/exact step-by-step computation: 365
 Interval time [years]: 0.00273973
-Option strike price [USD]: 100
+B: 1.5
+K [percentage]: 0.3
+N [EUR]: 1
 
 
 Beginning GPU computation...
 
 ## DEVICE OUTPUT MONTE CARLO DATA ##
-Monte Carlo estimated price via exact formula [EUR]: 10.45152282246013975
-Monte Carlo estimated error via exact formula [EUR]: 0.024536025800617297654
-Monte Carlo relative error via exact formula [EUR]: 0.0023476029491022883632
-Monte Carlo estimated price via Euler formula [EUR]: 10.389087365069871183
-Monte Carlo estimated error via Euler formula [EUR]: 0.02433480655206835333
-Monte Carlo relative error via Euler formula [EUR]: 0.0023423430467902984012
-Discrepancy between Euler and exact results [units of sigma]: 1.8067284295163630325
-Computation time [ms]: 567.68585205078125
+Monte Carlo estimated price via exact formula [EUR]: 0.56636002417938635656
+Monte Carlo estimated error via exact formula [EUR]: 2.5191891090969085971e-05
+Monte Carlo relative error via exact formula [EUR]: 4.4480348215731268201e-05
+Monte Carlo estimated price via Euler formula [EUR]: 0.56630599670568604331
+Monte Carlo estimated error via Euler formula [EUR]: 2.5179646239818803026e-05
+Monte Carlo relative error via Euler formula [EUR]: 4.4462969465790200274e-05
+Discrepancy between Euler and exact results [units of sigma]: 1.5168563009788018636
+Computation time [ms]: 552.048583984375
 
