@@ -33,5 +33,5 @@ Monte Carlo estimated price via Euler formula [EUR]: 0
 Monte Carlo estimated error via Euler formula [EUR]: 0
 Monte Carlo relative error via Euler formula [EUR]: -nan
 Discrepancy between Euler and exact results [units of sigma]: nan
-Computation time [ms]: 25.690656661987304688
+Computation time [ms]: 22.78639984130859375
 

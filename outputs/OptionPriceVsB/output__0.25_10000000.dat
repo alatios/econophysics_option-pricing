@@ -29,9 +29,9 @@ Beginning GPU computation...
 Monte Carlo estimated price via exact formula [EUR]: 1.09578082739708439e-09
 Monte Carlo estimated error via exact formula [EUR]: 6.1256000661558777882e-10
 Monte Carlo relative error via exact formula [EUR]: 0.559016904932222225
-Monte Carlo estimated price via Euler formula [EUR]: 3.5612876890405210105e-09
-Monte Carlo estimated error via Euler formula [EUR]: 1.3559591263889182114e-09
-Monte Carlo relative error via Euler formula [EUR]: 0.38074967393444125729
-Discrepancy between Euler and exact results [units of sigma]: 1.657034831795781038
-Computation time [ms]: 11107.6875
+Monte Carlo estimated price via Euler formula [EUR]: 4.6570685164376051937e-09
+Monte Carlo estimated error via Euler formula [EUR]: 1.699784668969965147e-09
+Monte Carlo relative error via Euler formula [EUR]: 0.36499026436274217833
+Discrepancy between Euler and exact results [units of sigma]: 1.9710556043075231347
+Computation time [ms]: 11262.177734375
 
