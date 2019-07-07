@@ -17,10 +17,10 @@ using namespace std;
 int main(){
 	
 	// Verbosities
-	bool intraStreamAverageVerbosity = false;
-	bool intraStreamVarianceVerbosity = false;
-	bool intraStreamKurtosisVerbosity = false;
-	bool intraStreamAutocorrelationVerbosity = false;
+	bool intraStreamAverageVerbosity = true;
+	bool intraStreamVarianceVerbosity = true;
+	bool intraStreamKurtosisVerbosity = true;
+	bool intraStreamAutocorrelationVerbosity = true;
 	
 	bool interStreamAverageVerbosity = true;
 	bool interStreamVarianceVerbosity = true;
