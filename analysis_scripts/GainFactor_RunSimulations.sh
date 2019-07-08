@@ -1,14 +1,14 @@
 #!/bin/bash
 ## Runs simulations cycling through numbers of GPU blocks.
 
-DIRECTORY="ComputationTimeStudies"
+DIRECTORY="GainFactor_Cabibbo_CPU"
 NOFSIMSPERTHREAD=1000
-MARRAY=(1 2 3 4 5 6 7 8 9 10 50 100 200 300)
+MARRAY=(1 10 50 100 200 300 400)
 
 cd ..;
 rm -rf outputs/${DIRECTORY}/output*;
 for m in ${MARRAY[@]}; do
-	for i in {1..201..10}; do
+	for i in {1..88..1}; do
 		echo "${i}, ${m}";
 		sed -e "s/_gpu_blocks_/$i/g" \
 			-e "s/_underlying_initial_price_/100/g" \
@@ -22,7 +22,7 @@ for m in ${MARRAY[@]}; do
 			-e "s/_K_/0.3/g" \
 			-e "s/_N_/1/g" \
 			-e "s/_simulations_/$((NOFSIMSPERTHREAD * 512 * i))/g" \
-			-e "s/_cpugpu_/b/g" \
+			-e "s/_cpugpu_/c/g" \
 			-e "s/_gauss_bimodal_/g/g" \
 			input.dat.template | tee input.dat "inputs/${DIRECTORY}/input__${i}_${m}.dat" > /dev/null;
 	#	./main.x > "outputs/${DIRECTORY}/output__${i}_${m}.dat";
