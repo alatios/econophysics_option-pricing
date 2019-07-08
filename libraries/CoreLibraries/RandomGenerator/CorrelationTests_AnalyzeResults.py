@@ -12,7 +12,7 @@ inputFileInterStreamAutocorr = "CorrelationTests_InterstreamAutocorrelations.dat
 outputDirectory = "graphs/"
 
 if not os.path.exists(inputFile):
-	print("Error: input file", inputfile, "does not exist.")
+	print("Error: input file", inputFile, "does not exist.")
 	exit(1)
 
 if not os.path.exists(inputFileIntraStreamAutocorr):
