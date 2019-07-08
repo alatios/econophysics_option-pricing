@@ -35,6 +35,8 @@ paste -d" " uniformavgs.dat gaussavgs.dat gaussvar.dat gausskurt.dat > ${OUTPUTF
 sed -i '1 i\thread uniavg gaussavg gaussvar gausskurt' ${OUTPUTFILE_INTRASTREAM};
 rm uniformavgs.dat gaussavgs.dat gaussvar.dat gausskurt.dat;
 
+## INTRASTREAM CORRELATION
+
 OUTPUTFILE_AUTOCORR="CorrelationTests_Autocorrelations.dat"
 
 LINECOUNT=$(sed -n '/Uniform autocorrelations i\/i+k/,/Gaussian autocorrelations i\/i+k/p' ${INPUTFILE} | head -n -2 | tail -n +2 | sed '/thread/d' | wc -l)
@@ -65,5 +67,26 @@ sed -n '/Gaussian autocorrelations i\/i+k/,/INTER-STREAM/p' CorrelationTests_Unp
 paste -d" " autocorr_threads.dat autocorr_uni.dat autocorr_gauss.dat > ${OUTPUTFILE_AUTOCORR}
 sed -i '1 i\thread offset unicorr gausscorr' ${OUTPUTFILE_AUTOCORR};
 rm autocorr_threads.dat autocorr_uni.dat autocorr_gauss.dat;
+
+## INTERSTREAM CORRELATION
+
+OUTPUTFILE_INTERCORR="CorrelationTests_InterstreamAutocorrelations.dat"
+
+sed -n '/Uniform super stream/,/Gaussian super stream/p' ${INPUTFILE} \
+	| head -n -1 \
+	| tail -n +4 \
+	| sed -e 's/<xi\*xi+//g' \
+	| sed -e 's/>:\t/ /g' \
+	> inter_autocorr_uni.dat
+
+sed -n '/Gaussian super stream autocorr/,$p' ${INPUTFILE} \
+	| tail -n +2 \
+	| sed -e '/^.*/s/^.*\(:\t\)//' \
+	> inter_autocorr_gauss.dat
+
+paste -d" " inter_autocorr_uni.dat inter_autocorr_gauss.dat > ${OUTPUTFILE_INTERCORR};
+sed -i '1 i\offset unicorr gausscorr' ${OUTPUTFILE_INTERCORR};
+
+rm inter_autocorr_uni.dat inter_autocorr_gauss.dat;
 
 exit 0
