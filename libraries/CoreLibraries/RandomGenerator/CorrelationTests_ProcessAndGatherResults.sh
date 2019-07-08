@@ -53,10 +53,17 @@ sed -n '/Uniform autocorrelations i\/i+k/,/Gaussian autocorrelations i\/i+k/p' C
 	| sed '/thread/d' \
 	| sed -e 's/<xi\*xi+//g' \
 	| sed -e 's/>:\t/ /g' \
-	> autocorr_main.dat;
+	> autocorr_uni.dat;
 
-paste -d" " autocorr_threads.dat autocorr_main.dat > ${OUTPUTFILE_AUTOCORR}
-sed -i '1 i\thread offset autocorr' ${OUTPUTFILE_AUTOCORR};
-rm autocorr_threads.dat autocorr_main.dat;
+sed -n '/Gaussian autocorrelations i\/i+k/,/INTER-STREAM/p' CorrelationTests_UnprocessedOutput.dat \
+	| head -n -2 \
+	| tail -n +2 \
+	| sed '/thread/d' \
+	| sed -e '/^.*/s/^.*\(:\t\)//' \
+	> autocorr_gauss.dat
+
+paste -d" " autocorr_threads.dat autocorr_uni.dat autocorr_gauss.dat > ${OUTPUTFILE_AUTOCORR}
+sed -i '1 i\thread offset unicorr gausscorr' ${OUTPUTFILE_AUTOCORR};
+rm autocorr_threads.dat autocorr_uni.dat autocorr_gauss.dat;
 
 exit 0
