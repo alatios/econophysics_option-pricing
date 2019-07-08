@@ -1,0 +1,37 @@
+
+###### INPUT DATA ######
+
+## GPU AND MC INPUT DATA ##
+Number of blocks: 44
+Number of threads per block: 512
+Total number of threads: 22528
+Number of simulations: 22528000
+Number of simulations per thread (round-up): 1000
+CPU v. GPU parameter: g
+Gaussian or bimodal random variable: g
+## MARKET DATA ##
+Initial underlying price [USD]: 100
+Market volatility: 0.25
+Risk free rate: 0.0001
+## OPTION DATA ##
+Option type: e
+Time to option maturity [years]: 1
+Number of intervals for Euler/exact step-by-step computation: 300
+Interval time [years]: 0.00333333
+B: 1
+K [percentage]: 0.3
+N [EUR]: 1
+
+
+Beginning GPU computation...
+
+## DEVICE OUTPUT MONTE CARLO DATA ##
+Monte Carlo estimated price via exact formula [EUR]: 0.38264874330350773235
+Monte Carlo estimated error via exact formula [EUR]: 5.6624732273257722271e-06
+Monte Carlo relative error via exact formula [EUR]: 1.4798097018273585518e-05
+Monte Carlo estimated price via Euler formula [EUR]: 0.38266130729917519071
+Monte Carlo estimated error via Euler formula [EUR]: 5.6595858947621855103e-06
+Monte Carlo relative error via Euler formula [EUR]: 1.4790065749546412715e-05
+Discrepancy between Euler and exact results [units of sigma]: 1.5693410801999916337
+Computation time [ms]: 87250.2421875
+
