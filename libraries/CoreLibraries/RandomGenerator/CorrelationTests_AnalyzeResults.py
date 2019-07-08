@@ -24,7 +24,7 @@ if not os.path.exists(inputFileInterStreamAutocorr):
 	exit(1)
 	
 if not os.path.exists(outputDirectory):
-	print("Error: output directory", inputFileInterStreamAutocorr, "does not exist.")
+	print("Error: output directory", outputDirectory, "does not exist.")
 	exit(2)
 
 data = ascii.read(inputFile, format="basic")
