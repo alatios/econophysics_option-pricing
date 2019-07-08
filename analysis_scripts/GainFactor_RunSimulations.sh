@@ -3,7 +3,7 @@
 
 DIRECTORY="GainFactor_Cabibbo_CPU"
 NOFSIMSPERTHREAD=1000
-MARRAY=(1 10 50 100 200 300 400)
+MARRAY=(1 10 100 200 300 400)
 
 cd ..;
 rm -rf outputs/${DIRECTORY}/output*;
@@ -25,7 +25,7 @@ for m in ${MARRAY[@]}; do
 			-e "s/_cpugpu_/c/g" \
 			-e "s/_gauss_bimodal_/g/g" \
 			input.dat.template | tee input.dat "inputs/${DIRECTORY}/input__${i}_${m}.dat" > /dev/null;
-	#	./main.x > "outputs/${DIRECTORY}/output__${i}_${m}.dat";
+		./main.x > "outputs/${DIRECTORY}/output__${i}_${m}.dat";
 	done
 done
 
