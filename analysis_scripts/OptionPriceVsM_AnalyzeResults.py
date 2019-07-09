@@ -44,7 +44,7 @@ plt.legend()
 plt.xlabel("Number of fixing dates")
 plt.ylabel("Monte Carlo estimated price [EUR]")
 plt.grid()
-plt.savefig(outputDirectory + "OptionPriceVsM_PriceVsM_N100mln.pdf", , bbox_inches='tight')
+plt.savefig(outputDirectory + "OptionPriceVsM_PriceVsM_N100mln.pdf", bbox_inches='tight')
 plt.close()
 
 ## Plot exact price vs. m for all N

@@ -2,7 +2,7 @@
 ## Runs simulations cycling through numbers of GPU blocks.
 
 DIRECTORY="ComputationTimeStudies_Tesla"
-NOFSIMSPERTHREAD=1000
+NOFSIMSPERTHREAD=2000
 MARRAY=(1 10 100 200 300 400)
 
 cd ..;
