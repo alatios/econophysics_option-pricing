@@ -4,9 +4,12 @@
 
 NARRAY=(1000 10000 100000 1000000 10000000 100000000)
 MARRAY=(1 2 3 4 5 10 50 100 150 200 250 300 400)
+DIRECTORY="OptionPriceVsM"
 
 cd ..;
-rm -rf outputs/output_PriceVsM/output*;
+rm -rf outputs/${DIRECTORY}/output*;
+rm -rf inputs/${DIRECTORY}/input*;
+
 for N in "${NARRAY[@]}"; do
 	for m in "${MARRAY[@]}"; do
 		echo "${m}, ${N}";
