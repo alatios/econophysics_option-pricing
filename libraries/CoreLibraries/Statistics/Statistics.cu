@@ -9,6 +9,7 @@ __device__ __host__ Statistics::Statistics(){
 	this->_PayoffSum = 0.;
 	this->_SquaredPayoffSum = 0.;
 	this->_PayoffCounter = 0;
+	this->_NegativePriceCounter = 0;
 }
 
 // Public methods for addition
@@ -23,6 +24,7 @@ __device__ __host__ void Statistics::ResetSums(){
 	this->_PayoffSum = 0.;
 	this->_SquaredPayoffSum = 0.;
 	this->_PayoffCounter = 0;
+	this->_NegativePriceCounter = 0;
 }
 
 // Public get methods
@@ -62,9 +64,16 @@ __host__ Statistics& Statistics::operator+=(const Statistics& otherStatistics){
 	this->_PayoffSum += otherStatistics.GetPayoffSum();
 	this->_SquaredPayoffSum += otherStatistics.GetSquaredPayoffSum();
 	this->_PayoffCounter += otherStatistics.GetPayoffCounter();
+	this->_NegativePriceCounter += otherStatistics.GetNegativePriceCounter();
 	
 	return *this;
 }
 
+// Manage negative price counter
+__device__ __host__ unsigned int Statistics::GetNegativePriceCounter() const{
+	return this->_NegativePriceCounter;
+}
 
-
+__device__ __host__ void Statistics::IncreaseNegativePriceCounter(){
+	++(this->_NegativePriceCounter);
+}

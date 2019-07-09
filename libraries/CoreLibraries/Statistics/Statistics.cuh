@@ -12,6 +12,8 @@ class Statistics{
 		double _PayoffAverage;
 		double _PayoffError;
 		
+		unsigned int _NegativePriceCounter;
+		
 	public:
 	
 		// Constructor and destructor
@@ -33,6 +35,10 @@ class Statistics{
 		__device__ __host__ void EvaluateEstimatedPriceAndError();
 		__device__ __host__ double GetPayoffAverage() const;
 		__device__ __host__ double GetPayoffError() const;
+		
+		// Manage negative price counter
+		__device__ __host__ unsigned int GetNegativePriceCounter() const;
+		__device__ __host__ void IncreaseNegativePriceCounter();
 		
 		// Overload of += operator
 		__host__ Statistics& operator+=(const Statistics&);	// Host-only because of isinf, at least for now

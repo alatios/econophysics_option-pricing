@@ -6,10 +6,10 @@ from matplotlib import pyplot as plt
 from matplotlib import axes
 import os.path
 
-inputFile = "CorrelationTests_MainIntraStream.dat"
-inputFileIntraStreamAutocorr = "CorrelationTests_Autocorrelations.dat"
-inputFileInterStreamAutocorr = "CorrelationTests_InterstreamAutocorrelations.dat"
-outputDirectory = "graphs/"
+inputFile = "../outputs/CorrelationTests/CorrelationTests_MainIntraStream.dat"
+inputFileIntraStreamAutocorr = "../outputs/CorrelationTests/CorrelationTests_Autocorrelations.dat"
+inputFileInterStreamAutocorr = "../outputs/CorrelationTests/CorrelationTests_InterstreamAutocorrelations.dat"
+outputDirectory = "../outputs/CorrelationTests/graphs/"
 
 if not os.path.exists(inputFile):
 	print("Error: input file", inputFile, "does not exist.")
@@ -37,7 +37,7 @@ plt.axvline(0.5, color="dimgrey", label="Expected average")
 plt.grid()
 cbar = plt.colorbar()
 cbar.set_label('Thread number', rotation=270, labelpad=+13)
-plt.savefig(outputDirectory + "CorrelationTests_UniAvgVsGaussAvg.pdf")
+plt.savefig(outputDirectory + "CorrelationTests_UniAvgVsGaussAvg.pdf", bbox_inches='tight')
 plt.close()
 
 plt.scatter(data["gaussvar"], data["gausskurt"], c=data["thread"], cmap="cool", marker="x", s=30, label="")
@@ -48,7 +48,7 @@ plt.axvline(1, color="dimgrey", label="Expected average")
 plt.grid()
 cbar = plt.colorbar()
 cbar.set_label('Thread number', rotation=270, labelpad=+13)
-plt.savefig(outputDirectory + "CorrelationTests_KurtosisVsVariance.pdf")
+plt.savefig(outputDirectory + "CorrelationTests_KurtosisVsVariance.pdf", bbox_inches='tight')
 plt.close()
 
 autocorrdata = ascii.read(inputFileIntraStreamAutocorr, format="basic")
@@ -61,7 +61,7 @@ plt.xlabel("$<x_i,x_{i+k}>$, uniform numbers")
 plt.ylabel("$<x_i,x_{i+k}>$, gaussian numbers")
 cbar = plt.colorbar()
 cbar.set_label('Autocorrelation offset $k$', rotation=270, labelpad=+13)
-plt.savefig(outputDirectory + "CorrelationTests_IntraStreamCorrelations.pdf")
+plt.savefig(outputDirectory + "CorrelationTests_IntraStreamCorrelations.pdf", bbox_inches='tight')
 plt.close()
 
 intercorrdata = ascii.read(inputFileInterStreamAutocorr, format="basic")
@@ -76,7 +76,7 @@ plt.xlabel("$<x_i,x_{i+k}>$, uniform numbers")
 plt.ylabel("$<x_i,x_{i+k}>$, gaussian numbers")
 cbar = plt.colorbar()
 cbar.set_label('Autocorrelation offset $k$', rotation=270, labelpad=+13)
-plt.savefig(outputDirectory + "CorrelationTests_InterStreamCorrelations.pdf")
+plt.savefig(outputDirectory + "CorrelationTests_InterStreamCorrelations.pdf", bbox_inches='tight')
 plt.close()
 
 plt.scatter(intercorrdata["offset"], intercorrdata["unicorr"], color="skyblue", marker="x", s=20)
@@ -85,7 +85,7 @@ plt.xlabel("Autocorrelation offset $k$")
 plt.ylabel("$<x_i,x_{i+k}>$, uniform numbers")
 plt.axhline(0.25, color="dimgrey")
 plt.grid()
-plt.savefig(outputDirectory + "CorrelationTests_UniformInterStreamAutocorrelationVsOffset.pdf")
+plt.savefig(outputDirectory + "CorrelationTests_UniformInterStreamAutocorrelationVsOffset.pdf", bbox_inches='tight')
 plt.close()
 
 plt.hist(intercorrdata["unicorr"], bins=2000, color="skyblue")
@@ -93,7 +93,7 @@ plt.xlim((0.247, 0.252))
 plt.xlabel("$<x_i,x_{i+k}>$, uniform numbers")
 plt.axvline(0.25, color="dimgrey")
 plt.grid()
-plt.savefig(outputDirectory + "CorrelationTests_UniformInterStreamAutocorrelationHistogram.pdf")
+plt.savefig(outputDirectory + "CorrelationTests_UniformInterStreamAutocorrelationHistogram.pdf", bbox_inches='tight')
 plt.close()
 
 plt.scatter(intercorrdata["offset"], intercorrdata["gausscorr"], color="orchid", marker="x", s=20)
@@ -102,7 +102,7 @@ plt.xlabel("Autocorrelation offset $k$")
 plt.ylabel("$<x_i,x_{i+k}>$, gaussian numbers")
 plt.axhline(0., color="dimgrey")
 plt.grid()
-plt.savefig(outputDirectory + "CorrelationTests_GaussInterStreamAutocorrelationVsOffset.pdf")
+plt.savefig(outputDirectory + "CorrelationTests_GaussInterStreamAutocorrelationVsOffset.pdf", bbox_inches='tight')
 plt.close()
 
 plt.hist(intercorrdata["gausscorr"], bins=2000, color="orchid")
@@ -110,7 +110,7 @@ plt.xlim((-0.02, 0.02))
 plt.xlabel("$<x_i,x_{i+k}>$, gaussian numbers")
 plt.axvline(0.0, color="dimgrey")
 plt.grid()
-plt.savefig(outputDirectory + "CorrelationTests_GaussInterStreamAutocorrelationHistogram.pdf")
+plt.savefig(outputDirectory + "CorrelationTests_GaussInterStreamAutocorrelationHistogram.pdf", bbox_inches='tight')
 plt.close()
 
 print("Analysis completed! You will find the graphs saved in", outputDirectory, ".")

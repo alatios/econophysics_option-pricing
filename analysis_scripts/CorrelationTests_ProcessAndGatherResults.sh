@@ -3,8 +3,8 @@
 #	Joins completely verbose output of CorrelationTest.cu in an astropy.io-readable table.
 #
 
-INPUTFILE="CorrelationTests_UnprocessedOutput.dat"
-OUTPUTFILE_INTRASTREAM="CorrelationTests_MainIntraStream.dat"
+INPUTFILE="../libraries/CoreLibraries/RandomGenerator/CorrelationTests_UnprocessedOutput.dat"
+OUTPUTFILE_INTRASTREAM="../outputs/CorrelationTests/CorrelationTests_MainIntraStream.dat"
 
 sed -n '/Uniform averages (exp. 0.5):/,/Gaussian averages (exp. 0):/p' ${INPUTFILE} \
 	| head -n -2 \
@@ -37,7 +37,7 @@ rm uniformavgs.dat gaussavgs.dat gaussvar.dat gausskurt.dat;
 
 ## INTRASTREAM CORRELATION
 
-OUTPUTFILE_AUTOCORR="CorrelationTests_Autocorrelations.dat"
+OUTPUTFILE_AUTOCORR="../outputs/CorrelationTests/CorrelationTests_Autocorrelations.dat"
 
 LINECOUNT=$(sed -n '/Uniform autocorrelations i\/i+k/,/Gaussian autocorrelations i\/i+k/p' ${INPUTFILE} | head -n -2 | tail -n +2 | sed '/thread/d' | wc -l)
 ITERATIONS=$((${LINECOUNT}/512))
@@ -49,7 +49,7 @@ for ((thread=0; thread<512; ++thread)); do
 	done
 done
 
-sed -n '/Uniform autocorrelations i\/i+k/,/Gaussian autocorrelations i\/i+k/p' CorrelationTests_UnprocessedOutput.dat \
+sed -n '/Uniform autocorrelations i\/i+k/,/Gaussian autocorrelations i\/i+k/p' ${INPUTFILE} \
 	| head -n -2 \
 	| tail -n +2 \
 	| sed '/thread/d' \
@@ -57,7 +57,7 @@ sed -n '/Uniform autocorrelations i\/i+k/,/Gaussian autocorrelations i\/i+k/p' C
 	| sed -e 's/>:\t/ /g' \
 	> autocorr_uni.dat;
 
-sed -n '/Gaussian autocorrelations i\/i+k/,/INTER-STREAM/p' CorrelationTests_UnprocessedOutput.dat \
+sed -n '/Gaussian autocorrelations i\/i+k/,/INTER-STREAM/p' ${INPUTFILE} \
 	| head -n -2 \
 	| tail -n +2 \
 	| sed '/thread/d' \
@@ -70,7 +70,7 @@ rm autocorr_threads.dat autocorr_uni.dat autocorr_gauss.dat;
 
 ## INTERSTREAM CORRELATION
 
-OUTPUTFILE_INTERCORR="CorrelationTests_InterstreamAutocorrelations.dat"
+OUTPUTFILE_INTERCORR="../outputs/CorrelationTests/CorrelationTests_InterstreamAutocorrelations.dat"
 
 sed -n '/Uniform super stream/,/Gaussian super stream/p' ${INPUTFILE} \
 	| head -n -1 \

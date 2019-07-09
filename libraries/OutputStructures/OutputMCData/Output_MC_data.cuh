@@ -9,6 +9,7 @@ struct Output_MC_data{
 	double EstimatedPriceMCExact;
 	double ErrorMCExact;
 	double Tick;			// Calculation time [ms]
+	unsigned int NegativePriceCounter;
 	
 	__device__ __host__ double GetRelativeErrorEuler() const;
 	__device__ __host__ double GetRelativeErrorExact() const;

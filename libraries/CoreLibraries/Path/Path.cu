@@ -20,6 +20,7 @@ __device__ __host__ Path::Path(){
 	this->_N = NULL;
 	this->_K = NULL;
 	this->_PerformanceCorridorBarrierCounter = 0;
+	this->_NegativePrice = false;
 }
 
 __device__ __host__ Path::Path(const Input_market_data& market, const Input_option_data& option){
@@ -35,6 +36,7 @@ __device__ __host__ Path::Path(const Input_market_data& market, const Input_opti
 	this->_N = &(option.N);
 	this->_K = &(option.K);
 	this->_PerformanceCorridorBarrierCounter = 0;
+	this->_NegativePrice = false;
 }
 
 // Public set methods
@@ -51,6 +53,7 @@ __device__ __host__ void Path::ResetToInitialState(const Input_market_data& mark
 	this->_N = &(option.N);
 	this->_K = &(option.K);
 	this->_PerformanceCorridorBarrierCounter = 0;
+	this->_NegativePrice = false;
 }
 
 __device__ __host__ void Path::ResetToInitialState(const Path& otherPath){
@@ -66,6 +69,7 @@ __device__ __host__ void Path::ResetToInitialState(const Path& otherPath){
 	this->_N = otherPath._N;
 	this->_K = otherPath._K;
 	this->_PerformanceCorridorBarrierCounter = otherPath._PerformanceCorridorBarrierCounter;
+	this->_NegativePrice = otherPath._NegativePrice;
 }
 
 // Public get methods
@@ -87,6 +91,9 @@ __device__ __host__ void Path::EulerLogNormalStep(double gaussianRandomVariable)
 	
 	if(*(_OptionType) == 'e')
 		this->CheckPerformanceCorridorCondition(this->_SpotPrice, SpotPrice_i);
+		
+	if(SpotPrice_i < 0)
+		this->_NegativePrice = true;
 	
 	this->_SpotPrice = SpotPrice_i;
 }
@@ -139,4 +146,8 @@ __device__ __host__ double Path::GetActualizedPayoff() const{
 	}	
 	
 	return (payoff * exp(- *(this->_RiskFreeRate) * *(this->_TimeToMaturity)));
+}
+
+__device__ __host__ bool Path::GetNegativePrice() const{
+	return this->_NegativePrice;
 }

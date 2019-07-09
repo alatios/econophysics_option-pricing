@@ -39,7 +39,7 @@ plt.plot(data_N200mln["B"], data_N200mln["exactPrice"], color="crimson", label="
 plt.xlabel("$B$")
 plt.ylabel("Estimated Monte Carlo exact price [EUR]")
 plt.grid()
-plt.savefig(outputDirectory + "OptionPriceVsB_PriceVsB_N200mln.pdf")
+plt.savefig(outputDirectory + "OptionPriceVsB_PriceVsB_N200mln.pdf", bbox_inches='tight')
 plt.close()
 
 ## Plot exact errors vs. N in log-log scale
@@ -59,7 +59,7 @@ plt.xlabel("Number of simulations")
 plt.ylabel("Absolute error on Monte Carlo exact price [EUR]")
 plt.legend(bbox_to_anchor=(1.01, 1.05))
 plt.grid()
-plt.savefig(outputDirectory + "OptionPriceVsB_ExactErrorVsN_WithAllBs.pdf")
+plt.savefig(outputDirectory + "OptionPriceVsB_ExactErrorVsN_WithAllBs.pdf", bbox_inches='tight')
 plt.close()
 
 ## Average H(B) for all N, plot as function of B
@@ -74,7 +74,7 @@ plt.plot(BValues, HBs, color="crimson", marker="x")
 plt.xlabel("$B$")
 plt.ylabel("$H(B) = \\varepsilon_{MC} \\times \sqrt{N}$")
 plt.grid()
-plt.savefig(outputDirectory + "OptionPriceVsB_HBVsB.pdf")
+plt.savefig(outputDirectory + "OptionPriceVsB_HBVsB.pdf", bbox_inches='tight')
 plt.close()
 
 print("Analysis completed! You will find the graphs saved in", outputDirectory, ".")

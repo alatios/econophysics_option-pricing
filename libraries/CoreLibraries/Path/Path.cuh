@@ -31,6 +31,9 @@ class Path{
 		const double* _N;
 		unsigned int _PerformanceCorridorBarrierCounter;
 		
+		// Boolean keeping track of negative prices in the Euler formula
+		bool _NegativePrice;
+		
 		__device__ __host__ void CheckPerformanceCorridorCondition(double currentSpotPrice, double nextSpotPrice);
 		
 	public:
@@ -50,6 +53,9 @@ class Path{
 		
 		// Payoff evaluation
 		__device__ __host__ double GetActualizedPayoff() const;
+		
+		// Check if a negative price happened in this run
+		__device__ __host__ bool GetNegativePrice() const;
 
 };
 

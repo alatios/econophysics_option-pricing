@@ -110,6 +110,7 @@ __host__ void Data_stream_manager::StoreOutputData(Output_MC_data& outputMC, con
 	outputMC.ErrorMCEuler = eulerResults.GetPayoffError();
 	outputMC.Tick = elapsedTime;
 	outputMC.HostOrDevice = hostOrDevice;
+	outputMC.NegativePriceCounter = eulerResults.GetNegativePriceCounter();
 }
 
 __host__ void Data_stream_manager::PrintOutputData(const Output_MC_data& outputMC) const{
@@ -130,6 +131,7 @@ __host__ void Data_stream_manager::PrintOutputData(const Output_MC_data& outputM
 	cout << "Monte Carlo relative error via Euler formula [EUR]: " << setprecision(20) << outputMC.GetRelativeErrorEuler() << endl;
 	cout << "Discrepancy between Euler and exact results [units of sigma]: " << setprecision(20) << outputMC.GetEulerToExactDiscrepancy() << endl;
 	cout << "Computation time [ms]: " << setprecision(20) << outputMC.Tick << endl;
+	cout << "Negative price counter: " << outputMC.NegativePriceCounter << endl;
 	
 	cout << endl;	
 }

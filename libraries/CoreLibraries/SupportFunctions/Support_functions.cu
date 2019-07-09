@@ -48,6 +48,9 @@ __host__ __device__ void OptionPricingEvaluator_HostDev(Input_gpu_data inputGPU,
 
 			exactOutputs[threadNumber].AddPayoff(exactPath.GetActualizedPayoff());
 			eulerOutputs[threadNumber].AddPayoff(eulerPath.GetActualizedPayoff());
+			
+			if(eulerPath.GetNegativePrice())
+				eulerOutputs[threadNumber].IncreaseNegativePriceCounter();
 		}
 	}
 }
