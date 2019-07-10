@@ -5,8 +5,8 @@
 Number of blocks: 74
 Number of threads per block: 512
 Total number of threads: 37888
-Number of simulations: 37888000
-Number of simulations per thread (round-up): 1000
+Number of simulations: 75776000
+Number of simulations per thread (round-up): 2000
 CPU v. GPU parameter: g
 Gaussian or bimodal random variable: g
 ## MARKET DATA ##
@@ -26,12 +26,13 @@ N [EUR]: 1
 Beginning GPU computation...
 
 ## DEVICE OUTPUT MONTE CARLO DATA ##
-Monte Carlo estimated price via exact formula [EUR]: 0.38264173609058538261
-Monte Carlo estimated error via exact formula [EUR]: 3.7802608661590441619e-06
-Monte Carlo relative error via exact formula [EUR]: 9.879374123642689699e-06
-Monte Carlo estimated price via Euler formula [EUR]: 0.38265655057981984299
-Monte Carlo estimated error via Euler formula [EUR]: 3.7806617516122238992e-06
-Monte Carlo relative error via Euler formula [EUR]: 9.8800392829642684912e-06
-Discrepancy between Euler and exact results [units of sigma]: 2.7709384984727289947
-Computation time [ms]: 178884.953125
+Monte Carlo estimated price via exact formula [EUR]: 0.38264250865242216415
+Monte Carlo estimated error via exact formula [EUR]: 2.6728963080188304028e-06
+Monte Carlo relative error via exact formula [EUR]: 6.9853616563202791404e-06
+Monte Carlo estimated price via Euler formula [EUR]: 0.38264981003637277279
+Monte Carlo estimated error via Euler formula [EUR]: 2.6727736293147328852e-06
+Monte Carlo relative error via Euler formula [EUR]: 6.9849077647802109727e-06
+Discrepancy between Euler and exact results [units of sigma]: 1.9316037700366130991
+Computation time [ms]: 357329.40625
+Negative price counter: 5
 
