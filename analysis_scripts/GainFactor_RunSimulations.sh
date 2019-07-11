@@ -1,15 +1,28 @@
 #!/bin/bash
 ## Runs simulations cycling through numbers of GPU blocks.
 
-DIRECTORY="GainFactor_Cabibbo_CPU"
+DIRECTORY="GainFactor_Tesla"
 NOFSIMSPERTHREAD=1000
 MARRAY=(1 10 100 200 300 400)
 
+echo "This will overwrite all existing output. Are you sure you want to run this? y/[n]"
+read response
+
+case "$response" in
+	[yY][eE][sS]|[yY])
+		:
+		;;
+	*)
+		echo "Aborting..."
+		exit 3
+		;;
+esac
+
 cd ..;
 rm -rf outputs/${DIRECTORY}/output*;
-rm -rf inputs/$(DIRECTORY)/input*;
+rm -rf inputs/${DIRECTORY}/input*;
 for m in ${MARRAY[@]}; do
-	for i in {1..88..5}; do
+	for i in {1..88..10}; do
 		echo "${i}, ${m}";
 		sed -e "s/_gpu_blocks_/$i/g" \
 			-e "s/_underlying_initial_price_/100/g" \

@@ -6,6 +6,19 @@ NARRAY=(1000 5000 10000 50000 100000 500000 1000000 5000000 10000000 50000000 10
 BARRAY=(0 0.25 0.33 0.5 0.66 0.75 1 1.25 1.5 1.75 2 2.25 2.5 2.75 3 3.5 4 4.5 5)
 DIRECTORY="OptionPriceVsB"
 
+echo "This will overwrite all existing output. Are you sure you want to run this? y/[n]"
+read response
+
+case "$response" in
+	[yY][eE][sS]|[yY])
+		:
+		;;
+	*)
+		echo "Aborting..."
+		exit 3
+		;;
+esac
+
 cd ..;
 rm -rf outputs/${DIRECTORY}/output*;
 for N in "${NARRAY[@]}"; do

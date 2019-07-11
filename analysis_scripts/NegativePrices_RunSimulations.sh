@@ -6,6 +6,19 @@ DIRECTORY="NegativePrices"
 MARRAY=(1 2 3 4 5 6 7 8 9 10 20 30 40)
 VARRAY=(0 0.25 0.5 0.75 1)
 
+echo "This will overwrite all existing output. Are you sure you want to run this? y/[n]"
+read response
+
+case "$response" in
+	[yY][eE][sS]|[yY])
+		:
+		;;
+	*)
+		echo "Aborting..."
+		exit 3
+		;;
+esac
+
 cd ..;
 rm -rf outputs/${DIRECTORY}/output*;
 rm -rf inputs/${DIRECTORY}/input*;
