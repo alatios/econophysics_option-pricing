@@ -5,6 +5,19 @@
 DIRECTORY="OptionPriceBimodal"
 MARRAY=(1 2 3 4 5 6 7 8 9 10 15 20 25 30 50 100 150 200 250 300 350)
 
+echo "This will overwrite all existing output. Are you sure you want to run this? y/[n]"
+read response
+
+case "$response" in
+	[yY][eE][sS]|[yY])
+		:
+		;;
+	*)
+		echo "Aborting..."
+		exit 3
+		;;
+esac
+
 cd ..;
 rm -rf outputs/${DIRECTORY}/output*;
 for m in "${MARRAY[@]}"; do

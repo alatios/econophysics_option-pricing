@@ -6,6 +6,19 @@ NARRAY=(1000 10000 100000 1000000 10000000 100000000)
 MARRAY=(1 2 3 4 5 10 50 100 150 200 250 300 400)
 DIRECTORY="OptionPriceVsM"
 
+echo "This will overwrite all existing output. Are you sure you want to run this? y/[n]"
+read response
+
+case "$response" in
+	[yY][eE][sS]|[yY])
+		:
+		;;
+	*)
+		echo "Aborting..."
+		exit 3
+		;;
+esac
+
 cd ..;
 rm -rf outputs/${DIRECTORY}/output*;
 rm -rf inputs/${DIRECTORY}/input*;

@@ -5,6 +5,19 @@ DIRECTORY="ComputationTimeStudies_Tesla"
 NOFSIMSPERTHREAD=2000
 MARRAY=(1 10 100 200 300 400)
 
+echo "This will overwrite all existing output. Are you sure you want to run this? y/[n]"
+read response
+
+case "$response" in
+	[yY][eE][sS]|[yY])
+		:
+		;;
+	*)
+		echo "Aborting..."
+		exit 3
+		;;
+esac
+
 cd ..;
 rm -rf outputs/${DIRECTORY}/output*;
 for m in ${MARRAY[@]}; do
