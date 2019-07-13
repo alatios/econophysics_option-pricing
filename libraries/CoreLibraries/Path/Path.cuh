@@ -7,14 +7,13 @@
 class Path{
 
 	private:
-
-		// Ricordarsi di mettere i puntatori
 		
 		double _SpotPrice;		// The step (spotprice) required to generate the next one
 
 		// Market data
 		const double* _RiskFreeRate;
 		const double* _Volatility;
+		const double* _InitialPrice;
 
 		// Base European option/contract data
 		const char* _OptionType;
@@ -56,6 +55,9 @@ class Path{
 		
 		// Check if a negative price happened in this run
 		__device__ __host__ bool GetNegativePrice() const;
+
+		// Black & Scholes formula
+		__device__ __host__ double GetBlackAndScholesPrice() const;
 
 };
 
