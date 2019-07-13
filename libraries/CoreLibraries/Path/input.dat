@@ -5,7 +5,7 @@
 #
 ## GPU DATA
 # Number of GPU blocks
-50
+10
 ## MARKET DATA
 # Initial underlying price at t = 0 [USD]
 100
@@ -22,7 +22,7 @@
 # Time to maturity [years]
 1
 # Number of intervals in which TTM is divided
-400
+365
 # Option type
 # f = forward contract
 # c = plain vanilla call option
@@ -41,7 +41,7 @@ c
 1
 ## MONTE CARLO DATA
 # Number of simulations
-100000000
+5000
 # CPU/GPU comparison
 # c = cpu-only
 # g = gpu-only

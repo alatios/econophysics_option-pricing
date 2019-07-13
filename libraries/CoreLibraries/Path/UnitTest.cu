@@ -136,6 +136,35 @@ int main(){
 	test = (path2.GetActualizedPayoff() == static_cast<double>(0.));
 	cout << test << "\n";
 
+	cout << "\nBlack and Scholes testing\n";
+
+	//Option
+	double strikePriceBlackScholes = 100.;
+	unsigned int numberOfIntervalsBlackScholes = 1;
+	double timeToMaturityBlackScholes = 1.;
+	//Market
+	double initialPriceBlackScholes = 100.;
+	double volatilityBlackScholes = 0.25;
+	double riskFreeRateBlackScholes = 0.1;
+	Input_market_data marketBlackScholes = {initialPriceBlackScholes, volatilityBlackScholes, riskFreeRateBlackScholes};
+	Input_option_data optionBlackScholes_c = {'c', numberOfIntervalsBlackScholes, timeToMaturityBlackScholes, strikePriceBlackScholes, 0, 0, 0};
+	Input_option_data optionBlackScholes_p = {'p', numberOfIntervalsBlackScholes, timeToMaturityBlackScholes, strikePriceBlackScholes, 0, 0, 0};
+
+	cout << "\nPlain vanilla call option: Black and Scholes testing\n";
+
+	path1.ResetToInitialState(marketBlackScholes, optionBlackScholes_c);
+
+	test = (path1.GetBlackAndScholesPrice() == static_cast<double>(14.975790778311299789));
+	cout << test << "\n";
+
+	cout << "\nPlain vanilla put option: Black and Scholes testing\n";
+
+	path1.ResetToInitialState(marketBlackScholes, optionBlackScholes_p);
+
+	test = (path1.GetBlackAndScholesPrice() == static_cast<double>(5.4595325819072471063));
+	cout << test << "\n";
+
+
 	return 0;
 
 }

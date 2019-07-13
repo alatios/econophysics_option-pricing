@@ -12,6 +12,7 @@ __device__ __host__ Path::Path(){
 	this->_SpotPrice = 0.;
 	this->_RiskFreeRate = NULL;
 	this->_Volatility = NULL;
+	this->_InitialPrice = NULL;
 	this->_TimeToMaturity = NULL;
 	this->_NumberOfIntervals = NULL;
 	this->_DeltaTime = 0.;
@@ -28,6 +29,7 @@ __device__ __host__ Path::Path(const Input_market_data& market, const Input_opti
 	this->_SpotPrice = market.InitialPrice;
 	this->_RiskFreeRate = &(market.RiskFreeRate);
 	this->_Volatility = &(market.Volatility);
+	this->_InitialPrice = &(market.InitialPrice);
 	this->_TimeToMaturity = &(option.TimeToMaturity);
 	this->_NumberOfIntervals = &(option.NumberOfIntervals);
 	this->_DeltaTime = option.GetDeltaTime();
@@ -45,6 +47,7 @@ __device__ __host__ void Path::ResetToInitialState(const Input_market_data& mark
 	this->_SpotPrice = market.InitialPrice;
 	this->_RiskFreeRate = &(market.RiskFreeRate);
 	this->_Volatility = &(market.Volatility);
+	this->_InitialPrice = &(market.InitialPrice);
 	this->_TimeToMaturity = &(option.TimeToMaturity);
 	this->_NumberOfIntervals = &(option.NumberOfIntervals);
 	this->_DeltaTime = option.GetDeltaTime();
@@ -61,6 +64,7 @@ __device__ __host__ void Path::ResetToInitialState(const Path& otherPath){
 	this->_SpotPrice = otherPath._SpotPrice;
 	this->_RiskFreeRate = otherPath._RiskFreeRate;
 	this->_Volatility = otherPath._Volatility;
+	this->_InitialPrice = otherPath._InitialPrice;
 	this->_TimeToMaturity = otherPath._TimeToMaturity;
 	this->_NumberOfIntervals = otherPath._NumberOfIntervals;
 	this->_DeltaTime = otherPath._DeltaTime;
@@ -150,4 +154,28 @@ __device__ __host__ double Path::GetActualizedPayoff() const{
 
 __device__ __host__ bool Path::GetNegativePrice() const{
 	return this->_NegativePrice;
+}
+
+__device__ __host__ double Path::GetBlackAndScholesPrice() const{
+	double d1 = 1./(*(this->_Volatility) * sqrt(*(this->_TimeToMaturity))) 
+	* (log(*(this->_InitialPrice) / *(this->_StrikePrice))
+	+ (*(this->_RiskFreeRate) + pow(*(this->_Volatility),2)/2) * *(this->_TimeToMaturity));
+
+	double d2 = d1 -  *(this->_Volatility) * sqrt(*(this->_TimeToMaturity));
+
+	if(*(this->_OptionType) == char('c')){
+		double callPrice = *(this->_InitialPrice) * (0.5 * (1. + erf(d1/sqrt(2.)))) - *(this->_StrikePrice) 
+		* exp(- *(this->_RiskFreeRate) * *(this->_TimeToMaturity))
+		* (0.5 * (1. + erf(d2/sqrt(2.))));
+
+		return callPrice;
+	} 
+
+	if(*(this->_OptionType) == char('p')){
+		double putPrice = *(this->_InitialPrice) * ((0.5 * (1. + erf(d1/sqrt(2.)))) - 1) - *(this->_StrikePrice)
+		* exp(- *(this->_RiskFreeRate) * *(this->_TimeToMaturity))
+		* ((0.5 * (1. + erf(d2/sqrt(2.)))) - 1);
+
+		return putPrice;
+	}
 }
