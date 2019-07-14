@@ -1,13 +1,13 @@
 \chapter{(A) Introduzione alla libreria e aspetti implementativi}
 \section{Econofisica e \textit{option pricing}}
-In ambito finanziario si definisce \textit{titolo derivato} un contratto basato su un prodotto finanziario più fondamentale, detto \textit{bene sottostante} o semplicemente \textit{sottostante}. Obiettivo di questa relazione è lo studio di un tipo particolare di titolo derivato, ovvero le \textit{opzioni europee}, nella loro forma più elementare definibili come contratti che garantiscono il diritto di compravendita del sottostante in una data futura (detta \textit{data di maturità}) a un certo prezzo (detto \textit{prezzo di esercizio}). A seconda delle caratteristiche del tipo di opzione prescelto, ciò frutterà al suo acquirente un rendimento $P$ detto \textit{payoff}.
+In ambito finanziario si definisce \textit{titolo derivato} un contratto il cui valore dipende da prodotto finanziario più fondamentale, detto \textit{bene sottostante} o semplicemente \textit{sottostante}. Obiettivo di questa relazione è lo studio di un tipo particolare di titolo derivato, ovvero le \textit{opzioni europee}, nella loro forma più elementare definibili come contratti che garantiscono il diritto di compravendita del sottostante in una data futura (detta \textit{data di maturità}) a un prezzo fissato (detto \textit{prezzo di esercizio}). A seconda delle caratteristiche del tipo di opzione prescelto, ciò frutterà al suo acquirente un rendimento $P$ detto \textit{payoff}.
 
 Un primo esempio di contratto derivato analizzato in questa trattazione è il contratto a termine \textit{forward}, con un \textit{payoff} definito da
 \begin{equation}
     P_f = S(T),
     \label{eq:forward_payoff}
 \end{equation}
-dove $T$ è la data di maturità e $S(t)$ il prezzo del sottostante al tempo $t$. Altra classe di opzioni importante è quella delle opzioni \textit{plain vanilla}, definite come \textit{call} o \textit{put} a seconda che diano il diritto di comprare o vendere il sottostante. Nel caso delle \textit{plain vanilla call} il \textit{payoff} è dato da
+dove $T$ è la data di maturità e $S(t)$ il prezzo del sottostante al tempo $t$. Altra tipologia importante di opzioni è quella delle opzioni \textit{plain vanilla}, definite come \textit{call} o \textit{put} a seconda che diano il diritto di comprare o vendere il sottostante. Nel caso delle \textit{plain vanilla call} il \textit{payoff} è dato da
 \begin{equation}
     P_{pvc} = \Theta(S(T)-E),
     \label{eq:pvc_payoff}
@@ -33,16 +33,16 @@ dove $+$ indica la parte positiva dell'espressione e
     \label{eq:performancecorridor_barrier}
 \end{equation}
 
-Questo è un caso di opzione \textit{path-dependent}, in quanto il \textit{payoff} è funzione della percentuale di volte in cui il rendimento logaritmico del sottostante in modulo tra due date di rilevamento rimane confinato all'interno di una barriera parametrizzata dalla volatilità e da $B$. In questo contesto la variabile $K$ rappresenta una sorta di <<prezzo di esercizio>> in percentuale, mentre $N$ è il nozionale a cui la percentuale risultante dal calcolo del \textit{payoff} viene applicata.
+Questo è un caso di opzione \textit{path-dependent}, in quanto il \textit{payoff} è funzione della percentuale di volte in cui il rendimento logaritmico del sottostante in modulo tra due date di rilevazione rimane confinato all'interno di una barriera la cui altezza è parametrizzata da $B$. In questo contesto la variabile $K$ rappresenta una sorta di <<prezzo di esercizio>> in percentuale, mentre $N$ è il nozionale a cui la percentuale risultante dal calcolo del \textit{payoff} viene applicata.
 
-In virtù dell'\textit{assioma non arbitraggio}, il quale afferma che non è possibile realizzare un guadagno certo a un rendimento superiore al tasso di interesse privo di rischio, il prezzo equo delle opzioni è stabilito sulla base del \textit{payoff} delle opzioni stesse. Essendo quest'ultimo dipendente dall'andamento del prezzo del sottostante tra la data odierna e la data di maturità, il problema del \textit{pricing} delle opzioni è legato a doppio filo alla necessità di modellizzare l'evoluzione del sottostante nel tempo.
+In virtù dell'\textit{assioma di non arbitraggio}, il quale afferma che non è possibile realizzare un guadagno certo a un rendimento superiore al tasso di interesse privo di rischio, il prezzo equo delle opzioni è stabilito sulla base del \textit{payoff} delle opzioni stesse. Essendo quest'ultimo dipendente dall'andamento del prezzo del sottostante tra la data odierna e la data di maturità, il problema del \textit{pricing} delle opzioni è legato a doppio filo alla necessità di modellizzare l'evoluzione del sottostante nel tempo.
 
 Uno dei modelli più diffusi per questo scopo è quello del \textit{moto browniano geometrico}, basato sull'assunto che il prezzo $S(t)$ del sottostante segua un processo lognormale con tasso d'interesse privo di rischio $r$ e volatilità $\sigma$ fissata
 \begin{equation}
     \frac{dS}{S} = r dt + \sigma \sqrt{dt} w,
     \label{eq:lognormal}
 \end{equation}
-dove $w$ è una variabile casuale estratta da una distribuzione normale di media $0$ e varianza $1$. Dividendo l'intervallo $[0,T]$ in $m$ date di rilevamento $t_i$ di distanza $\Delta t$, si calcola il prezzo $S(t_{i+1})$ in funzione del prezzo attuale $S(t_i)$ secondo la formula
+dove $w$ è una variabile casuale estratta da una distribuzione normale di media nulla e varianza unitaria. Dividendo l'intervallo $[0,T]$ in $m$ date di rilevazione $t_i$ di distanza $\Delta t$, si calcola il prezzo $S(t_{i+1})$ in funzione del prezzo attuale $S(t_i)$ secondo la formula
 \begin{equation}
     S(t_{i+1}) = S(t_i) \exp{\left[\left(r- \frac{\sigma^2}{2}\right)\Delta t + \sigma \sqrt{\Delta t} w\right]}.
     \label{eq:exactprice}
@@ -112,5 +112,5 @@ L'interazione tra le varie componenti del codice è organizzata dal metodo  \cod
 \label{tab:hardware}
 \end{table}
 
-\section{Specifiche hardware}
+\section{Specifiche hardware} \label{sec:hardware}
 La maggior parte delle simulazioni da cui sono stati ottenuti i risultati illustrati nella presente relazione è stata effettuata su una scheda grafica di modello \verb|Tesla P100-PCIE-12GB|. Occasionalmente, e in modo significativo negli studi sul tempo di esecuzione in Sezione \ref{sec:comptime}, abbiamo fatto uso di una meno performante \verb|Tesla C2075|. In Tabella \ref{tab:hardware} sono riportate le specifiche hardware delle due GPU.

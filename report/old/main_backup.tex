@@ -2,14 +2,10 @@
 \documentclass[12pt,a4paper]{book}
 
 % useful packages
-\usepackage{microtype}
 \usepackage[T1]{fontenc}
-\usepackage[utf8]{inputenc}
-\usepackage[italian]{babel}
+\usepackage[utf8]{inputenc}              
+\usepackage[italian]{babel}     
 
-\usepackage[eng,exjobb]{KTHEEtitlepage}
-
-\usepackage{amssymb}
 \usepackage{caption}
 \usepackage{subcaption}
 \usepackage{graphicx,xcolor,textpos}
@@ -32,6 +28,17 @@
 \texttt{\textcolor{blue}{#1}}%
 }
 
+\pagestyle{plain}
+
+% instellingen voor hoofdstuknummering en inhoudstafel
+\setcounter{secnumdepth}{2} % nummering tot welk subniveau?
+\setcounter{tocdepth}{2}
+
+\newcommand*\cleartoleftpage{%
+  \clearpage
+  \ifodd\value{page}\hbox{}\newpage\fi
+}
+
 % pagina-instellingen
 \topmargin -10mm
 \textwidth 160truemm
@@ -39,19 +46,22 @@
 \oddsidemargin 0mm
 \evensidemargin 0mm
 
-\pagestyle{plain}
+% kleuren definiëren
+\definecolor{green}{RGB}{172,196,0}
+\definecolor{bluetitle}{RGB}{29,141,176}
+\definecolor{blueaff}{RGB}{0,0,128}
+\definecolor{blueline}{RGB}{82,189,236}
 
-% instellingen voor hoofdstuknummering en inhoudstafel
-\setcounter{secnumdepth}{2} % nummering tot welk subniveau?
-\setcounter{tocdepth}{2}
+% define units for the text blocks
+\setlength{\TPHorizModule}{1mm}
+\setlength{\TPVertModule}{1mm}
 
+% Hier begint het eigenlijke document
 \begin{document}
 % FRONT MATTER
 \frontmatter
-%\input{00-copertina.tex} \cleardoublepage 
-% COVER PAGE
-\ititle{\textsc{Pricing di derivati finanziari tramite tecniche Monte Carlo\\ in architettura CUDA/C++}}
-\makeititle
+\input{00-copertina.tex} \cleardoublepage 
+
 \rmfamily
 
 %\input{Auteursrecht.tex} \cleardoublepage
