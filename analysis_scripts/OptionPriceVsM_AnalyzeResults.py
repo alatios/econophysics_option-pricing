@@ -150,12 +150,12 @@ r = 0.0001
 ms = data_N100mln["m"]
 deltats = 1./ms
 
-ps = 1 - norm.cdf(B - (r-(sigma**2)/2.) * np.sqrt(deltats)/sigma) + norm.cdf( - B - (r-(sigma**2)/2.) * np.sqrt(deltats)/sigma)
+ps = norm.cdf(B - (r-(sigma**2)/2.) * np.sqrt(deltats)/sigma) * (1 - norm.cdf( - B - (r-(sigma**2)/2.) * np.sqrt(deltats)/sigma))
 teorerrs = (1/np.sqrt(ms)) * np.sqrt(ps * (1-ps))
 rel_teorerrs = teorerrs / data_N100mln["exactPrice"]
 
 
-plt.plot(data_N100mln["m"], data_N100mln["exactError"]/data_N100mln["exactPrice"], color="orchid", marker="", label="Monte Carlo error ($N={10}^8$)", linewidth=3)
+plt.plot(data_N100mln["m"], data_N100mln["exactError"]/data_N100mln["exactPrice"], color="orchid", marker="x", label="Monte Carlo error ($N={10}^8$)", linewidth=2.5, markersize=8)
 plt.plot(data_N100mln["m"], rel_teorerrs/np.sqrt(10**8), color="dimgrey", marker="", linestyle="--", label="Bernoulli approximation ($N={10}^8$)", linewidth=2)
 
 plt.xscale("log")
