@@ -66,21 +66,23 @@ Nella seguente tabella sono riportati i risultati ottenuti rispettivamente per l
     \item Volatilità = $25\%$.
 \end{itemize}
 
-\begin{table}
+\begin{table}[t]
 \small
 \centering
 \begin{tabular}{|l||l|l|l|l|l|l|}
 \hline
 \textbf{Tipo opzione} & $F_{MC}$ & $\epsilon_{MC}$ & $F_{BS}$ & Distanza in unità di $\epsilon_{MC}$ \\
 \hline \hline
-\textit{Plain vanilla call} & $10.404537859734702465$ & $0.0017273760098347717539$ &
-$10.403539152996621908$ & $0.14$\\ \hline
-\textit{Plain vanilla put} & $9.409028312051816556$ & $0.0012283895079351757774$ & $9.4085225279134334642$ & $0.41$\\ \hline
-\textit{Forward} & 100.00025356881356231 & 0.0025398402816907039888 & $100$ & 0.0998\\ \hline
+\textit{Plain vanilla call} & $10.404538$ & $0.001728$ &
+$10.4035392$ & $0.58$\\ \hline
+\textit{Plain vanilla put} & $9.409028$ & $0.001228$ & $9.408523$ & $0.41$\\ \hline
+\textit{Forward} & $100.000254$ & $0.002540$ & $100$ & $0.1$\\ \hline
 \end{tabular}
+\caption{Confronto tra i risultati delle simulazioni Monte Carlo e quelli analitici ottenuti con l'argomentazione di Black \& Scholes.}
+\label{tab:BS-MC}
 \end{table}
 
-Si noti che i risultati ottenuti attraverso le simulazioni sono compatibili con i valori teorici poiché la discrepanza tra questi è minore di .......
+Si noti che i risultati ottenuti attraverso le simulazioni sono compatibili con i valori teorici poiché i prezzi delle opzioni ottenuti attraverso le simulazioni Monte Carlo sono contenuti nell'intervallo $[F_{BS}-\epsilon_{MC},F_{BS}+\epsilon_{MC}]$.
 
 \section{(B-2) Controlli di autocorrelazione nella generazione di numeri casuali}
 
@@ -186,10 +188,10 @@ Per indagare più a fondo questa distorsione abbiamo riportato in Figura \ref{fi
 
 Ciononostante, le analoghe Figure \ref{fig:inter_gauss_autocorr_histo} e \ref{fig:inter_gauss_autocorr_offset} evidenziano come, pur essendo i numeri gaussiani generati a partire da quelli uniformi, in essi sia essenzialmente assente ogni spettro di autocorrelazione. Poiché le variabili gaussiane sono quelle di reale interesse, i controlli effettuati avvalorano l'indipendenza e l'affidabilità delle nostre simulazioni.
 
-\section{(B-3) \textit{Pricing} dell'opzione \textit{performance corridor}}
+\section{(B-3) \textit{Pricing} dell'opzione \textit{performance corridor}} \label{sec:pc_pricing}
 In questa sezione riportiamo gli studi sull'andamento del prezzo dell'opzione \textit{performance corridor} al variare di alcuni parametri chiave delle simulazioni.
 
-\subsection{(B-3-a) Dipendenza dalle date di rilevazione e dal numero di simulazioni}
+\subsection{(B-3-a) Dipendenza del prezzo dalle date di rilevazione e dal numero di simulazioni}
 
 \begin{figure}[t]
     \centering
@@ -209,7 +211,7 @@ In primo luogo abbiamo studiato la dipendenza del prezzo dell'opzione dal numero
 
 La natura di questa differenza tra i prezzi calcolati secondo le due formule emerge con più chiarezza in Figura \ref{fig:ex_eul_discrep_M}, dove è rappresentata in funzione delle densità di campionamento per diversi ordini di grandezza di simulazioni effettuate (in scala cromatica da ciano a magenta). Al crescere del numero di simulazioni, le discrepanze convergono stabilmente a una curva nonostante, come discusso più a fondo in Sezione \ref{sec:errorstudies}, l'errore Monte Carlo scali come $\epsilon_{MC}\propto N^{-\frac{1}{2}}$. Questa constatazione anticipa i limiti di applicabilità dello schema di Eulero per date di rilevazione troppo ridotte, che saranno approfonditi in Sezione \ref{sec:limits}.
 
-\subsection{(B-3-b) Dipendenza dal valore di $B$}
+\subsection{(B-3-b) Dipendenza del prezzo dal valore di $B$}
 
 \begin{figure}[t]
     \centering
@@ -224,7 +226,7 @@ In Figura \eqref{fig:price_vs_b} è rappresentato l'andamento del prezzo stimato
 \section{(B-4) Studi sull'errore Monte Carlo} \label{sec:errorstudies}
 Se nella precedente sezione ci siamo concentrati sulle variazioni in prezzo simulato, qui affronteremo invece l'impatto dei medesimi parametri sull'entità dell'errore della stima Monte Carlo come definito nella \eqref{eq:mcerror}.
 
-\subsection{(B-4-a) Dipendenza dalle date di rilevazione e dal numero di simulazioni}
+\subsection{(B-4-a) Dipendenza dell'errore dalle date di rilevazione e dal numero di simulazioni} \label{sec:error_vs_m_and_N}
 
 \begin{figure}[t]
 \centering
@@ -248,20 +250,20 @@ Le Figure \ref{fig:exact_error_M} e \ref{fig:euler_error_M} riportano l'andament
 Una spiegazione della dipendenza da $m$ si trova interpretando il calcolo del \textit{payoff} come da equazioni \eqref{eq:performancecorridor_payoff} e \eqref{eq:performancecorridor_barrier} nell'ottica di un processo di Bernoulli, ossia un processo costituito da una serie di eventi indipendenti detti \textit{prove di Bernoulli} che hanno come soli possibili risultati un successo (probabilità $p$) o un fallimento (probabilità $1-p$). Nel caso dell'opzione \textit{performance corridor}, le prove in questione sono le <<estrazioni>> del valore di $P_i$ nelle $m$ date di rilevazione, le quali hanno probabilità di successo ($P_i=1$) pari a
 \begin{equation}
 \begin{aligned}
-    p &= P(P_i = 1) = P\left(\left| \frac{1}{\sqrt{\Delta t}} \ln{\frac{S_{i+1}}{S_i}} \right| > B \sigma\right) \\
-    &= P\left(\left| \left(r - \frac{\sigma^2}{2}\right)\sqrt{\Delta t} + \sigma w \right| > B \sigma\right).
+    p &= P(P_i = 1) = P\left(\left| \frac{1}{\sqrt{\Delta t}} \ln{\frac{S_{i+1}}{S_i}} \right| < B \sigma\right) \\
+    &= P\left(\left| \left(r - \frac{\sigma^2}{2}\right)\sqrt{\Delta t} + \sigma w \right| < B \sigma\right).
     \label{eq:success_prob_bernoulli}
 \end{aligned}
 \end{equation}
 
-Poiché $w$ è una variabile estratta da una distribuzione normale di media nulla e varianza unitaria, possiamo definire la corrispondente funzione di distribuzione cumulativa
+Poiché $w$ è una variabile estratta da una distribuzione normale di media nulla e varianza unitaria, possiamo usare la corrispondente funzione di distribuzione cumulativa per definire la probabilità $P(w \leq X)$\footnote{La probabilità calcolata tramite funzione cumulativa è per $w$ minore \textit{o uguale} a un certo valore, mentre la probabilità che cerchiamo nella \eqref{eq:success_prob_bernoulli} è esclusivamente minore. Ciò non è un problema, poiché la probabilità puntuale in una funzione di densità di probabilità è nulla.}
 \begin{equation}
-    \mathcal{N}[x] = \frac{1}{\sqrt{2\pi}} \int_{-\infty}^x{e^{-\frac{1}{2} t^2} dt}
+    P(w \leq x) = \mathcal{N}[x] = \frac{1}{\sqrt{2\pi}} \int_{-\infty}^x{e^{-\frac{1}{2} t^2} dt}
     \label{eq:cumulative_gaussian}
 \end{equation}
-per riscrivere la probabilità \eqref{eq:success_prob_bernoulli} come
+e riscrivere la probabilità \eqref{eq:success_prob_bernoulli} come
 \begin{equation}
-    p = 1 - \mathcal{N}\left[B - \left(r - \frac{\sigma^2}{2}\right)\frac{\sqrt{\Delta t}}{\sigma} \right] + \mathcal{N}\left[- B - \left(r - \frac{\sigma^2}{2}\right)\frac{\sqrt{\Delta t}}{\sigma} \right].
+    p = \mathcal{N}\left[B - \left(r - \frac{\sigma^2}{2}\right)\frac{\sqrt{\Delta t}}{\sigma} \right] \cdot \left(1 - \mathcal{N}\left[- B - \left(r - \frac{\sigma^2}{2}\right)\frac{\sqrt{\Delta t}}{\sigma} \right]\right).
     \label{eq:success_prob_cumul}
 \end{equation}
 
@@ -284,9 +286,9 @@ Assumendo che la scelta di $B$ e $K$ sia tale da non rendere mai negativo il ter
     \label{fig:theoretical_vs_experimental_error}
 \end{figure}
 
-A titolo di esempio, in Figura \ref{fig:theoretical_vs_experimental_error} è riportato il confronto tra modello teorico ed errore sperimentale per $N={10}^8$ simulazioni, con una confluenza particolarmente efficace per $m \gtrsim 100$.
+A titolo di esempio, in Figura \ref{fig:theoretical_vs_experimental_error} è riportato il confronto tra modello teorico ed errore sperimentale per $N={10}^8$ simulazioni, con una confluenza efficace già per $m \gtrsim 5$.
 
-\subsection{(B-4-b) Dipendenza dal valore di $B$}
+\subsection{(B-4-b) Dipendenza dell'errore dal valore di $B$}
 
 \begin{figure}[t]
     \centering
@@ -295,15 +297,21 @@ A titolo di esempio, in Figura \ref{fig:theoretical_vs_experimental_error} è ri
     \label{fig:error_vs_B}
 \end{figure}
 
+Come mostrato in Figura \ref{fig:error_vs_B} nel caso dello schema esatto, l'errore assoluto sulla stima prezzo Monte Carlo presenta anche una dipendenza dal valore di $B$, ovvero dall'altezza della barriera. La scala bilogaritmica evidenzia infatti una legge di scala dell'errore del tipo
+\begin{equation}
+    \epsilon_\text{MC} = \frac{H(B)}{\sqrt{N}},
+    \label{eq:h_of_b}
+\end{equation}
+dove $N$ è il numero di simulazioni e $H$ una costante moltiplicativa che dipende da fattori quali i dati di mercato, le condizioni contrattuali e da eventuali tecniche di riduzione della varianza.
+
 \begin{figure}[t]
     \centering
     \includegraphics[scale=0.5]{graphs/OptionPriceVsB_HBVsB.pdf}
-    \caption{Andamento del valore della costante moltiplicativa $H(B)$ dell'EQUAZIONE in funzione di $B$.}
+    \caption{Andamento del valore della costante moltiplicativa $H(B)$ nell'equazione \eqref{eq:h_of_b} in funzione di $B$.}
     \label{fig:HB_vs_B}
 \end{figure}
 
-\lipsum[1-3]
-
+Abbiamo estrapolato la dipendenza di $H$ dal valore di $B$ invertendo la \eqref{eq:h_of_b} e mediando in $N$; la curva risultante è mostrata in Figura \ref{fig:HB_vs_B}. L'andamento individuato trova una sua interpretazione osservando che la formula per il calcolo dell'errore Monte Carlo \eqref{eq:mcerror} lo lega, tra le altre cose, alla dispersione dei prezzi stimati. È sufficiente confrontare la curva in questione con quella del prezzo al variare di $B$ riportata in Figura \ref{fig:price_vs_b} per intuire che, per valori molto ridotti o elevati di $B$, il confinamento del rendimento logaritmico del sottostante è rispettivamente nullo o totale e in ambo i casi la dispersione dei \textit{payoff} calcolati secondo la \eqref{eq:performancecorridor_payoff} tende asintoticamente a zero. Quando l'ampiezza del corridoio cresce abbastanza da permettere ai \textit{payoff} di iniziare a variare, l'errore Monte Carlo sale molto rapidamente raggiungendo un picco per $B\approx 1.25$; a quel punto aumentare ulteriormente la barriera riduce la probabilità che $\frac{1}{\sqrt{\Delta t}}\ln{\frac{S_{i+1}}{S_i}}$ la ecceda, il \textit{payoff} tende alla saturazione e la variabilità in calo induce una diminuzione di $\epsilon_\text{MC}$ che tende nuovamente a zero.
 
 \section{(B-5) Studi sui tempi di esecuzione} \label{sec:comptime}
 \subsection{(B-5-a) Analisi dei tempi di esecuzione in GPU}
@@ -312,7 +320,7 @@ Come anticipato nella Sezione \ref{sec:hardware} relativa alle specifiche hardwa
 La scelta è stata dettata dalla volontà di visualizzare le attese discontinuità <<a gradini>> nell'andamento dei tempi di esecuzione in funzione del numero di blocchi istanziati. Ogni scheda grafica ha infatti un certo numero di multiprocessori che limitano la quantità di blocchi da poter chiamare contemporaneamente. Nel momento in cui si eccede questa quantità, la GPU deve rinunciare a eseguire in parallelo tutti i processi e l'esecuzione viene scorporata in più fasi successive fino al raggiungimento del numero di blocchi richiesto.
 Il modello \verb|Tesla P100-PCIE-12GB| è risultato eccessivamente performante rispetto alla CPU montata sullo stesso nodo: garantendo la possibilità di gestire in contemporanea fino a 56 blocchi, tale scheda richiederebbe di istanziarne un numero piuttosto elevato per poter osservare l'andamento a gradini. L'esecuzione su CPU relativa a una simile simulazione avrebbe così tempistiche proibitive.
 
-In Figura \ref{fig:gpucomptime} viene rappresentato il tempo di esecuzione GPU relativo a simulazioni con numero diverso di date di rilevazione.
+In Figura \ref{fig:gpucomptime} viene rappresentato il tempo di esecuzione GPU relativo a simulazioni con numero diverso di date di rilevazione. A ogni \textit{thread} sono demandate 1000 simulazioni, così da rendere il calcolo sufficientemente intensivo.
 
 \begin{figure}[t]
     \centering
@@ -339,11 +347,29 @@ Abbiamo a tal fine inserito in un grafico, Figura \ref{fig:gainfactor}, la dipen
     \label{fig:gainfactor}
 \end{figure}
 
-L'operazione è stata ripetuta per diversi valori di densità di date di rilevamento, individuate nel grafico da colori distinti nella gamma ciano-magenta.
+L'operazione è stata ripetuta per diversi valori di densità di date di rilevazione, individuate nel grafico da colori distinti nella gamma ciano-magenta. Il numero di \textit{thread} per blocco istanziati è di 512, a ogni \textit{thread} sono affidate 1000 simulazioni. 
 
-La maggiore efficienza della GPU, coerentemente con le aspettative, risulta evidente per ogni valore di m. Tutti gli andamenti presentano un'iniziale fase di crescita, per poi stabilizzarsi attorno a un valore di $t_{CPU}/t_{GPU}$ diverso in base al numero di date di rilevamento considerato. Per $m=1$ il fattore di guadagno è di circa $40$. Gli altri sviluppi risultano abbastanza sovrapponibili, con un fattore di guadagno attorno a $60$ a tendenza leggermente crescente.
+La maggiore efficienza della GPU, coerentemente con le aspettative, risulta evidente per ogni valore di $m$. Tutti gli andamenti presentano un'iniziale fase di crescita, per poi stabilizzarsi attorno a un valore di $t_{CPU}/t_{GPU}$ diverso in base al numero di date di rilevazione considerato. Per $m=1$ il fattore di guadagno è di circa $40$. Gli altri sviluppi risultano piuttosto sovrapponibili, con un fattore di guadagno attorno a $60$ a tendenza leggermente crescente.
 
-\section{(B-6) Limiti di applicabilità e approssimazioni} \label{sec:limits}
+\section{(B-6) Limiti di applicabilità dello schema di Eulero} \label{sec:limits}
+
+Gli studi sul prezzo dell'opzione \textit{performance corridor} condotti in Sezione \ref{sec:pc_pricing}, e in particolare il grafico in Figura \ref{fig:ex_eul_discrep_M}, hanno evidenziato come il metodo approssimato di Eulero \eqref{eq:eulerprice} non riesca a riprodurre in modo proficuo la formula esatta \eqref{eq:exactprice} per date combinazioni di numero di simulazioni $N$ e numero di date di rilevazione $m$.
+
+Un fattore che contribuisce a questa distorsione sistematica è il fatto che, calcolando il prezzo secondo lo schema di Eulero, si incorre in una probabilità non nulla che il prezzo del sottostante diventi negativo. Data infatti la formula
+\begin{equation}
+    S(t_{i+1}) = S(t_i) \left(1 + r \Delta t + \sigma \sqrt{\Delta t} w\right),
+    \label{eulerprice_repeat}
+\end{equation}
+il termine in parentesi sarà negativo qualora la variabile $w$ sia estratta con un valore
+\begin{equation}
+    w < w_{lim} \equiv - \frac{1+r \Delta t}{\sigma \sqrt{\Delta t}}.
+\end{equation}
+Come discusso in Sezione \ref{sec:error_vs_m_and_N}, la probabilità che ciò avvenga per una variabile estratta secondo una distribuzione normale di media nulla e varianza unitaria è
+\begin{equation}
+    P\left(S(t_{i+1})<0\right) = \mathcal{N}\left[w_{lim} \right],
+    \label{eq:probability_negativeprice}
+\end{equation}
+dove $\mathcal{N}[x]$ è la funzione di distribuzione normale cumulativa definita come da \eqref{eq:cumulative_gaussian}. Posto $\Delta t = \frac{T}{m}$, si verifica facilmente che $w_{lim} \rightarrow 0$ per $m \rightarrow 0$ e $w_{lim} \rightarrow -\infty$ per $m \rightarrow +\infty$. Questo implica che è più probabile ottenere prezzi negativi per campionamenti più rarefatti, spiegando almeno in parte le discrepanze osservate tra schema di Eulero e schema esatto in tali situazioni.
 
 \begin{figure}[t] 
     \centering
@@ -351,4 +377,7 @@ La maggiore efficienza della GPU, coerentemente con le aspettative, risulta evid
     \caption{Percentuale di evoluzioni simulate del prezzo del sottostante che riportano almeno un'istanza di prezzo $S(t_i)$ negativo al variare della distanza temporale $\Delta t$ tra le date di rilevazione; curve di colore da \textit{ciano} a \textit{magenta} corrispondono a valori crescenti della volatilità $\sigma$ del mercato.}
     \label{fig:negativeprices}
 \end{figure}
-\lipsum[1-3]
+
+Altro fattore contributivo, come evidenziato dal grafico in Figura \ref{fig:negativeprices}, è dato dalla volatilità $\sigma$: si osserva infatti che accrescere il valore di quest'ultima incrementa anche la probabilità che nel corso della simulazione il prezzo sottostante diventi negativo almeno una volta, arrivando al $16\%$ per $\sigma=100\%$. Notiamo comunque che per $\sigma=25\%$, ovvero il nostro valore <<standard>>, l'incidenza di questa anomalia è estremamente bassa, e in generale per volatilità non patologiche già a $\Delta t \approx 0.2$ ($m=5$ se $T=1 \, \text{yr}$) questa incertezza sistematica nello schema di Eulero diventa trascurabile.
+
+Tenendo in debita considerazione i risultati ottenuti negli studi in Sezione \ref{sec:pc_pricing}, possiamo concludere che lo schema di Eulero può essere un'approssimazione ottimale dello schema esatto, specie a livello di economia computazionale in quanto non necessita del calcolo di un'esponenziale, a patto di tenere sotto controllo le date di rilevazione e di avere a disposizione sufficiente statistica in modo da minimizzare la variabilità dei risultati. Evidenziamo in ogni caso che, per $N\approx 10^6$ simulazioni e $m = 100$ date di rilevazione (parametri più lassi di quelli da noi generalmente usati), la Figura \ref{fig:ex_eul_discrep_M} conferma che la convergenza tra le due formule è più che adatta ai nostri scopi, con compatibilità dei prezzi stimati entro $2\sigma_e \equiv 2\sqrt{\epsilon_\text{exact}^2 + \epsilon_\text{euler}^2}$.

@@ -1,5 +1,5 @@
 \chapter{(A) Introduzione alla libreria e aspetti implementativi}
-\section{Econofisica e \textit{option pricing}}
+\section{Econofisica e \textit{option pricing}} \label{sec:introduction_econophysic_option_pricing}
 In ambito finanziario si definisce \textit{titolo derivato} un contratto il cui valore dipende da prodotto finanziario più fondamentale, detto \textit{bene sottostante} o semplicemente \textit{sottostante}. Obiettivo di questa relazione è lo studio di un tipo particolare di titolo derivato, ovvero le \textit{opzioni europee}, nella loro forma più elementare definibili come contratti che garantiscono il diritto di compravendita del sottostante in una data futura (detta \textit{data di maturità}) a un prezzo fissato (detto \textit{prezzo di esercizio}). A seconda delle caratteristiche del tipo di opzione prescelto, ciò frutterà al suo acquirente un rendimento $P$ detto \textit{payoff}.
 
 Un primo esempio di contratto derivato analizzato in questa trattazione è il contratto a termine \textit{forward}, con un \textit{payoff} definito da
@@ -27,7 +27,7 @@ Un esempio di opzione più sofisticata, che sarà anche l'oggetto principale di 
 dove $+$ indica la parte positiva dell'espressione e
 \begin{equation}
     P_i = \begin{cases}
-    1, & \text{se} \,\,\left| \frac{1}{\Delta t} \ln{\frac{S(t_{i+1})}{S(t_i)}} \right| < B \sigma;\\
+    1, & \text{se} \,\,\left| \frac{1}{\sqrt{\Delta t}} \ln{\frac{S(t_{i+1})}{S(t_i)}} \right| < B \sigma;\\
     0, & \text{altrimenti}.
   \end{cases}
     \label{eq:performancecorridor_barrier}
@@ -88,7 +88,7 @@ A partire dai numeri generati da un puntatore \codeword{RNG*}, la classe \codewo
 
 Infine la classe \codeword{Data_stream_manager} gestisce l'interazione dell'utente con il flusso di dati in entrata e in uscita, interpretando i dati indicati nel file \verb|input.dat|, scrivendo i risultati di \textit{output} in un oggetto \codeword{Output_MC_data} e stampando a schermo le informazioni sulle simulazioni effettuate.
 
-L'interazione tra le varie componenti del codice è organizzata dal metodo  \codeword{OptionPricingEvaluator(...)}, programmata nelle sue varianti \codeword{__global__}, \codeword{__host__} e \codeword{__device__ __host__} secondo il paradigma \textit{host-device} approfondito in Sezione \ref{sec:cpugpu}. La funzione principale \codeword{main()}, secondo i desideri dell'utente, esegue tale algoritmo su CPU o GPU invocando due funzioni ausiliarie \codeword{CPUOptionPricingMonteCarloAlgorithm(...)} e \codeword{CPUOptionPricingMonteCarloAlgorithm(...)}.
+L'interazione tra le varie componenti del codice è organizzata dal metodo  \codeword{OptionPricingEvaluator(...)}, programmato nelle sue varianti \codeword{__global__}, \codeword{__host__} e \codeword{__device__ __host__} secondo il paradigma \textit{host-device} approfondito in Sezione \ref{sec:cpugpu}. La funzione principale \codeword{main()}, secondo i desideri dell'utente, esegue tale algoritmo su CPU o GPU invocando due funzioni ausiliarie \codeword{CPUOptionPricingMonteCarloAlgorithm(...)} e \codeword{CPUOptionPricingMonteCarloAlgorithm(...)}.
 
 \begin{table}[t]
 \small
