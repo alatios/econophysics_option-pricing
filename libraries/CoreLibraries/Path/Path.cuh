@@ -56,9 +56,6 @@ class Path{
 		// Check if a negative price happened in this run
 		__device__ __host__ bool GetNegativePrice() const;
 
-		// Black & Scholes formula
-		__device__ __host__ double GetBlackAndScholesPrice() const;
-
 };
 
 #endif
