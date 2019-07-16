@@ -150,7 +150,7 @@ r = 0.0001
 ms = data_N100mln["m"]
 deltats = 1./ms
 
-ps = norm.cdf(B - (r-(sigma**2)/2.) * np.sqrt(deltats)/sigma) * (1 - norm.cdf( - B - (r-(sigma**2)/2.) * np.sqrt(deltats)/sigma))
+ps = norm.cdf(B - (r-(sigma**2)/2.) * np.sqrt(deltats)/sigma) - norm.cdf( - B - (r-(sigma**2)/2.) * np.sqrt(deltats)/sigma)
 teorerrs = (1/np.sqrt(ms)) * np.sqrt(ps * (1-ps))
 rel_teorerrs = teorerrs / data_N100mln["exactPrice"]
 
