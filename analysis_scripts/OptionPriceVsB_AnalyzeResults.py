@@ -35,7 +35,7 @@ mask_N200mln = (data["N"] == 200000000)
 data_N200mln = data[mask_N200mln]
 data_N200mln
 
-plt.plot(data_N200mln["B"], data_N200mln["exactPrice"], color="crimson", label="Exact price", marker="x", linewidth=1)
+plt.plot(data_N200mln["B"], data_N200mln["exactPrice"], color="orchid", label="Exact price", marker="x", linewidth=1)
 plt.xlabel("$B$")
 plt.ylabel("Estimated Monte Carlo exact price [EUR]")
 plt.grid()
@@ -70,7 +70,7 @@ for selectedB in BValues:
     maskeddata = data[mask]
     HBs.append(np.average(maskeddata["exactError"] * np.sqrt(maskeddata["N"])))
 
-plt.plot(BValues, HBs, color="crimson", marker="x")
+plt.plot(BValues, HBs, color="orchid", marker="x")
 plt.xlabel("$B$")
 plt.ylabel("$H(B) = \\varepsilon_{MC} \\times \sqrt{N}$")
 plt.grid()

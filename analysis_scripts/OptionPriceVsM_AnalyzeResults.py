@@ -39,8 +39,8 @@ mask_N100mln = (data["N"] == 100000000)
 data_N100mln = data[mask_N100mln]
 
 ## Plot price vs. m for highest N
-plt.plot(data_N100mln["m"], data_N100mln["exactPrice"], color="black", label="Exact price", marker="", linewidth=2, linestyle="--")
-plt.plot(data_N100mln["m"], data_N100mln["eulerPrice"], color="magenta", label="Euler price", marker="", linewidth=2)
+plt.plot(data_N100mln["m"], data_N100mln["exactPrice"], color="dimgrey", label="Exact price", marker="", linewidth=2, linestyle="--")
+plt.plot(data_N100mln["m"], data_N100mln["eulerPrice"], color="orchid", label="Euler price", marker="", linewidth=2)
 plt.xscale("log")
 plt.legend()
 plt.xlabel("Number of fixing dates")

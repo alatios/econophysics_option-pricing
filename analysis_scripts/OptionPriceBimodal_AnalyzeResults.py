@@ -19,8 +19,8 @@ if not os.path.exists(outputDirectory):
 data = ascii.read(inputFile, format="basic")
 data.sort("m")
 
-plt.plot(data["m"], data["gauss"], color="black", linestyle="-.", label="Gaussian lognormal")
-plt.plot(data["m"], data["bimodal"], color="crimson", label="Bimodal lognormal")
+plt.plot(data["m"], data["gauss"], color="dimgrey", linestyle="-.", label="Gaussian lognormal")
+plt.plot(data["m"], data["bimodal"], color="orchid", label="Bimodal lognormal")
 plt.xlabel("Number of fixing dates")
 plt.ylabel("Monte Carlo estimated price [EUR]")
 plt.xscale("log")
