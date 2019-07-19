@@ -12,7 +12,7 @@
 \usepackage{amssymb}
 \usepackage{caption}
 \usepackage{subcaption}
-\usepackage{graphicx,xcolor,textpos}
+\usepackage{graphicx,textpos}
 \usepackage{helvet}
 \usepackage{lipsum}
 \usepackage{blindtext}
@@ -21,15 +21,16 @@
 \usepackage{multicol}
 \usepackage[super,comma]{natbib}
 \usepackage{emptypage}
-\usepackage{xcolor}
 \usepackage{listings}
 \usepackage{xparse}
 \usepackage{braket}
 \usepackage{verbatim}
 \usepackage[font=footnotesize,labelfont=bf]{caption}
 \usepackage{listings}
-
-\usepackage{xcolor}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{hyperref} % for \texorpdfstring
+\usepackage{sectsty}
+\allsectionsfont{\boldmath}
  
 \definecolor{codegreen}{rgb}{0,0.6,0}
 \definecolor{codegray}{rgb}{0.5,0.5,0.5}
@@ -61,6 +62,10 @@
 \texttt{\textcolor{blue}{#1}}%
 }
 
+\NewDocumentCommand{\codered}{v}{%
+\texttt{\textcolor{red}{#1}}%
+}
+
 % pagina-instellingen
 \topmargin -10mm
 \textwidth 160truemm
@@ -90,8 +95,11 @@
 %\input{prefazione.tex} \clearpage{\pagestyle{plain}\cleardoublepage}
 %\input{Samenvatting.tex} \cleardoublepage
 
-\addcontentsline{toc}{chapter}{Sommario}
-\tableofcontents \cleardoublepage
+\addcontentsline{toc}{chapter}{Indice}
+\tableofcontents
+\listoffigures
+\listoftables
+\cleardoublepage
 % MAIN MATTER
 \mainmatter
 \setcounter{page}{0}

@@ -2,10 +2,12 @@
 \chapter{Listato commentato del codice} \label{app:allcode}
 
 \section{Strutture di \textit{input}}
-\lipsum[1]
+Il codice si sviluppa secondo uno schema ramificato di cartelle dai nomi autoesplicativi, così da rendere il più semplice possibile tanto la lettura quanto la modifica delle singole strutture secondarie. La prima macrocategoria in ordine logico è quella raggruppante le classi dei dati di \textit{input} per la simulazione. Tali dati sono stati accorpati nelle seguenti quattro famiglie di \codeword{struct} in base al tipo di informazione di cui sono portatori.
 
 \subsection{\texttt{Input\_gpu\_data}}
-\lipsum[1-3]
+La prima struttura di cui ci occupiamo è quella relativa alle informazioni per l'esecuzione del codice su scheda grafica.
+
+Tale struttura contiene un unico dato membro in cui viene immagazzinato il numero di blocchi, mentre una direttiva a preprocessore fissa quello di \textit{thread} per blocco a $512$ così da permettere il calcolo del numero totale di \textit{thread} richiesti.
 
 \begin{lstlisting}[language=C++, caption={\texttt{libraries/InputStructures/InputGPUData/Input\_gpu\_data.cuh}}]
 #ifndef __Input_gpu_data_h__
@@ -38,7 +40,7 @@ __device__ __host__ unsigned int Input_gpu_data::GetTotalNumberOfThreads() const
 \end{lstlisting}
 
 \subsection{\texttt{Input\_market\_data}}
-\lipsum[1-3]
+\codeword{Input_market_data} è la \codeword{struct} relativa ai dati di mercato: la sua volatilità, il tasso di interesse privo di rischio e il prezzo del bene sottostante al tempo iniziale $t=0$.
 
 \begin{lstlisting}[language=C++, caption={\texttt{libraries/InputStructures/InputMarketData/Input\_market\_data.cuh}}]
 #ifndef __Input_Market_data_h__
@@ -55,7 +57,9 @@ struct Input_market_data{
 \end{lstlisting}
 
 \subsection{\texttt{Input\_option\_data}}
-\lipsum[1-3]
+Avendo preso in considerazione opzioni europee di tipo \textit{plain vanilla call} e \textit{put}, contratto \textit{forward} e l'opzione esotica \textit{performance corridor}, la struttura \codeword{Input_option_data} in cui sono inseriti i dati dell'opzione è costruita su due livelli così da garantire la massima generalità.
+
+Le informazioni primarie sono quelle relative al tipo di prodotto derivato considerato (si veda la legenda nei commenti) o comuni a tutte le tipologie che abbiamo preso in considerazione: numero di date di rilevazione e data di maturità. Sono poi presenti dati propri della singola tipologia di opzione: il prezzo di esercizio per le \textit{plain vanilla} e le costanti per il calcolo del \textit{pay-off} nelle \textit{performance corridor}.
 
 \begin{lstlisting}[language=C++, caption={\texttt{libraries/InputStructures/InputOptionData/Input\_option\_data.cuh}}]
 #ifndef __Input_option_data_h__
@@ -97,7 +101,7 @@ __device__ __host__ double Input_option_data::GetDeltaTime() const{
 \end{lstlisting}
 
 \subsection{\texttt{Input\_MC\_data}}
-\lipsum[1-3]
+L'ultima struttura di \textit{input} implementata, \codeword{Input_MC_data}, gestisce le informazioni relative alla simulazione Monte Carlo in sé: oltre a fissare il numero totale di simulazioni, essa contiene istruzioni per l'algoritmo circa l'esecuzione su CPU, GPU o entrambe e sull'impiego di variabili aleatorie gaussiane o bimodali nel processo lognormale.
 
 \begin{lstlisting}[language=C++, caption={\texttt{libraries/InputStructures/InputMCData/Input\_MC\_data.cuh}}]
 #ifndef __Input_MC_data_h__
@@ -135,10 +139,10 @@ __device__ __host__ unsigned int Input_MC_data::GetNumberOfSimulationsPerThread(
 \end{lstlisting}
 
 \section{Strutture di \textit{output}}
-\lipsum[1]
+Come per le strutture di \textit{input}, anche nel caso degli \textit{output} abbiamo implementato un contenitore in cui raggruppare i risultati delle simulazioni. Il prodotto di ogni esecuzione non restituisce dati suddivisibili in categorie come per gli \textit{input}; la struttura che ingloba gli \textit{output} è quindi unica.
 
 \subsection{\texttt{Output\_MC\_data}}
-\lipsum[1-3]
+In \codeword{Output_MC_data} vengono immagazzinati i dati relativi ai \textit{pay-off} calcolati tramite il processo lognormale esatto e di Eulero, con annessa indicazione dello strumento di calcolo che ha effettuato la simulazione (CPU o GPU). Sono inoltre inseriti i valori degli errori su entrambi i risultati e il tempo di calcolo del processo. Attraverso il metodo \codeword{GetEulerToExactDiscrepancy()} è possibile ottenere la discrepanza in unità di sigma tra i due risultati ottenuti.
 
 \begin{lstlisting}[language=C++, caption={\texttt{libraries/OutputStructures/OutputMCData/Output\_MC\_data.cuh}}]
 #ifndef __Output_MC_data_h__
@@ -182,10 +186,31 @@ __device__ __host__ double Output_MC_data::GetEulerToExactDiscrepancy() const{
 \end{lstlisting}
 
 \section{Librerie principali}
-\lipsum[1]
+Con la dicitura <<librerie principali>> indichiamo quell'insieme di librerie che costituisce il cuore dell'intero algoritmo. Ogni cartella si occupa di una precisa fase implementativa, di cui daremo una breve descrizione nei sottoparagrafi successivi.
 
-\subsection{\texttt{RNG}, \texttt{RNG\_Tausworthe}, \texttt{RNG\_Combined}}
-\lipsum[1-3]
+\subsection{\texttt{RNG}, \texttt{RNG\_Tausworthe}, \texttt{RNG\_CombinedGenerator}}
+L'algoritmo Monte Carlo, nella sua definizione più generale, è un metodo computazionale che produce stime numeriche a partire da campionamenti casuali. Da qui la necessità di potersi servire di un generatore di numeri pseudocasuali con periodo sufficientemente ampio.
+
+L'approccio da noi prescelto sfrutta l'ereditarietà tipica del linguaggio C++ attraverso la creazione di una classe astratta \codeword{RNG} da cui si diramano le classi figlie dei generatori specifici. Comuni a tutti i generatori sono i seguenti metodi virtuali:
+\begin{itemize}
+    \item \codeword{ResetSeed()}, metodo che ripristina i valori dei \textit{seed} a una situazione predefinita;
+    \item \codeword{GetUnsignedInt()}, metodo che genera una variabile pseudocasuale intera uniformemente distribuita tra $0$ e \codeword{UINT_MAX}, costante dipendente dal sistema in uso che indica il massimo valore assegnabile a un oggetto di tipo \codeword{unsigned int};
+    \item \codeword{GetUniform()}, metodo che genera una variabile pseudocasuale reale uniformemente distribuita nell'intervallo $[0,1]$;
+    \item \codeword{GetGauss()}, metodo che genera una variabile pseudocasuale reale secondo una distribuzione normale di media nulla e varianza unitaria;
+    \item \codeword{GetBimodal()}, metodo che genera una variabile pseudocasuale dicotomica che assume i soli valori $\pm1$ con uguale probabilità;
+    \item \codeword{SetInternalState(RNG*)}: metodo per inizializzare il generatore con \textit{seed} prodotti da un secondo generatore ausiliario.
+\end{itemize}
+
+Ogni generatore fornisce la propria implementazione dei metodi virtuali puri della classe madre, un costruttore di \textit{default} e uno che prende in ingresso il necessario numero di \textit{seed}, ossia uno per il generatore \codeword{RNG_Tausworthe} e quattro per il generatore combinato \codeword{RNG_CombinedGenerator}. Quest'ultimo è ottenuto a partire da tre generatori Tausworthe (periodi $2^{31}-1$, $2^{30}-1$ e $2^{28}-1$) e da un generatore lineare congruenziale (periodo $2^{32}$), che non ha una propria identità di classe ma è implementato come metodo interno a \codeword{RNG_CombinedGenerator}; il periodo complessivo è dato dal minimo comune multiplo dei periodi dei singoli generatori, ovvero $\approx 2^{121}$. Per approfondimenti inerenti l'uso dei generatori nel corpo dell'algoritmo si faccia riferimento alla Sezione \ref{sec:correlation_check}.
+
+Legata all'argomento di generatori pseudocasuali è la libreria \codeword{CorrelationToolbox}, dove sono raccolte funzioni ausiliarie utili per i test di autocorrelazione descritti in Sezione \ref{sec:correlation_check}; a differenza delle altre librerie elencate, questa non gioca alcun ruolo nell'eseguibile principale ed è invece utilizzata solo in \verb|CorrelationTests.cu|. Essa è costituita da:
+\begin{itemize}
+    \item un metodo \codeword{RandomNumberGeneration(...)} per la generazione di numeri pseudocasuali su sola CPU secondo una distribuzione uniforme in $[0,1]$ e una distribuzione normale di media nulla e varianza unitaria;
+    \item una serie di metodi per il calcolo di media, varianza, curtosi e autocorrelazione di un singolo flusso di numeri, caratterizzati dal suffisso \codeword{SingleStream};
+    \item una serie di metodi, caratterizzati dal suffisso \codeword{MultipleStreams}, che implementano i precedenti per un vettore di flussi, quale per esempio quello prodotto in uscita dalla funzione \codeword{RandomNumberGeneration(...)}.
+\end{itemize}
+
+In ragione della mole di dati generata da alcuni dei metodi, in particolare quelli legati all'autocorrelazione, laddove opportuno abbiamo definito una variabile booleana \codeword{verbose} in ingresso, sulla base della quale viene deciso se stampare o meno a schermo i risultati.
 
 \begin{lstlisting}[language=C++, caption={\texttt{libraries/CoreLibraries/RandomGenerator/RNG.cuh}}]
 #ifndef _RNG__H
@@ -621,7 +646,9 @@ __host__ void EvaluateCompleteAutocorrelation_MultipleStreams(double **inputStre
 \end{lstlisting}
 
 \subsection{\texttt{Path}}
-\lipsum[1-3]
+Sulla classe \codeword{Path} si innesta il processo iterativo che permette il calcolo del prezzo del sottostante alla data di maturità attraverso la ricorsione dei metodi \codeword{EulerLogNormalStep (double)} e \codeword{ExactLogNormalStep(double)}.
+
+Oltre a una variabile di appoggio \codeword{_SpotPrice} per la temporanea memorizzazione del prezzo al passo $i$-esimo, la classe è dotata di dati membri privati dichiarati per composizione tramite cognizione, ovvero istanziando puntatori alle aree di memoria in questione evitando di creare copie fisiche degli oggetti; ciò permette di conservare informazioni relative a mercato e opzione considerata senza occupare ulteriore spazio in memoria, rendendo inoltre la classe più versatile rispetto a modifiche dei dati anagrafici. Un dato membro booleano \codeword{_NegativePrice} tiene inoltre traccia di possibili rendimenti negativi restituiti dal processo lognormale di Eulero (fare riferimento alla Sezione \ref{sec:limits}). La classe è infine dotata di un metodo per il calcolo del \textit{pay-off} attualizzato.
 
 \begin{lstlisting}[language=C++, caption={\texttt{libraries/CoreLibraries/Path/Path.cuh}}]
 #ifndef __Path_h__
@@ -848,7 +875,11 @@ __device__ __host__ bool Path::GetNegativePrice() const{
 \end{lstlisting}
 
 \subsection{\texttt{Statistics}}
-\lipsum[1-3]
+Come si può evincere dal nome, la classe \codeword{Statistics} estrapola dati statistici a partire dai risultati di una sequenza di simulazioni. Il risultato finale è immagazzinato nelle variabili \codeword{_PayoffAverage} e \codeword{_PayoffError}, il cui valore viene aggiornato dal metodo \codeword{EvaluateEstimatedPriceAndError()}. Per il calcolo di media e varianza la classe si serve di dati membri d'appoggio contenenti la somma ordinaria e quadratica dei \textit{pay-off} passati a ogni ciclo, nonché di un contatore che tiene traccia del numero di chiamate alla funzione \codeword{AddPayoff(double)}. È poi inserito un ulteriore contatore per i \codeword{Path} contenenti almeno un rendimento negativo del sottostante, casistica trattata nella Sezione \ref{sec:limits}.
+
+La classe così composta è dotata di tutte le caratteristiche necessarie al primo utilizzo che ne viene fatto all'interno del codice, cioè quello di calcolare la media e la varianza dei risultati del singolo \textit{thread} all'interno della funzione \codeword{OptionPricingEvaluator_HostDev(...)}.
+
+Esiste poi un secondo impiego di \codeword{Statistics}: le medie e varianze finali delle simulazioni di ogni \textit{thread} devono essere manipolate per generare un prodotto finale unico. Per farlo abbiamo definito un \textit{overload} dell'operatore \codeword{+=}, così da poter sommare in un singolo oggetto le istanze della classe di ogni \textit{thread}, restituite dall'algoritmo nella forma di due vettori \codeword{Statistics*} (uno per il processo lognormale esatto, l'altro per l'approssimazione di Eulero). 
 
 \begin{lstlisting}[language=C++, caption={\texttt{libraries/CoreLibraries/Statistics/Statistics.cuh}}]
 #ifndef __Statistics_h__
@@ -984,7 +1015,14 @@ __device__ __host__ void Statistics::IncreaseNegativePriceCounter(){
 \end{lstlisting}
 
 \subsection{\texttt{Data\_stream\_manager}}
-\lipsum[1-3]
+\label{sec:data_stream_manager}
+La classe \codeword{Data_stream_manager} è stata sviluppata per ovviare alla necessità di uno strumento per la gestione dei dati di \textit{input} e la raccolta di quelli di \textit{output}. Il cuore di questa libreria è di conseguenza duplice:
+\begin{itemize}
+    \item il metodo \codeword{ReadInputData(...)}, previa inizializzazione dell'unico dato membro, legge il file \codeword{_InputFile} dove sono contenuti i dati e li inserisce nella struttura di \textit{input} appropriata, ignorando le righe che cominciano con il simbolo \verb|#| (interpretate come commenti);
+    \item il metodo \codeword{StoreOutputData(...)} effettua un'operazione simile, ricevendo in ingresso i risultati delle simulazioni e scrivendoli in un oggetto \codeword{Output_MC_data}.
+\end{itemize}
+
+Accanto a questa coppia di funzioni ne sono presenti altre due, \codeword{PrintInputData(..)} e \codeword{PrintOutputData(...)}, che gestiscono la stampa a schermo di dati e risultati delle simulazioni facilitandone la raccolta e l'analisi.
 
 \begin{lstlisting}[language=C++, caption={\texttt{libraries/CoreLibraries/DataStreamManager/Data\_stream\_manager.cuh}}]
 #ifndef _DATA__STREAM__MANAGER_H_
@@ -1168,8 +1206,73 @@ __host__ void Data_stream_manager::PrintOutputData(const Output_MC_data& outputM
 }
 \end{lstlisting}
 
+\begin{lstlisting}[language=bash, caption={\texttt{input.dat}}]
+####### INPUT DATA FOR OPTION PRICING #######
+### Comments beginning with # are ignored ###
+#
+#
+#
+## GPU DATA
+# Number of GPU blocks
+50
+## MARKET DATA
+# Initial underlying price at t = 0 [USD]
+100
+# Market volatility
+0.25
+# Risk-free interest rate [percentage, i.e. 0.1 = 10%]
+0.01
+## OPTION DATA
+## NOTE: for flexibility, all option data are read even if they will not be used
+## (e.g. because forward contract does not have a strike price)
+## Please don't leave any line empty, use arbitrary values instead
+#
+## BASE/FORWARD CONTRACT DATA
+# Time to maturity [years]
+1
+# Number of intervals in which TTM is divided
+400
+# Option type
+# f = forward contract
+# c = plain vanilla call option
+# p = plain vanilla put option
+# e = performance corridor option
+c
+## PLAIN VANILLA OPTION DATA
+# Option strike price [USD]
+100
+## PERFORMANCE CORRIDOR OPTION DATA
+# B
+1
+# K [percentage, i.e. 0.1 = 10%]
+0.3
+# N [EUR]
+1
+## MONTE CARLO DATA
+# Number of simulations
+100000000
+# CPU/GPU comparison
+# c = cpu-only
+# g = gpu-only
+# b = both
+g
+# Gaussian or bimodal (1/-1) random variable
+# g = gaussian
+# b = bimodal
+g
+#
+#
+#############################################
+#############################################
+\end{lstlisting}
+
 \subsection{\texttt{Support\_functions}}
-\lipsum[1-3]
+\label{sec:support_functions}
+Sono definite \codeword{Support_functions} le funzioni base dell'algoritmo per il \textit{pricing} delle opzioni, su cui si innestano i singoli processi di calcolo di cui abbiamo discusso nelle sezioni precedenti.
+
+Nello specifico abbiamo implementato due funzioni \codeword{__host__} \codeword{CPUOptionPricingMonte CarloAlgorithm(...)} e \codeword{GPUOptionPricingMonteCarloAlgorithm(...)} che preparano il terreno per l'esecuzione dell'algoritmo di \textit{pricing} su CPU e su GPU. Entrambi i metodi sono dotati di strumenti di controllo dei tempi di calcolo; il secondo si occupa inoltre dei passi necessari per allocare spazio in memoria sulla scheda grafica e copiare oggetti da memoria standard a globale e viceversa. 
+
+Abbiamo altresì implementato separatamente, secondo il paradigma \textit{host-device}, la funzione per l'esecuzione vera e propria della simulazione Monte Carlo. La versione \codeword{__global__} del metodo, definita come \codeword{OptionPricingEvaluator_Global(...)}, assegna l'indice del \textit{thread} secondo lo schema standard di scorrimento lungo la griglia e invoca poi la versione \codeword{__host__ __device__}, sotto il nome di \codeword{OptionPricingEvaluator_HostDev(...)}, che esegue le simulazioni richieste al singolo \textit{thread} definendo due oggetti \codeword{Path} ripristinati allo stato iniziale ogniqualvolta il processo lognormale si arresta alla data di maturità (il tutto è finalizzato a una più efficiente gestione della memoria). La funzione \codeword{__host__} pura \codeword{OptionPricingEvaluator_Host(...)} svolge lo stesso ruolo della corrispettiva \codeword{__global__}; essendo tuttavia destinata all'esecuzione su CPU, essa simula il calcolo parallelo che avviene su scheda grafica richiamando \codeword{OptionPricingEvaluator_HostDev(...)} all'interno di un ciclo \codeword{for} sul numero totale di \textit{thread} richiesti.
 
 \begin{lstlisting}[language=C++, caption={\texttt{libraries/CoreLibraries/SupportFunctions/Support\_functions.cuh}}]
 #ifndef _SUPPORT_FUNCTIONS_H_
@@ -1385,10 +1488,23 @@ __host__ void GPUOptionPricingMonteCarloAlgorithm(Data_stream_manager streamMana
 \end{lstlisting}
 
 \section{Eseguibili}
-\lipsum[1]
+Riportiamo in questa sezione una breve descrizione di tutti gli eseguibili che abbiamo implementato.
+
+\subsection{\textit{Unit test}}
+Con la dicitura \textit{unit test} indichiamo l'attività di collaudo delle singole unità \textit{software}, ossia dei componenti elementari di un programma; a seconda dello \textit{unit test} in questione questo può corrispondere ai metodi di una struttura, a classi più sofisticate oppure a funzioni singole. Nel nostro caso, gli \textit{unit test} sono costituiti da un eseguibile che lancia dei controlli verificandone il risultato, restituendo $1$ se il controllo è superato e $0$ in caso di fallimento.
+
+Lo scopo generale della procedura di \textit{unit testing} è quello di verificare il corretto funzionamento di parti di programma, permettendo così di individuare precocemente eventuali errori di programmazione. Questo approccio facilita in modo sostanziale la modifica a posteriori della libreria, in quanto gli \textit{unit test} evidenzieranno criticità in potenziali nuovi moduli integrati e nella loro interazione con il codice preesistente.
+
+Durante il nostro progetto abbiamo sviluppato uno \textit{unit test} per ciascuna delle classi e strutture implementate, sfruttandoli proficuamente nella fase di espansione progressiva della libreria; poiché essi sono scarsamente significativi ai fini dell'\textit{option pricing}, non ne riporteremo i codici integrali per brevità.
 
 \subsection{Controlli sui numeri pseudocasuali}
-\lipsum[1-3]
+In questa sezione sono presentati due eseguibili relativi a controlli effettuati sui generatori di numeri pseudocasuali.
+
+Il primo è \verb|OutputTest.cu|, utilizzato in Sezione \ref{sec:cpugpu} per verificare la corrispondenza dei risultati ottenuti in CPU e GPU: esso sfrutta il paradigma \textit{host-device} per eseguire nei due casi il medesimo algoritmo di generazione a partire da un \textit{seed} in comune. Il frutto del codice sono tre vettori di numeri casuali per parte (interi generati uniformemente in $[0,\codeword{UINT_MAX}]$, in virgola mobile generati uniformemente in $[0,1]$ e secondo una distribuzione gaussiana di media nulla e varianza unitaria). Questi vettori sono poi confrontati elemento per elemento alla ricerca di discrepanze nei risultati prodotti, attesi esattamente coincidenti.
+
+Nel tentativo di automatizzare questo processo di verifica ci siamo accorti che, verosimilmente a causa di troncamenti operati in maniera differente sui due supporti, i due insiemi di numeri generati non risultavano effettivamente identici nonostante combaciassero a numeri estremamente alti di cifre decimali, rendendo impossibile l'utilizzo dell'operatore \codeword{==}. Per risolvere questo problema abbiamo definito due istanze di una funzione \codeword{AreSame(...)} che verifica la compatibilità di due \codeword{double} o \codeword{unsigned int} entro una precisione dello $0.01\%$. Per quanto questa risoluzione sia molto più grezza rispetto a quella richiesta per ritenere validi gli ordini di grandezza degli errori Monte Carlo, si tenga presente che si tratta di un valore simbolico atto a verificare l'assenza di problematiche strutturali; il paradigma \textit{host-device}, a meno di problemi a livello \textit{hardware} o di spazio in memoria, rende fisiologicamente impossibile che i due insiemi di numeri pseudocasuali generati differiscano al di sotto di tale soglia.
+
+Il secondo eseguibile, \verb|CorrelationTests.cu|, è essenzialmente un'interfaccia che esegue su CPU le funzioni definite nella libreria \codeword{CorrelationToolbox}, restituendo i dati che, opportunamente elaborati, sono stati presentati in Sezione \ref{sec:correlation_check}.
 
 \begin{lstlisting}[language=C++, caption={\texttt{libraries/CoreLibraries/RandomGenerator/OutputTest.cu}}]
 //
@@ -1690,7 +1806,7 @@ int main(){
 		cout << endl << "Gaussian autocorrelations i/i+k (exp. 0):" << endl;
 	EvaluateCompleteAutocorrelation_MultipleStreams(gaussianNumbers, gaussCorrelations, totalNumberOfThreads, numbersToGeneratePerThread, intraStreamAutocorrelationVerbosity);
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////
 
 	cout << endl <<  "############### INTER-STREAM TEST ###############" << endl;
 	// Build the Super Stream, i.e. the combination of all streams of RNGs
@@ -1765,14 +1881,77 @@ int main(){
 \end{lstlisting}
 
 \subsection{Confronto con i risultati analitici}
-\lipsum[1-3]
+Il test che riportiamo di seguito è stato utilizzato nella Sezione \ref{sec:MC-BS} per verificare la compatibilità dei risultati ottenuti attraverso le simulazioni e i valori analitici esatti. 
+
+Nel codice sono state implementate due funzioni \codeword{ GetBlackAndScholesCallPrice(...)} e \codeword{ GetBlackAndScholesPutPrice(...)} per il calcolo del prezzo attraverso la formula analitica di Black e Scholes rispettivamente per una opzione \textit{plain vanilla call} \eqref{eq:BS_call} e una \textit{plain vanilla put} \eqref{eq:BS_put}. La gestione dei dati relativi al mercato e alle opzioni è affidata a un oggetto \codeword{Data_stream_manager} come spiegato nel dettaglio in Sezione \ref{sec:data_stream_manager}.
 
 \begin{lstlisting}[language=C++, caption={\texttt{libraries/CoreLibraries/Path/BlackScholesUnitTest.cu}}]
-//
+#include <iostream>
+#include <iomanip>
+
+#include "../../InputStructures/InputMarketData/Input_market_data.cuh"
+#include "../../InputStructures/InputOptionData/Input_option_data.cuh"
+#include "../../InputStructures/InputGPUData/Input_gpu_data.cuh"
+#include "../../InputStructures/InputMCData/Input_MC_data.cuh"
+#include "../../CoreLibraries/DataStreamManager/Data_stream_manager.cuh"
+#include "../../CoreLibraries/SupportFunctions/Support_functions.cuh"
+#include "Path.cuh"
+
+using namespace std;
+
+// Black & Scholes formula
+__host__ double GetBlackAndScholesCallPrice(const Input_market_data& inputMarket, const Input_option_data& inputOption){
+	double d1 = 1./(inputMarket.Volatility * sqrt(inputOption.TimeToMaturity)) 
+	* (log(inputMarket.InitialPrice / inputOption.StrikePrice)
+	+ (inputMarket.RiskFreeRate + pow(inputMarket.Volatility,2)/2) * inputOption.TimeToMaturity);
+
+	double d2 = d1 -  inputMarket.Volatility * sqrt(inputOption.TimeToMaturity);
+
+	double callPrice = inputMarket.InitialPrice * (0.5 * (1. + erf(d1/sqrt(2.)))) - inputOption.StrikePrice 
+	* exp(- inputMarket.RiskFreeRate * inputOption.TimeToMaturity)
+	* (0.5 * (1. + erf(d2/sqrt(2.))));
+
+	return callPrice;	 
+}
+
+__host__ double GetBlackAndScholesPutPrice(const Input_market_data& inputMarket, const Input_option_data& inputOption){
+	double d1 = 1./(inputMarket.Volatility * sqrt(inputOption.TimeToMaturity)) 
+	* (log(inputMarket.InitialPrice / inputOption.StrikePrice)
+	+ (inputMarket.RiskFreeRate + pow(inputMarket.Volatility,2)/2) * inputOption.TimeToMaturity);
+
+	double d2 = d1 -  inputMarket.Volatility * sqrt(inputOption.TimeToMaturity);
+
+	double putPrice = inputMarket.InitialPrice * ((0.5 * (1. + erf(d1/sqrt(2.)))) - 1) - inputOption.StrikePrice
+	* exp(- inputMarket.RiskFreeRate * inputOption.TimeToMaturity)
+	* ((0.5 * (1. + erf(d2/sqrt(2.)))) - 1);
+
+	return putPrice;
+
+}
+
+int main(){
+    
+    cout << "\n-------------Black and Scholes test-------------\n";
+
+	// Read & print input data from file
+	Data_stream_manager streamManager("input.dat");
+	
+	Input_gpu_data inputGPU;
+	Input_option_data inputOption;
+	Input_market_data inputMarket;
+	Input_MC_data inputMC;
+	streamManager.ReadInputData(inputGPU, inputOption, inputMarket, inputMC);
+	streamManager.PrintInputData(inputGPU, inputOption, inputMarket, inputMC);
+
+	if(inputOption.OptionType == char('c')) cout << "Black and Scholes Call price: " << setprecision(20) << GetBlackAndScholesCallPrice(inputMarket, inputOption) << endl << endl;
+	if(inputOption.OptionType == char('p')) cout << "Black and Scholes Put price: " << setprecision(20) << GetBlackAndScholesPutPrice(inputMarket, inputOption) << endl << endl;
+	
+    return 0;
+}
 \end{lstlisting}
 
 \subsection{\texttt{main.cu}}
-\lipsum[1-3]
+Viene qui riportato il file contenente la funzione \codeword{main()} del programma, che si occupa di estrarre il \textit{seed} dal generatore di supporto \codeword{RNG_Tausworthe}, leggere i dati di input dal file \verb|input.dat| (si veda la Sezione \ref{sec:data_stream_manager}) ed effettuare le simulazioni su GPU e/o CPU a seconda delle necessità. Per i dettagli dell'algoritmo si veda la Sezione \ref{sec:support_functions}.
 
 \begin{lstlisting}[language=C++, caption={\texttt{main.cu}}]
 #include <iostream>
@@ -1818,64 +1997,4 @@ int main(){
 
 	return 0;
 }
-\end{lstlisting}
-
-\begin{lstlisting}[language=bash, caption={\texttt{input.dat}}]
-####### INPUT DATA FOR OPTION PRICING #######
-### Comments beginning with # are ignored ###
-#
-#
-#
-## GPU DATA
-# Number of GPU blocks
-50
-## MARKET DATA
-# Initial underlying price at t = 0 [USD]
-100
-# Market volatility
-0.25
-# Risk-free interest rate [percentage, i.e. 0.1 = 10%]
-0.01
-## OPTION DATA
-## NOTE: for flexibility, all option data are read even if they will not be used
-## (e.g. because forward contract does not have a strike price)
-## Please don't leave any line empty, use arbitrary values instead
-#
-## BASE/FORWARD CONTRACT DATA
-# Time to maturity [years]
-1
-# Number of intervals in which TTM is divided
-400
-# Option type
-# f = forward contract
-# c = plain vanilla call option
-# p = plain vanilla put option
-# e = performance corridor option
-c
-## PLAIN VANILLA OPTION DATA
-# Option strike price [USD]
-100
-## PERFORMANCE CORRIDOR OPTION DATA
-# B
-1
-# K [percentage, i.e. 0.1 = 10%]
-0.3
-# N [EUR]
-1
-## MONTE CARLO DATA
-# Number of simulations
-100000000
-# CPU/GPU comparison
-# c = cpu-only
-# g = gpu-only
-# b = both
-g
-# Gaussian or bimodal (1/-1) random variable
-# g = gaussian
-# b = bimodal
-g
-#
-#
-#############################################
-#############################################
 \end{lstlisting}
