@@ -356,7 +356,7 @@ Nella Sezione \ref{sec:code_generics} abbiamo accennato a come l'esecuzione di a
 
 Abbiamo a tal fine inserito in un grafico, Figura \ref{fig:gainfactor}, la dipendenza del fattore di guadagno
 \begin{equation}
-     g = \frac{t_\text{CPU}}{t_\text{GPU}}
+     g \coloneqq \frac{t_\text{CPU}}{t_\text{GPU}}
 \end{equation}
 dal numero di blocchi allocati. In entrambi i casi i tempi sono stati calcolati per mezzo degli strumenti di controllo di eventi offerti da CUDA, istanziando oggetti \codeword{cudaEvent_t}.
 
@@ -381,7 +381,7 @@ Un fattore che contribuisce a questa distorsione sistematica è il fatto che, ca
 \end{equation}
 il termine in parentesi sarà negativo qualora la variabile $w$ sia estratta con un valore
 \begin{equation}
-    w < w_{lim} := - \frac{1+r \Delta t}{\sigma \sqrt{\Delta t}}.
+    w < w_{lim} \coloneqq - \frac{1+r \Delta t}{\sigma \sqrt{\Delta t}}.
     \label{eq:wcondition_withsigma}
 \end{equation}
 Come discusso in Sezione \ref{sec:error_vs_m_and_N}, la probabilità che ciò avvenga per una variabile estratta secondo una distribuzione normale di media nulla e varianza unitaria è

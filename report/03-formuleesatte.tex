@@ -73,7 +73,7 @@ che possiamo riscrivere nella forma
     0, & \text{altrimenti},
   \end{cases}
 \end{equation}
-dove è stata omessa la parte positiva poiché la quantità tra parentesi quadre è sempre maggiore di zero.
+dove è stata omessa la parte positiva poiché la quantità $1-K$ è sempre maggiore di zero.
 
 Utilizzando il modello del moto browniano geometrico, secondo il quale il prezzo del sottostante segue un processo lognormale, il valore che il prezzo assume alla data di maturità è dato dalla formula
 \begin{equation}
@@ -95,7 +95,7 @@ Essendo $w$ un numero pseudocasuale gaussiano con media nulla e varianza unitari
 \end{equation}
 dove
 \begin{equation}
-    c:=\left(r- \frac{\sigma^2}{2}\right) \frac{\sqrt{T}}{\sigma}
+    c \coloneqq \left(r- \frac{\sigma^2}{2}\right) \frac{\sqrt{T}}{\sigma}
 \end{equation}
 e $\mathcal{N}(x)$ indica la funzione di distribuzione normale cumulata (\ref{eq:cumulative_gaussian})
 
@@ -143,7 +143,7 @@ Si può facilmente riscrivere la condizione \eqref{eq:performancecorridor_barrie
 \end{equation}
 Nel limite considerato la quantità $ \frac{1}{m} \sum_{i}{P_i}$ che compare nella formula del \textit{pay-off} \eqref{eq:performancecorridor_pay-off} tende alla probabilità che la variabile $P_{i}$ assuma il valore $1$:
 \begin{equation}
-    \lim_{m \to \infty} \frac{1}{m} \sum_{i=0}^{m-1}{P_i} = p := P\left(P_{i}=1\right).
+    \lim_{m \to \infty} \frac{1}{m} \sum_{i=0}^{m-1}{P_i} = p \coloneqq P\left(P_{i}=1\right).
 \end{equation}
 
 Analogamente al caso precedente, essendo $w$ un numero casuale gaussiano con media nulla e varianza unitaria, si ottiene
@@ -186,4 +186,4 @@ Si noti che a differenza del caso precedente, in cui $m=1$, la formula ricavata 
 
 In Tabella \ref{tab:Teo-MC_m_inf} riportiamo il confronto tra alcuni valori ottenuti dalle simulazioni con lo schema esatto e quelli analitici previsti per diversi valori di $B$ e $K$ prendendo in considerazione $m=10^4$ date di rilevazione.
 
-Dalla tabella si nota che i risultati ottenuti attraverso le simulazioni presentano una buona compatibilità con i valori previsti poiché il prezzo dell'opzione ricade entro un intervallo di $2\epsilon_\text{MC}$ per tutti i valori di $B$ e $K$ considerati; una discrepanza maggiore di $3\epsilon_{MC}$ è stata ottenuta solo per valori di $B$ superiori a $4$. Inoltre le simulazioni stimano correttamente il prezzo dell'opzione per tutte quelle combinazioni di $B$ e $K$ tale per cui il \textit{pay-off} previsto è nullo.
+Dalla tabella si nota che i risultati ottenuti attraverso le simulazioni presentano una buona compatibilità con i valori previsti poiché il prezzo dell'opzione ricade entro un intervallo di $2\epsilon_\text{MC}$ per la maggior parte dei valori di $B$ e $K$ considerati; una discrepanza maggiore di $3\epsilon_{MC}$ è stata ottenuta solo per valori di $B$ superiori a $4$. Inoltre le simulazioni stimano correttamente il prezzo dell'opzione per tutte quelle combinazioni di $B$ e $K$ tale per cui il \textit{pay-off} previsto è nullo.
