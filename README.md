@@ -1,5 +1,5 @@
 # Econophysics option pricing project "Orbison"
-Econophysics option pricing CUDA project simulating evolutions of the underlying asset through a gaussian Monte Carlo approach. Computes European-style plain vanilla put/call options with fixed time to maturity and strike price, comparing the estimated payoff to the theoretical result obtained from the Black-Scholes formula.
+Econophysics option pricing CUDA project simulating evolutions of the underlying asset through a gaussian Monte Carlo approach. Computes European-style forward contracts, call/put plain vanilla and performance corridor options with given time to maturity and key parameters. Includes sample Bash and Python 3 scripts for parameter analysis automation.
 
 ## Tree structure
 ```
